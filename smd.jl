@@ -1,7 +1,7 @@
 
 # the first step is to load the `EoM` and other support libraries.
 using EoM, Plots
-gr() # choose plotting engine
+plotly() # choose plotting engine
 
 # we ask EoM to build a folder of example systems like the spring mass damper; you can build your own input files for other systems, but EoM has many examples; you should look into those files to see the structure of an EoM input file.
 
@@ -125,10 +125,12 @@ write_html(
     p2,
     p3,
     folder = "output",
-    filename = "result",
     :verbose,
     bode = [3],
 )
 # make the Bode plot using the third ouput (kx) only, because the Bode plot should be dimensionless, i.e., input and output should have the same units, so we plot the ratio of psring force to applied force, as a function of frequency
+
+using EoM_X3D
+animate_modes(my_sys[1], my_result[1], scale=0.2)
 
 println("Done.")

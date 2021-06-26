@@ -204,4 +204,7 @@ p4 = plot(x.t, y[:, 3]; ylims=(0,Inf), xlabel, ylabel, label, lw)
 # pass all the results and plots to the html writer, skip the bode plots
 write_html(my_sys, my_result, p1, p2, p3, p4, bode = [])
 
+using EoM_X3D
+animate_modes(my_sys[1], my_result[1])
+
 println("Done.")

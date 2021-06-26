@@ -11,10 +11,10 @@ include(joinpath("examples", "input_ex_yaw_plane.jl"))
 m = 1500
 a = 1.5
 b = 1.6
-temp(x) = input_ex_yaw_plane(u = x; m, a, b)
+temp(x) = input_ex_yaw_plane(;u = x, m, a, b)
 # Here we set the speed, which get copied as vpts argument in run_eom, which in turn gets sent one at a time to the temp function, which finally sends them to the input_ex_yaw_plane function
-speed = 1:0.5:25
-my_sys, my_eqns = run_eom(temp, vpts = speed, :verbose)
+vpts = 1:0.5:25
+my_sys, my_eqns = run_eom(temp, :verbose; vpts)
 my_result = analyze(my_eqns, :verbose)
 
 function steer(t)
@@ -63,7 +63,7 @@ p4 = plot(t, [res[4, :] d]; xlabel, ylabel, label, lw)
 xlabel = "x [m]"
 ylabel = "y [m]"
 label = ""
-p5 = plot(speed[end] * t, res[5, :]; xlabel, ylabel, label, lw)
+p5 = plot(vpts[end] * t, res[5, :]; xlabel, ylabel, label, lw)
 
 write_html(
     my_sys,

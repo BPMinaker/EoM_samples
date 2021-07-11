@@ -1,4 +1,4 @@
-using OrdinaryDiffEq, EoM, Interpolations, Plots
+using EoM, Interpolations, Plots
 plotly() # choose plot engine, need plotly for html format plots
 
 # call EoM function to build example input systems
@@ -62,12 +62,10 @@ Zr0 = my_sys[1].flex_points[2].preload[1]
 println("Static Zf=", round(Zf0, digits = 2), " N")
 println("Static Zr=", round(Zr0, digits = 2), " N")
 
-# build the function that solves the equation of motion
+# build the function that is the input to the equation of motion
 # we will call this function through the ODE solver
-# note the in Julia, we can write back into the arguments, and in this case, we will use the values in x and t to compute and return x_dot
-# this is actually faster, as the computer does not need to allocate space to store the result at each time step
-function eqn_of_motion(xdot, x, p, t)
-    #println("t ",t)
+function u(x,t)
+    # println("t ",t)
     # set empty inputs
     u = [0.0; 0.0]
     # u[1] aero resistance force
@@ -119,42 +117,16 @@ function eqn_of_motion(xdot, x, p, t)
     # set traction force
     u[2] = X
 
-    # solve for xdot
-    # note the .= ; this is because the memory for xdot is already allocated, and part of the input argument
-    # we use the .= to ensure we write into this existing memory rather than overwriting, and storing in a new location, allows the integrator to work more efficiently
-    xdot .= A * x + B * u
+    # return u
+    u
 end
 
-# define stopping condition (when distance travelled - 1/4 mile > 0)
-function dist_to_end(x, t, integrator)
-    y = C * x
-    y[1] - 402.336
-end
-
-# time to simulate
-tf = 30.0
-# choose the time interval
-tspan = (0.0, tf)
-# define initial positon and velocity, all zeros
-x0 = zeros(size(A, 1))
-# define and solve the ODE
-prob = ODEProblem(eqn_of_motion, x0, tspan)
-cb = ContinuousCallback(dist_to_end, terminate!, interp_points = 1000)
-x = solve(prob, Tsit5(), saveat = 0.01, callback = cb, progress = true)
-# the return argument x is actually a function that we can evaluate at any time but we choose to store it at 0.01 second intervals so we can treat it as data, in the structured variable x (x.u is a vector of vectors, one output vector every 0.01 seconds, time is in x.t)
-
-# back calculate the acceleration from the velocity
-# start by defining xdot as a vector of zeros, the same length as the size of the solution
-xdot = [zeros(size(x[1])) for i in x.u]
-# call the equation of motion, and fill in xdot, note the .( to call as a vector, using each entry in xdot, x.u, x.t
-eqn_of_motion.(xdot, x.u, 0, x.t)
-
-# take all those individual x.u vectors at each t and stack them into a matrix, using horizontal concatenation
-# the hcat function sticks things together, and the splatting operator ... takes all the vectors and makes them into a sequence of arguments, equivalent to writing out hcat(x.u[1],x.u[2],x.u[3],etc)
-# then multiply by C, to change states (x) to outputs (y) and transpose the result from rows to columns using '
-y = (C * hcat(x.u...))'
-# do the same for ydot, but only keep the 2nd column (acceleration), the first column is redunant, and last two aren't of interest
-ydot = (C*hcat(xdot...))[2, :]
+## solve the ODE, and convert result to columns
+xu = 0
+t = 0:0.01:30
+y, xu = splsim(my_result[1].ss_eqns, u, t, flag = true)
+y = hcat(y...)'
+ydot = (C * [A B] * xu)[2,:]
 
 y[:, 2] *= 3.6 # scale second column to convert to km/h
 y[:, 3] .+= y[:, 4] # add damping load to spring load, note .+= increments each entry in column 3 by the corresponding entry in column 4
@@ -163,24 +135,29 @@ y[:, 3] .+= Zr0 # add static load, note .+= increments each entry in the vector
 y[:, 3] /= 1000 # scale third column to get kN
 ydot /= 9.81 # acc'n in g
 
+# linear interpolation to find 1/4 mile, 60 mph times
+# note 1/4 mile = 402.336 m, 60 mph = 96.5606 km/h
+interp_ts = LinearInterpolation(y[:, 1], t)
+interp_ut = LinearInterpolation(t, y[:, 2])
+interp_tu = LinearInterpolation(y[:, 2], t)
+
 # find quarter mile time and speed, round it, and print
-if x.t[end] < tf
+if y[end, 1] > 402.336
+    tf = interp_ts(402.336)
     println(
         "Quarter mile time: ",
-        round(x.t[end], digits = 2),
+        round(tf, digits = 2),
         " s at ",
-        round(y[end, 2], digits = 1),
+        round(interp_ut(tf), digits = 1),
         " km/h.",
     )
 else
-    println("Simulation ended before 1/4 mile!")
+    println("Simulation ended before 1/4 mile!  Increase the time interval.")
 end
 
-# linear interpolation to find 60 mph, note 60 mph = 96.5606 km/h
-
+# find 0-60 time, round it, and print
 if y[end, 2] > 96.5606
-    interp = LinearInterpolation(y[:, 2] , x.t)
-    println("0-60 mph time: ",round(interp(96.5606), digits = 2), " s.")
+    println("0-60 mph time: ",round(interp_tu(96.5606), digits = 2), " s.")
 else
     println("Simulation ended below 60 mph!")
 end
@@ -190,21 +167,69 @@ xlabel = "Time [s]"
 label = ""
 
 ylabel = "Distance [m]"
-p1 = plot(x.t, y[:, 1]; xlabel, ylabel, label, lw)
+plots = [plot(t, y[:, 1]; xlabel, ylabel, label, lw)]
 
 ylabel = "Velocity [km/h]"
-p2 = plot(x.t, y[:, 2]; xlabel, ylabel, label, lw)
+push!(plots,plot(t, y[:, 2]; xlabel, ylabel, label, lw))
 
 ylabel = "Accl'n [g]"
-p3 = plot(x.t, ydot; xlabel, ylabel, label, lw)
+push!(plots, plot(t, ydot; xlabel, ylabel, label, lw))
 
 ylabel = "Z_r [kN]"
-p4 = plot(x.t, y[:, 3]; ylims=(0,Inf), xlabel, ylabel, label, lw)
+push!(plots, plot(t, y[:, 3]; ylims=(0,Inf), xlabel, ylabel, label, lw))
 
 # pass all the results and plots to the html writer, skip the bode plots
-write_html(my_sys, my_result, p1, p2, p3, p4, bode = [])
+write_html(my_sys, my_result, plots, bode = [])
 
 using EoM_X3D
 animate_modes(my_sys[1], my_result[1])
 
 println("Done.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # define stopping condition (when distance travelled - 1/4 mile > 0)
+# function dist_to_end(x, t, integrator)
+#     y = C * x
+#     y[1] - 402.336
+# end
+
+# # time to simulate
+# tf = 30.0
+# # choose the time interval
+# tspan = (0.0, tf)
+# # define initial positon and velocity, all zeros
+# x0 = zeros(size(A, 1))
+# # define and solve the ODE
+# prob = ODEProblem(eqn_of_motion, x0, tspan)
+# cb = ContinuousCallback(dist_to_end, terminate!, interp_points = 1000)
+# x = solve(prob, Tsit5(), saveat = 0.01, callback = cb, progress = true)
+# # the return argument x is actually a function that we can evaluate at any time but we choose to store it at 0.01 second intervals so we can treat it as data, in the structured variable x (x.u is a vector of vectors, one output vector every 0.01 seconds, time is in x.t)
+
+# # back calculate the acceleration from the velocity
+# # start by defining xdot as a vector of zeros, the same length as the size of the solution
+# xdot = [zeros(size(x[1])) for i in x.u]
+# # call the equation of motion, and fill in xdot, note the .( to call as a vector, using each entry in xdot, x.u, x.t
+# eqn_of_motion.(xdot, x.u, 0, x.t)
+
+# # take all those individual x.u vectors at each t and stack them into a matrix, using horizontal concatenation
+# # the hcat function sticks things together, and the splatting operator ... takes all the vectors and makes them into a sequence of arguments, equivalent to writing out hcat(x.u[1],x.u[2],x.u[3],etc)
+# # then multiply by C, to change states (x) to outputs (y) and transpose the result from rows to columns using '
+# y = (C * hcat(x.u...))'
+# # do the same for ydot, but only keep the 2nd column (acceleration), the first column is redunant, and last two aren't of interest
+# ydot = (C*hcat(xdot...))[2, :]
+
+
+
+
+

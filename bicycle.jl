@@ -10,4 +10,4 @@ vpts = 0.1:0.2:10
 my_sys, my_eqns = run_eom(temp, :verbose; vpts)
 my_result = analyze(my_eqns, :verbose)
 
-write_html(my_sys, my_result)
+write_html(my_sys, my_result, :verbose)

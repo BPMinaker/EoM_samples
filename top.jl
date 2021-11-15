@@ -2,12 +2,16 @@ using EoM
 
 build_examples()
 include(joinpath("examples", "input_ex_top.jl"))
+f(x) = input_ex_top(r = x)
 
-temp(x) = input_ex_top(r=x)
-vpts = 0.:0.1:10
-my_sys, my_eqns=run_eom(temp, :verbose; vpts)
-my_result = analyze(my_eqns, :verbose)
+vpts= 0:10/50:10
+system = f.(vpts)
 
-write_html(my_sys, my_result, :verbose; ss = [], vpt_name=["r" "Angular speed" "rad/s"])
+output = run_eom!.(system, vpts .== 0)
+result = analyze(output, true)
+
+summarize(system, vpts, result; ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
+
+# write_html(system, vpts, result; ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
 
 println("Done.")

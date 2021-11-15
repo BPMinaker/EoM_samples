@@ -8,14 +8,16 @@ a = 1.5
 b = 1.3
 cf = 100
 cr = 100
-I = 2000
+Iy = 2000
+system = input_ex_half_car(; m, a, b, cf, cr, Iy)
+output = run_eom!(system)
+result = analyze(output)
 
-temp() = input_ex_half_car(;m, a, b, cf, cr, I)
-my_sys, my_eqns = run_eom(temp)
-my_result = analyze(my_eqns)
-write_html(my_sys, my_result)
+summarize(system, result)
 
-using EoM_X3D
-animate_modes(my_sys[1], my_result[1])
+#write_html(system, result)
+
+#using EoM_X3D
+#animate_modes(system, result())
 
 println("Done.")

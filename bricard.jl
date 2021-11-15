@@ -1,15 +1,18 @@
 
-using EoM, EoM_X3D
+using EoM
 
 build_examples()
 include(joinpath("examples", "input_ex_bricard.jl"))
 
-temp() = input_ex_bricard(m=2,l=0.4)
-my_sys, my_eqns = run_eom(temp)
-my_result = analyze(my_eqns)
+system = input_ex_bricard(m = 2, l = 0.4)
+output = run_eom!(system)
+result = analyze(output)
 
-animate_modes(my_sys[1], my_result[1])
+summarize(system, result)
 
-write_html(my_sys, my_result)
+# write_html(system, result)
+
+# using EoM_X3D
+# animate_modes(system, result())
 
 println("Done.")

@@ -7,15 +7,22 @@ include(joinpath("examples", "susp.jl"))
 include(joinpath("examples", "tire.jl"))
 
 # here you can enter your vehicle specs by name, and set the speed
-a = 2.65*0.58
-tw=1.94-0.23
-r=0.346
+a = 2.65 * 0.58
+tw = 1.71
+r = 0.346
+vpts = 10
 
-temp(x) = quarter_car_a_arm_pushrod(;u = x, a, tw, r)
-my_sys, my_eqns = run_eom(temp, vpts = 10, :verbose)
-my_result = analyze(my_eqns, :verbose, decomp = true)
 
-write_html(my_sys, my_result, :verbose)
+f(x) = quarter_car_a_arm_pushrod(; u = x, a, tw, r)
+system = f.(vpts)
 
-using EoM_X3D
-animate_modes(my_sys[1], my_result[1], :verbose)
+output = run_eom!(system)
+result = analyze(output)
+
+summarize(system, result)
+
+
+#write_html(system, result)
+
+#using EoM_X3D
+#animate_modes(system, result())

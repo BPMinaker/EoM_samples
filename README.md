@@ -15,5 +15,7 @@ These are a bunch of sample input files for EoM.  You can edit them for your use
 12. disk model. the simple rolling disk, well studied in the literature
 13. pendulum model.  A single body supported by a massless wire, from Anderson's Engineering Dynamics
 14. bricard model. A famous complicated 3D 5 body mechanism, has redundant constraints, but still moves, small motions only
-15. rotor stator model.  A benchmark from the literature
+15. rotor stator model.  A benchmark from the literature, see Negrut and Ortiz 2006 paper
 16. spining top model.  A classic problem in dynamics
+17. Euler beam element model. EoM allows you to include beams with or without mass in your models
+

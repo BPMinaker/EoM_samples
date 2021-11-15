@@ -1,4 +1,3 @@
-
 using EoM
 
 build_examples()
@@ -10,14 +9,17 @@ kf = 25000
 kr = 30000
 cf = 0
 cr = 0
-I = 2000
+Iy = 2000
 
-temp() = input_ex_bounce_pitch(;m, a, b, kf, kr, cf, cr, I)
-my_sys, my_eqns = run_eom(temp)
-my_result = analyze(my_eqns)
-write_html(my_sys, my_result)
+system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
+output = run_eom!(system)
+result = analyze(output)
+
+summarize(system, result)
+
+# write_html(system, result)
 
 using EoM_X3D
-animate_modes(my_sys[1], my_result[1])
+animate_modes(system, result())
 
 println("Done.")

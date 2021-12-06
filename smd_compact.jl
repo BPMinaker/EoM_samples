@@ -1,15 +1,27 @@
 using EoM
 
+# this file repeats the spring mass damper example, but shows how we can analyze a series of systems, using Julia's dot notation
+
 build_examples()
 include(joinpath("examples", "input_ex_smd.jl"))
 
-k = 5
-m = 1
-c = 0.2
-system = input_ex_smd(; k, m, c)
-output = run_eom!(system)
+k = 1.0
+m = 1.0
+
+# here we redefine the input function, so we can call it using any value of c
+f(x) = input_ex_smd(; k, m, c = x)
+# then we define the range of values for c
+vpts = 0:0.03:3
+# then we call the function using the dot notation
+system = f.(vpts)
+# we take the vector of input systems, and generate the equations for all of them, again using dot notation
+output = run_eom!.(system)
+# now, the `analyze()` function has been written using another feature of Julia, called `multiple dispatch`, which allows the same function to do different things, depending on the type of arguments
+# analyze will behave differently if `output` is a vector
 result = analyze(output)
 
-summarize(system, result; bode = [3])
+summarize(system, vpts, result; ss = [], bode = [3], vpt_name = ["c" "Damping coefficient" "Ns/m"])
+
+write_output(system, vpts, result)
 
 println("Done.")

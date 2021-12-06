@@ -1,7 +1,6 @@
-# you might find it helpful to turn on 'word wrapping' in VSCode; go to File Preferences Setting, and search for 'wrap'; change the setting to 'on'
+# you might find it helpful to turn on 'word wrapping' in VSCode; go to File, Preferences, Settings, and search for 'wrap'; change the setting to 'on'
 
 # the first step is to load the `EoM` and other support libraries
-
 using EoM, Plots
 plotly() # choose plotting engine
 
@@ -34,15 +33,15 @@ m = 1
 c = 0.2
 system = input_ex_smd(; k, m, c)
 
-# the advantage of this form is that now `m`, `c`, and `k` are available to use elsewhere in the code, if we wanted, and if we call `temp()` after any changes to `m`, `c`, or `k`, the updated values are used
+# the advantage of this form is that now `m`, `c`, and `k` are available to use elsewhere in the code, if we wanted, and if we call `input_ex_smd()` after any changes to `m`, `c`, or `k`, the updated values are used
 
 # we send the `system` to `run_eom()`; the optional argument tells `run_eom()` to print out progress to the screen
 
 output = run_eom!(system, true)
 
-println("Results...")
+println("Equations...")
 
-# the equations of motion are stored as descriptor state space systems (A,B,C,D,E) in `output`, so again we use `.()` to print all the enties, or `eqns[1]` to print the first entry
+# the equations of motion are stored as descriptor state space systems (A,B,C,D,E) in `output`
 
 println(output)
 
@@ -56,11 +55,11 @@ result = analyze(output, true)
 
 println(result)
 
-println.(result.ss_eqns)
+println(result.ss_eqns)
 
 # the results of the eigenvalue analysis are available; here we can use `display()` instead of `println()` as it formats vectors and matrices nicely; note that a second order system has two eigenvalues, but they are complex conjugates
 
-display.(result.e_val)
+display(result.e_val)
 
 # we can also print the natural frequencies, the damping ratios, the time constants, and the wavelengths; in this case, there are two of each, but they are all duplicate pairs, as they are calculated from conjugate eigenvalues; we can do this with a special function, using any variable name that is returned by the `analyze()` function; in this case `result` is data, but `result(vpt)` is a function, that returns the result from a particular vpt, in this case, 0
 
@@ -103,36 +102,38 @@ xlabel = "Time [s]"
 ylabel = "z [m], z dot [m/s], f [N]"
 label = ["z" "zdot" "f"]
 
+p1 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
+display(p1)
 
-plots = [plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)]
-display(plots[1])
-
-# the plot is stored in a vector called `plots`, and then sent to the screen using `display()`; this plot should show up in a tab in VS Code
+# the plot is stored and then sent to the screen using `display()`; this plot should show up in a tab in VS Code
 
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `u()` is defined as a function of `w` so all we have to do is update `w`, and `u()` will update as well
 
 w = 0.5 * result.omega_n[1][1]
-
 y = splsim(result.ss_eqns[1], u, t)
 res = hcat(y...)'
 u_t = u.(0, t)
 
-push!(plots, plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label))
+p2 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
+display(p2)
 
-# we can use the `push!()` function to add a new entry onto an existing vector of plots
 
 w = 2.0 * result.omega_n[1][1]
-
 y = splsim(result.ss_eqns[1], u, t)
 res = hcat(y...)'
 u_t = u.(0, t)
 
-push!(plots, plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label))
+p3 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
+display(p3)
 
-# to make a much more convenient result, we can send the system definition, the analysis results, and any extra plots to a helper function called `write_html()` to make a nice summary; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; you can change the folder name and filename with keyword arguments `folder` and `filename` if you really want; the default filename is taken from the model name in the input file; the data is also written to individual files as `output/date/filename/time/plot_1.html`, etc., which won't get overwritten if you run the analysis again, but the main html output file does, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
-
-write_html(system, result, true; plots, bode = [3])
+# to make a convenient result, we can send the system definition, the analysis results, and any extra plots to a helper function called `summarize()`
+summarize(system, result, true; bode = [3])
 
 # here, we make the Bode (i.e., frequency response) plot using the third ouput (kx) only, because the Bode plot should be dimensionless, i.e., input and output should have the same units, so we plot the ratio of spring force to applied force, as a function of frequency; the spring force is proportional to displacement, so we are really looking at displacement response, but in a nondimensional way; we should see a resonance near the natural frequency, as long as the damping ratio is below 0.707; note that at low frequencies, the spring force will nearly equal the applied force, so the Bode plot will tend toward 1.0, or 0 [dB] (remember the decibel is a logarithmic unit); at high frequency, the applied force changes direction so quickly, the mass doesn't have time to respond, so the motion becomes very small, i.e., 0.0 or -∞ [dB]
+
+
+# alternatively, we can send the analysis results, and any extra plots to a helper function called `write_html()` to make a nice summary; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; you can change the folder name and filename with keyword arguments `folder` and `filename` if you really want; the default filename is taken from the model name in the input file; the data is also written to individual files as `output/date/filename/time/plot_1.html`, etc., which won't get overwritten if you run the analysis again, but the main html output file does, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
+
+# write_html(system, result, true; plots = [p1, p2, p3], bode = [3])
 
 println("Done.")

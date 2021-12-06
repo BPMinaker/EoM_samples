@@ -1,4 +1,3 @@
-
 using EoM, Plots
 plotly()
 

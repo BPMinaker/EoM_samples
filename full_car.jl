@@ -1,5 +1,4 @@
-using EoM, Plots
-plotly()
+using EoM
 
 build_examples()
 include(joinpath("examples", "input_ex_full_car.jl"))

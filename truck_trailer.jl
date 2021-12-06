@@ -9,20 +9,19 @@ Iz = 3508
 d = 2.7
 e = 2.9
 h = 0.1
-f(x) = input_ex_truck_trailer(; u = x, m, Iz, d, e, h)
-
+mt = 2000
+It = 3000
 vpts = 1:0.5:35
-system = f.(vpts)
 
+f(x) = input_ex_truck_trailer(; u = x, m, Iz, d, e, h, mt, It)
+system = f.(vpts)
 output = run_eom!.(system, vpts .== 1)
 verbose = true
 result = analyze(output, verbose)
 
-# println(result(25))
-# println(result(vpts))
-
 # equations are known, let's solve a time history
-
+# pulse function is 1 from t=1 to t=3, zero otherwise
+# sin(pi * t) has a wavelength of 2 seconds (2 pi/ pi)
 function steer(x, t)
     EoM.pulse(t, 1, 3) * 2 * sin(pi * (t - 1))
 end
@@ -32,7 +31,7 @@ t = 0:0.05:20
 # solve the equations of motion using the EoM sparse linear solver, with the input function we just defined
 # we didn't send an inital condition, so the solver assumes all zeros
 # choose the equations of motion for 18 m/s (note function notation)
-n = findfirst(vpts .== 20)
+n = findfirst(vpts .== 18)
 
 y = splsim(result(n).ss_eqns, steer, t)
 # merge vector of vectors into matrix, so we can pull out individual outputs (rows) to plot

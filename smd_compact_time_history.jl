@@ -32,7 +32,6 @@ label = ["z" "zdot" "f"]
 my_plot = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
 display(my_plot)
 
-#plots = [my_plot]
-#write_html(system, result; plots, bode = [3])
+summarize(system, result; bode = [3])
 
 println("Done.")

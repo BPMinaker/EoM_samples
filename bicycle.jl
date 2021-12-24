@@ -11,5 +11,7 @@ verbose = (vpts .== 0.1)
 output = run_eom!.(system, verbose)
 result = analyze(output, true)
 
-summarize(system, vpts, result, true)
+ss = []
+bode = []
+summarize(system, vpts, result, true; ss, bode)
 # write_html(system, vpts, result, true)

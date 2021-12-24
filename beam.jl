@@ -15,7 +15,8 @@ verbose = true
 output = run_eom!(system, verbose)
 result = analyze(output, verbose)
 
-summarize(system, result, verbose)
+bode = [1 0; 0 1]
+summarize(system, result, verbose; bode)
 
 #using EoM_X3D
 #animate_modes(system, result(), num = 8)

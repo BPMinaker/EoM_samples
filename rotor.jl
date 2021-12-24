@@ -10,7 +10,9 @@ system = f.(vpts)
 output = run_eom!.(system, vpts .== 0)
 result = analyze(output, true)
 
-summarize(system, vpts, result, ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
+
+bode = [1 0; 1 0; 0 1]
+summarize(system, vpts, result; bode, ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
 
 # write_html(system, vpts, result, ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
 

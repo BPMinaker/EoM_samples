@@ -73,7 +73,7 @@ result = analyze(output, true)
 
 # to make a convenient result, we can send the system definition, the analysis results to a helper function called `summarize()` that prints all the results in nice tables or plots as necessary
 
-summarize(system, result; bode = [3])
+summarize(system, result; bode = [0, 0, 1])
 
 # here, we make the Bode (i.e., frequency response) plot using the third ouput (kx) only, because the Bode plot should be dimensionless, i.e., input and output should have the same units, so we plot the ratio of spring force to applied force, as a function of frequency; the spring force is proportional to displacement, so we are really looking at displacement response, but in a nondimensional way; we should see a resonance near the natural frequency, as long as the damping ratio is below 0.707; note that at low frequencies, the spring force will nearly equal the applied force, so the Bode plot will tend toward 1.0, or 0 [dB] (remember the decibel is a logarithmic unit); at high frequency, the applied force changes direction so quickly, the mass doesn't have time to respond, so the motion becomes very small, i.e., 0.0 or -∞ [dB]
 

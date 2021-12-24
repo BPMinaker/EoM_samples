@@ -25,6 +25,6 @@ result = analyze(output)
 
 
 # summarize also recognizes that the result is a vector, so it drops the tables, and gives a different series of plots
-summarize(system, vpts, result; ss = [], bode = [3], vpt_name = ["c" "Damping coefficient" "Ns/m"])
+summarize(system, vpts, result; ss = [], bode = [0,0,1], vpt_name = ["c" "Damping coefficient" "Ns/m"])
 
 println("Done.")

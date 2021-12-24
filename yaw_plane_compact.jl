@@ -13,8 +13,8 @@ system = f.(vpts)
 output = run_eom!.(system, vpts .== 1)
 result = analyze(output, true)
 
-ss = [1, 2, 3, 4]
-bode = [2, 3]
+ss = [1, 1, 1, 1, 0, 0, 0]
+bode = [0, 1, 1, 0, 0, 0, 1]
 summarize(system, vpts, result; ss, bode)
 
 println("Done.")

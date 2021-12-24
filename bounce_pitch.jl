@@ -18,9 +18,9 @@ system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
 output = run_eom!(system)
 result = analyze(output)
 
-#summarize(system, result)
-write_output(system, result)
+summarize(system, result)
 
+#write_output(system, result)
 # write_html(system, result)
 
 #using EoM_X3D

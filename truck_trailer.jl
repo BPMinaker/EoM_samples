@@ -67,8 +67,9 @@ ylabel = "Lateral acceleration [g], Steer angle [deg]"
 label = ["Lateral acceleration" "Steer angle"]
 push!(plots, plot(t, [res[5, :] delta]; xlabel, ylabel, label, lw))
 
-summarize(system, vpts, result, verbose; plots, bode = [2, 3, 4])
+bode = [0, 1, 1, 1, 0, 0]
+summarize(system, vpts, result, verbose; plots, bode)
 
-# write_html(system, vpts, result, verbose; plots, bode = [2, 3, 4])
+# write_html(system, vpts, result, verbose; plots, bode)
 
 println("Done.")

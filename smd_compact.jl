@@ -30,8 +30,11 @@ ylabel = "z [m], z dot [m/s], f [N]"
 label = ["z" "zdot" "f"]
 
 my_plot = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
-display(my_plot)
+# we can display the plot like:
+# display(my_plot)
+# or we can add it to a vector of plots, and send it to the `summarize()` function
+plots = [my_plot]
 
-summarize(system, result; bode = [3])
+summarize(system, result; plots, bode = [0,0,1])
 
 println("Done.")

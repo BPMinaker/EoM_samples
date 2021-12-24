@@ -116,7 +116,6 @@ push!(plots, plot(u * t, [res[:, 5] first.(track.(u * t))]; xlabel, ylabel, labe
 # write all the stuff to the output; skip steady state, Bode plots
 ss = []
 bode = []
-
 summarize(system, result, false; plots, ss, bode)
 # write_html(system, result, false; plots, ss, bode)
 

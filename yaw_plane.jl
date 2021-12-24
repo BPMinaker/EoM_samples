@@ -93,12 +93,12 @@ ylabel = "y [m]"
 label = ""
 push!(plots, plot(vel * t, y_dist; xlabel, ylabel, label, lw))
 
-# write all the results; steady state plots of outputs 1 through 4, but Bode of only 2 and 3, as they are the only ones where input and output have the same units
+# write all the results; steady state plots of outputs 1 through 4, but Bode of only 2 and 3, as they are the only ones where input and output have the same units, add bode of dimensionless yaw rate
 
-ss = [1, 2, 3, 4]
-bode = [2, 3]
+ss = [1, 1, 1, 1, 0, 0, 0]
+bode = [0, 1, 1, 0, 0, 0, 1]
 
 summarize(system, vpts, result; plots, ss, bode)
-#write_html(system, vpts, result, verbose; plots, ss, bode)
+# write_html(system, vpts, result, true; plots, ss, bode)
 
 println("Done.")

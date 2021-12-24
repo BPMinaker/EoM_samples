@@ -12,6 +12,4 @@ result = analyze(output, true)
 
 summarize(system, vpts, result; ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
 
-# write_html(system, vpts, result; ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
-
 println("Done.")

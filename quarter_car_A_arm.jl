@@ -17,8 +17,8 @@ output = run_eom!(system)
 result = analyze(output)
 
 summarize(system, result)
-write_output(system, result)
-#write_html(system, result)
 
 #using EoM_X3D
 #animate_modes(system, result())
+
+println("Done.")

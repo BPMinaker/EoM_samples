@@ -61,9 +61,9 @@ println("Static Zr=", round(Zr0, digits = 2), " N")
 result = analyze(output)
 
 # save the state space matrices in a convenient notation
-A = result.ss_eqns[1].A
-B = result.ss_eqns[1].B
-C = result.ss_eqns[1].C
+A = result.ss_eqns.A
+B = result.ss_eqns.B
+C = result.ss_eqns.C
 
 # build the function that is the input to the equation of motion (i.e., the external forces)
 # we will call this function through the ODE solver
@@ -134,7 +134,7 @@ println("Solving time history...")
 t = 0:0.01:30
 # pass the state space matrices, the input function, and the time interval to the solver
 # it will assume zeros as inital conditions
-y = splsim(result.ss_eqns[1], u, t)
+y = splsim(result.ss_eqns, u, t)
 # convert the vector of vectors to a matrix, and transpose it so the outputs are in columns for plotting
 y = hcat(y...)'
 
@@ -187,7 +187,5 @@ push!(plots, plot(t, y[:, 4]; ylims = (0, Inf), xlabel, ylabel, label, lw))
 
 # pass all the results and plots, skip the Bode plots for now
 summarize(system, result; plots, bode = [])
-
-# write_html(system, result; plots, bode = [])
 
 println("Done.")

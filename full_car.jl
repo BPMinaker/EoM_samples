@@ -17,9 +17,9 @@ result = analyze(output)
 
 summarize(system, result)
 
-# write_html(system, result)
+# summarize(system, result, format = :html)
 
-#using EoM_X3D
-#animate_modes(system, result(), scale = 0.2)
+# using EoM_X3D
+# animate_modes(system, result, scale = 0.2)
 
 println("Done.")

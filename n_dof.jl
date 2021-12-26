@@ -9,5 +9,5 @@ result = analyze(output, true)
 
 summarize(system, result)
 
-#using EoM_X3D
-#animate_modes(system, result(), scale = 0.5)
+# using EoM_X3D
+# animate_modes(system, result, scale = 0.5)

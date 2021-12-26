@@ -14,10 +14,10 @@ result = analyze(output)
 # equations of motion are found, now do time history solution
 
 t = 0:0.02:20
-w = 0.95 * result.omega_n[1][1]
+w = 0.95 * result.omega_n[1]
 
 u(x, t) = sin(2pi * w * t)
-y = splsim(result.ss_eqns[1], u, t)
+y = splsim(result.ss_eqns, u, t)
 
 # time history done, now make plots
 
@@ -36,5 +36,7 @@ my_plot = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
 plots = [my_plot]
 
 summarize(system, result; plots, bode = [0,0,1])
+
+# summarize(system, result; plots, bode = [0,0,1], format = :html)
 
 println("Done.")

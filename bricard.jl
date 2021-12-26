@@ -10,6 +10,6 @@ result = analyze(output)
 summarize(system, result)
 
 # using EoM_X3D
-# animate_modes(system, result())
+# animate_modes(system, result)
 
 println("Done.")

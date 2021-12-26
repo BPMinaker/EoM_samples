@@ -8,7 +8,7 @@ vpts= 0:10/50:10
 system = f.(vpts)
 
 output = run_eom!.(system, vpts .== 0)
-result = analyze(output, true)
+result = analyze.(output, vpts .== 0)
 
 summarize(system, vpts, result; ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
 

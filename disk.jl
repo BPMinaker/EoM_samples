@@ -8,11 +8,9 @@ vpts = 0:3/50:3
 
 system = f.(vpts)
 output = run_eom!.(system)
-result = analyze(output)
+result = analyze.(output)
 
 summarize(system, vpts, result)
-
-#write_html(system, vpts, result)
 
 println("Done.")
 

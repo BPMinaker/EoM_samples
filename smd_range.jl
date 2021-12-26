@@ -20,11 +20,13 @@ system = f.(vpts)
 # we take the vector of input systems, and generate the equations for all of them, again using dot notation
 output = run_eom!.(system)
 
-# the `analyze()` function has been written using another feature of Julia, called `multiple dispatch`, which allows the same function to do different things, depending on the type of arguments, analyze will behave differently if `output` is a vector of results, so we don't need the .()
-result = analyze(output)
+###### the `analyze()` function has been written using another feature of Julia, called `multiple dispatch`, which allows the same function to do different things, depending on the type of arguments, analyze will behave differently if `output` is a vector of results, so we don't need the .()
+result = analyze.(output)
 
 
 # summarize also recognizes that the result is a vector, so it drops the tables, and gives a different series of plots
 summarize(system, vpts, result; ss = [], bode = [0,0,1], vpt_name = ["c" "Damping coefficient" "Ns/m"])
+
+# summarize(system, vpts, result; ss = [], bode = [0,0,1], vpt_name = ["c" "Damping coefficient" "Ns/m"], format = :html)
 
 println("Done.")

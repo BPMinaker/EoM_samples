@@ -13,13 +13,12 @@ r = 0.346
 vpts = 10
 
 f(x) = input_full_car_a_arm_pushrod(; u = x, a, b, tw, r)
-system = f.(vpts) 
+system = f(vpts) 
 output = run_eom!(system)
 result = analyze(output)
 
 summarize(system, result)
+# summarize(system, result, format = :html)
 
-#write_html(system, result)
-
-#using EoM_X3D
-#animate_modes(system, result())
+using EoM_X3D
+animate_modes(system, result)

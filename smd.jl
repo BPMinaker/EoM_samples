@@ -89,7 +89,7 @@ t = 0:0.02:20
 
 # note that unlike Matlab, Julia makes a distinction between a vector of vectors and a matrix; we can acess a vector of vectors like so: a[2][3] to the get third entry in the second vector, where for a matrix a[2,3] gives the entry in the second row, third column; here, we pick the first entry in the first vector of the natural frequency, and choose an excitation frequency that's very close to that
 
-w = 0.95 * result.omega_n[1][1]
+w = 0.95 * result.omega_n[1]
 
 # the input function we pass to `splsim()` has to be defined as a function of the state and time, i.e., it takes two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input
 
@@ -97,7 +97,7 @@ u(x, t) = sin(2pi * w * t)
 
 # we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time vector to EoM's own linear ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has three entries: z, z_dot, and kz; we could choose the initial state if we wanted ,but `splsim()` will just use zeroes if we don't specify anything else
 
-y = splsim(result.ss_eqns[1], u, t)
+y = splsim(result.ss_eqns, u, t)
 
 # the return argument `y` is a vector of vectors, one output vector for each time point, i.e., y[1] = y(t=0), y[2] = y(t=0.02); to read `y`, we use the `hcat()` function for horizontal concatenation (i.e., sticking column vectors together to form a matrix), and the `splatting` operator `...` to read all the entries from `y`; you can think of it as a short form for [y[1] y[2] ... y[end]]; we stick all the columns together, because we want to plot rows of the resulting matrix, so we transpose `res` using the apostrophe operator
 
@@ -123,24 +123,24 @@ display(p1)
 
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `u()` is defined as a function of `w` so all we have to do is update `w`, and `u()` will update as well
 
-w = 0.5 * result.omega_n[1][1]
-y = splsim(result.ss_eqns[1], u, t)
+w = 0.5 * result.omega_n[1]
+y = splsim(result.ss_eqns, u, t)
 res = hcat(y...)'
 u_t = u.(0, t)
 
 p2 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
 display(p2)
 
-w = 2.0 * result.omega_n[1][1]
-y = splsim(result.ss_eqns[1], u, t)
+w = 2.0 * result.omega_n[1]
+y = splsim(result.ss_eqns, u, t)
 res = hcat(y...)'
 u_t = u.(0, t)
 
 p3 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
 display(p3)
 
-# alternatively, we can send the analysis results, and any extra plots to a helper function called `write_html()` to make a nice summary; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; you can change the folder name and filename with keyword arguments `folder` and `filename` if you really want; the default filename is taken from the model name in the input file; the data is also written to individual files as `output/date/filename/time/plot_1.html`, etc., which won't get overwritten if you run the analysis again, but the main html output file does, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
+# alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; you can change the folder name and filename with keyword arguments `folder` and `filename` if you really want; the default filename is taken from the model name in the input file; the data is also written to individual files as `output/date/filename/time/plot_1.html`, etc., which won't get overwritten if you run the analysis again, but the main html output file does, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
 
-# write_html(system, result, true; plots = [p1, p2, p3], bode = [3])
+# summarize(system, result; bode = [0, 0, 1], plots = [p1, p2, p3], format = :html)
 
 println("Done.")

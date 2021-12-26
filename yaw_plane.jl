@@ -29,9 +29,7 @@ system = f.(vpts)
 output = run_eom!.(system, vpts .== 1)
 
 # do the eigenvalues, freq resp, etc, for each forward speed
-# analyze function is smart enough to accept a single output or a vector, so we don't need the dot notation
-
-result = analyze(output, true)
+result = analyze.(output, vpts .== 1)
 
 # now, let's also do some time domain solutions; define the input function of the state (x) and time (t), but in this case, ignore the state
 
@@ -48,7 +46,7 @@ t = 0:0.05:20
 
 vel = 20
 n = findfirst(vpts .== vel)
-y = splsim(result(n).ss_eqns, u, t)
+y = splsim(result[n].ss_eqns, u, t)
 
 # merge vector of vectors into matrix, so we can pull out individual outputs to plot, and re-evaluate the steer angle so we can include it in the plots 
 
@@ -99,6 +97,6 @@ ss = [1, 1, 1, 1, 0, 0, 0]
 bode = [0, 1, 1, 0, 0, 0, 1]
 
 summarize(system, vpts, result; plots, ss, bode)
-# write_html(system, vpts, result, true; plots, ss, bode)
+# summarize(system, vpts, result; plots, ss, bode, format = :html)
 
 println("Done.")

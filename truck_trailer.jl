@@ -16,8 +16,7 @@ vpts = 1:0.5:35
 f(x) = input_ex_truck_trailer(; u = x, m, Iz, d, e, h, mt, It)
 system = f.(vpts)
 output = run_eom!.(system, vpts .== 1)
-verbose = true
-result = analyze(output, verbose)
+result = analyze.(output,  vpts .== 1)
 
 # equations are known, let's solve a time history
 # pulse function is 1 from t=1 to t=3, zero otherwise
@@ -33,7 +32,7 @@ t = 0:0.05:20
 # choose the equations of motion for 18 m/s (note function notation)
 n = findfirst(vpts .== 18)
 
-y = splsim(result(n).ss_eqns, steer, t)
+y = splsim(result[n].ss_eqns, steer, t)
 # merge vector of vectors into matrix, so we can pull out individual outputs (rows) to plot
 res = hcat(y...)
 # evaluate the steer angle so we can include it in the plots 
@@ -68,8 +67,9 @@ label = ["Lateral acceleration" "Steer angle"]
 push!(plots, plot(t, [res[5, :] delta]; xlabel, ylabel, label, lw))
 
 bode = [0, 1, 1, 1, 0, 0]
-summarize(system, vpts, result, verbose; plots, bode)
+summarize(system, vpts, result, true; plots, bode)
+# summarize(system, vpts, result, true; plots, bode, format = :html)
 
-# write_html(system, vpts, result, verbose; plots, bode)
+summarize(system[n], result[n], true; bode)
 
 println("Done.")

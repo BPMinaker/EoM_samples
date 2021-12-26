@@ -27,7 +27,7 @@ println("Solving time history...")
 t = 0:0.0025:10
 
 # because our model is linear, we can use the built-in linear ODE solver in EoM (splsim); it's much simpler and faster than using the ODE toolbox
-y = splsim(result.ss_eqns[1], zoft, t)
+y = splsim(result.ss_eqns, zoft, t)
 res = hcat(y...)
 
 # using that small time step means that we get about 4000 solution points; a typical HD screen can only display 1920 pixels across, so there is no way we can display that much data in a graph; so, we filter out the data and plot, e.g., only every 4th point; we use [1:4:end] to pick every 4th point
@@ -53,8 +53,10 @@ push!(plots, plot(t, [z20 z0]; xlabel, ylabel, label, lw))
 
 summarize(system, result, verbose; plots)
 
+# summarize(system, result, verbose; plots, format = :html)
+
 # generate animations of the mode shapes
 # using EoM_X3D
-# animate_modes(system, result(), scale = 0.2)
+# animate_modes(system, result, scale = 0.2)
 
 println("Done.")

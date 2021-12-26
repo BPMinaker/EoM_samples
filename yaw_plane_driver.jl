@@ -71,7 +71,7 @@ steer(x, t) = steer_driver(result.ss_eqns[1].C * x, t)
 
 # solve the equation of motion with the closed loop driver model
 
-y = splsim(result.ss_eqns[1], steer, t)
+y = splsim(result.ss_eqns, steer, t)
 
 # go back and figure out what steer angle the sriver model used, so we can plot it
 

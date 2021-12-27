@@ -37,6 +37,7 @@ plots = [my_plot]
 
 summarize(system, result; plots, bode = [0,0,1])
 
+# we could also write to html output instead of the screen
 # summarize(system, result; plots, bode = [0,0,1], format = :html)
 
 println("Done.")

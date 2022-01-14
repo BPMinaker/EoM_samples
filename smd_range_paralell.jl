@@ -14,7 +14,6 @@ f(x) = input_ex_smd(; k, m, c = x)
 # then we define the range of values for c
 vpts = 0:0.003:3
 
-
 @time begin
 n = length(vpts)
 system = Vector{EoM.mbd_system}(undef, n)
@@ -29,9 +28,9 @@ end
 end
 
 @time begin
-system = f.(vpts)
-output = run_eom!.(system)
-result = analyze.(output)
+system2 = f.(vpts)
+output2 = run_eom!.(system2)
+result2 = analyze.(output2)
 end
 
 

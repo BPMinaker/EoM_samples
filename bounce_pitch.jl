@@ -20,7 +20,8 @@ result = analyze(output)
 
 summarize(system, result)
 
-# summarize(system, result, format = :html)
+# input_delay!(system, result, (a+b)/10, [1, 2])
+# summarize(system, result)
 
 #using EoM_X3D
 #animate_modes(system, result)

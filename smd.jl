@@ -14,17 +14,15 @@ build_examples(true)
 include(joinpath("examples", "input_ex_smd.jl"))
 
 # one of the cool features of Julia is that it allows `keyword arguments`, i.e., you can pass many arguments to a function, but you can include the name of the argument, so it doesn't matter if you mix up the order; the example input file `input_ex_smd.jl` allows you to redefine the values of the mass (m), the stiffness (k), and the damping (c) by defining the function like this:
-
-# function input_ex_smd(; m = 1.0, c = 0.1, k = 10.0)
-
+# function input_ex_smd(; m = 1.0, c = 0.1, k = 10.0) 
 # notice the semicolon in the definition; any values we don't supply just use defaults defined in the file; so, for example, we could call:
 
-# input_ex_smd(m = 1.2)
+# system = input_ex_smd(m = 1.2)
 
 # and the default values of c and k would be used; the drawback is that sometime you get cases like this:
 
 # m = 1.2
-# input_ex_smd(m = m)
+# system = input_ex_smd(m = m)
 
 # this is confusing and weird, but we can get around it by using a semicolon in the call to the function, if we want to send a local value to the same variable name in a function
 
@@ -33,19 +31,19 @@ m = 1
 c = 0.2
 system = input_ex_smd(; k, m, c)
 
-# the advantage of this form is that now `m`, `c`, and `k` are available to use elsewhere in the code, if we wanted, and if we call `input_ex_smd()` after any changes to `m`, `c`, or `k`, the updated values are used
+# the advantage of this form is that now `m`, `c`, and `k` are available to use elsewhere in the code, if we wanted, and if we call `input_ex_smd(; k, m, c)` again after any changes to `m`, `c`, or `k`, the updated values are used
 
-# the return variable system is a `structured` variable, i.e., a container variable that holds a hold of other variables inside it; these variables that are inside are called the properties, and you can find then using 
+# the return variable `system` is a `structured` variable, i.e., a container variable that holds a hold of other variables inside it; these variables that are inside are called the properties, and you can find them using:
 
 println("Properties of the system variable...")
 println(propertynames(system))
 
-# the variable `system`` holds all the information in a vector called `item`; we can see that using a dot operator, like this:
+# the variable `system` holds all the information in a vector called `item`; we can see that using a dot operator, like this:
 
 println("Items in the system...")
 println(system.item)
 
-# we send the `system` to `run_eom!()`; the optional argument tells `run_eom!()` to print out progress to the screen; the exclamation ! doesn't actually do anything, but it is convention in Julia to name your functions with an exclamation at the end if they change the value of the input argument, which `run_eom!()` does
+# we send the `system` to `run_eom!()`; the optional argument tells `run_eom!()` to print out progress to the screen; the exclamation ! doesn't actually do anything, but it is convention in Julia to name your functions with an exclamation at the end if they change the value of the input argument, which `run_eom!()` does; it will do some initial sorting and processing of the system definition, and then build the equations of motion
 
 output = run_eom!(system, true)
 
@@ -75,7 +73,7 @@ result = analyze(output, true)
 
 summarize(system, result; bode = [0, 0, 1])
 
-# here, we make the Bode (i.e., frequency response) plot using the third ouput (kx) only, because the Bode plot should be dimensionless, i.e., input and output should have the same units, so we plot the ratio of spring force to applied force, as a function of frequency; the spring force is proportional to displacement, so we are really looking at displacement response, but in a nondimensional way; we should see a resonance near the natural frequency, as long as the damping ratio is below 0.707; note that at low frequencies, the spring force will nearly equal the applied force, so the Bode plot will tend toward 1.0, or 0 [dB] (remember the decibel is a logarithmic unit); at high frequency, the applied force changes direction so quickly, the mass doesn't have time to respond, so the motion becomes very small, i.e., 0.0 or -∞ [dB]
+# here, we make the Bode (i.e., frequency response) plot using the third ouput (kx) only, because the Bode plot should be dimensionless, i.e., input and output should have the same units, so we plot the ratio of spring force to applied force, as a function of frequency; the spring force is proportional to displacement, so we are really looking at displacement response, but in a nondimensional way; we should see a resonance near the natural frequency, as long as the damping ratio is below 0.707; note that at low frequencies, the spring force will nearly equal the applied force, so the Bode plot will tend toward 1.0, or 0 [dB] (remember the decibel is a logarithmic unit); at high frequency, the applied force changes direction so quickly that the mass doesn't have time to respond, so the motion becomes very small, i.e., 0.0 or -∞ [dB]
 
 # now, the ODE solver library in Julia is great, and has a number of very sophisticated algorithms, and can solve just about any type of ODE; however, in this case, our problem is quite a simple one, a linear ODE; for a linear ODE, it is often preferable to use a simpler ODE solver; there is one in the EoM library called `splsim()` (for sparse linear simulation); it uses something called `discrete time` to convert the differential equation to a difference equation, which it can solve very quickly
 

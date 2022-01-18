@@ -20,6 +20,7 @@ h_G = 0.4 # height of centre of mass [m]
 mu = 0.9 # friction limit
 # assume 5% tire slip, for purpose of computing shift speeds
 slip = 1.05
+rdf = 1.0 # rear drive fraction
 
 # input engine specs
 # engine torque [Nm] in evenly spaced engine speed increments from 0 to redline
@@ -85,6 +86,9 @@ function u(x, t)
     # y[3] long accl'n (note that we we can't use this to find u_vec because it depends directly on u_vec!)
     # y[4] rear axle normal spring force
     # y[5] rear axle damper force
+    # y[6] front axle normal spring force
+    # y[7] front axle damper force
+
 
     # calculate air resistance from outputs
     rho = 1.23
@@ -111,18 +115,30 @@ function u(x, t)
 
     # calculate traction force (axle torque/radius)
     X = te(w) * gear[n] * fd * eta / re
+    Xr = rdf * X
+    Xf = (1 - rdf) * X
 
     # calculate axle load, static plus dynamic load, note the dynamic is negative if the spring is in compression, but this should add to static, hence negative sign
     Zr = Zr0 - y[4] - y[5]
+    Zf = Zf0 - y[6] - y[7]
 
     # check for wheelspin, conditional
-    X > mu * Zr && (X = mu * Zr)
+    if Xr > mu * Zr
+        Xr = mu * Zr
+    end
+    if Xf > mu * Zf
+        Xf = mu * Zf
+    end
 
-    # include rolling resistance loss, note -= to subtract from current value, and sign function to reverse force if needed
-    X -= (0.013 + 6.5e-6 * y[2]^2) * 9.81 * m * sign(y[2])
+    if Xf > (1 - rdf)/rdf * Xr
+        Xf = (1 - rdf)/rdf * Xr
+    end
+    if Xr > rdf/(1 - rdf) * Xr
+        Xr = rdf/(1 - rdf) * Xr
+    end
 
-    # set traction force
-    u_vec[2] = X
+    # include rolling resistance loss, and note sign function to reverse force if needed, set traction force
+    u_vec[2] = Xr + Xf - (0.013 + 6.5e-6 * y[2]^2) * 9.81 * m * sign(y[2])
 
     # return u_vec
     u_vec
@@ -144,6 +160,10 @@ y[:, 4] .+= y[:, 5] # add damping load to spring load, note .+= increments each 
 y[:, 4] *= -1.0 # take compressive loads as positve (switch signs)
 y[:, 4] .+= Zr0 # add static load, note .+= increments each entry in the vector
 y[:, 4] /= 1000 # scale third column to get kN
+y[:, 6] .+= y[:, 7]
+y[:, 6] *= -1.0 # take compressive loads as positve (switch signs)
+y[:, 6] .+= Zf0 # add static load, note .+= increments each entry in the vector
+y[:, 6] /= 1000 # scale third column to get kN
 
 
 # linear interpolation to find 1/4 mile, 60 mph times
@@ -182,8 +202,9 @@ push!(plots, plot(t, y[:, 2]; xlabel, ylabel, label, lw))
 ylabel = "Accl'n [g]"
 push!(plots, plot(t, y[:, 3]; ylims = (0, Inf), xlabel, ylabel, label, lw))
 
-ylabel = "Z_r [kN]"
-push!(plots, plot(t, y[:, 4]; ylims = (0, Inf), xlabel, ylabel, label, lw))
+label = ["Z_r [kN]" "Z_f [kN]"]
+ylabel = "Axle vertical load [N]"
+push!(plots, plot(t, y[:, [4, 6]]; ylims = (0, Inf), xlabel, ylabel, label, lw))
 
 # pass all the results and plots, skip the Bode plots for now
 summarize(system, result; plots, bode = [])

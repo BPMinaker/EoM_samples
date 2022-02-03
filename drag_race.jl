@@ -133,8 +133,8 @@ function u(x, t)
     if Xf > (1 - rdf)/rdf * Xr
         Xf = (1 - rdf)/rdf * Xr
     end
-    if Xr > rdf/(1 - rdf) * Xr
-        Xr = rdf/(1 - rdf) * Xr
+    if Xr > rdf/(1 - rdf) * Xf
+        Xr = rdf/(1 - rdf) * Xf
     end
 
     # include rolling resistance loss, and note sign function to reverse force if needed, set traction force
@@ -187,6 +187,10 @@ else
     println("Simulation ended below 60 mph!")
 end
 
+# reduce the number of points that are plotted
+t = t[1:5:end]
+y = y[1:5:end, :]
+
 # set plot text, etc
 lw = 2 # thicker plot lineweight
 xlabel = "Time [s]"
@@ -208,5 +212,8 @@ push!(plots, plot(t, y[:, [4, 6]]; ylims = (0, Inf), xlabel, ylabel, label, lw))
 
 # pass all the results and plots, skip the Bode plots for now
 summarize(system, result; plots, bode = [])
+
+# using DelimitedFiles
+# writedlm(joinpath("output","data.txt"), [t y])
 
 println("Done.")

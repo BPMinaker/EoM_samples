@@ -93,8 +93,8 @@ push!(plots, plot(vel * t, y_dist; xlabel, ylabel, label, lw))
 
 # write all the results; steady state plots of outputs 1 through 4, but Bode of only 2 and 3, as they are the only ones where input and output have the same units, add bode of dimensionless yaw rate
 
-ss = [1, 1, 1, 1, 0, 0, 0]
-bode = [0, 1, 1, 0, 0, 0, 1]
+ss = [1, 1, 1, 1, 0, 0]
+bode = [0, 1, 1, 0, 0, 1]
 
 summarize(system, vpts, result; plots, ss, bode)
 # summarize(system, vpts, result; plots, ss, bode, format = :html)

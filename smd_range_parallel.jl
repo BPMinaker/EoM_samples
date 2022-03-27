@@ -12,7 +12,7 @@ m = 1.0
 f(x) = input_ex_smd(; k, m, c = x)
 
 # then we define the range of values for c
-vpts = 0:0.003:3
+vpts = 0:0.001:5
 
 @time begin
 n = length(vpts)
@@ -32,10 +32,6 @@ system2 = f.(vpts)
 output2 = run_eom!.(system2)
 result2 = analyze.(output2)
 end
-
-
-# the `summarize()` function has been written using another feature of Julia, called `multiple dispatch`, which allows the same function to do different things, depending on the type of arguments, `summarize()` recognizes if system and result are vectors, and if so, it drops the tables, and gives series of plots instead
-# summarize(system, vpts, result; ss = [], bode = [0,0,1], vpt_name = ["c" "Damping coefficient" "Ns/m"])
 
 # we could also write to html output instead of the screen
 # summarize(system, vpts, result; ss = [], bode = [0,0,1], vpt_name = ["c" "Damping coefficient" "Ns/m"], format = :html)

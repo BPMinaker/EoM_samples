@@ -20,10 +20,12 @@ result = analyze(output)
 
 summarize(system, result)
 
-# input_delay!(system, result, (a+b)/10, [1, 2])
-# summarize(system, result)
+input_delay!(system, result, (a+b)/10, [1, 2])
+summarize(system, result)
 
-#using EoM_X3D
-#animate_modes(system, result)
+summarize(system, result; format = :html)
+
+using EoM_X3D
+animate_modes(system, result)
 
 println("Done.")

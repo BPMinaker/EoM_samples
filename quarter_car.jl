@@ -53,10 +53,10 @@ push!(plots, plot(t, [z20 z0]; xlabel, ylabel, label, lw))
 
 summarize(system, result, verbose; plots)
 
-# summarize(system, result, verbose; plots, format = :html)
+summarize(system, result, verbose; plots, format = :html)
 
 # generate animations of the mode shapes
-# using EoM_X3D
-# animate_modes(system, result, scale = 0.2)
+using EoM_X3D
+animate_modes(system, result, scale = 0.2)
 
 println("Done.")

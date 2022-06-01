@@ -115,9 +115,10 @@ ylabel = "z [m], z dot [m/s], f [N]"
 label = ["z" "zdot" "f"]
 
 p1 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
-display(p1)
 
-# the plot is stored and then sent to the screen using `display()`; this plot should show up in a tab in VS Code
+# the plot is created and stored but not shown
+# we could send it to the screen using: display(p1)
+# this plot would show up in a tab in VS Code
 
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `u()` is defined as a function of `w` so all we have to do is update `w`, and `u()` will update as well
 
@@ -127,7 +128,6 @@ res = hcat(y...)'
 u_t = u.(0, t)
 
 p2 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
-display(p2)
 
 w = 2.0 * result.omega_n[1]
 y = splsim(result.ss_eqns, u, t)
@@ -135,10 +135,20 @@ res = hcat(y...)'
 u_t = u.(0, t)
 
 p3 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
-display(p3)
+
+# now let's display all out results, along with the extra plots
+# the `bode` argument says only generate the bode plot of the third output
+bode = [0, 0, 1]
+plots = [p1, p2, p3]
+summarize(system, result; bode, plots)
 
 # alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; you can change the folder name and filename with keyword arguments `folder` and `filename` if you really want; the default filename is taken from the model name in the input file; the data is also written to individual files as `output/date/filename/time/plot_1.html`, etc., which won't get overwritten if you run the analysis again, but the main html output file does, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
 
-# summarize(system, result; bode = [0, 0, 1], plots = [p1, p2, p3], format = :html)
+# summarize(system, result; bode, plots, format = :html)
+
+
+# or alternatively, if you have LaTeX installed, you can generate nicely formatted pdf reports
+# using EoM_TeX
+# write_report(system, result; bode)
 
 println("Done.")

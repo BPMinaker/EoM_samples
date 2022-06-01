@@ -10,7 +10,12 @@ result = analyze(output)
 
 summarize(system, result)
 
-# using EoM_X3D
-# animate_modes(system, result)
+
+summarize(system, result, format = :html)
+using EoM_X3D
+animate_modes(system, result)
+
+# using EoM_TeX
+# write_report(system, result)
 
 println("Done.")

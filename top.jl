@@ -10,9 +10,7 @@ system = f.(vpts)
 output = run_eom!.(system, vpts .== 0)
 result = analyze.(output, vpts .== 0)
 
-summarize(system, vpts, result; ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
-
-# using EoM_TeX
-# write_report(system, vpts, result; clean = false)
+# summarize(system, vpts, result; ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
+summarize(system, vpts, result; ss = [], vpt_name = ["r" "Angular speed" "rad/s"], format = :html)
 
 println("Done.")

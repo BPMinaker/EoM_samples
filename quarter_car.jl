@@ -51,8 +51,7 @@ push!(plots, plot(t, [z12 z0]; xlabel, ylabel, label, lw))
 label = ["Tire compression" "Ground"]
 push!(plots, plot(t, [z20 z0]; xlabel, ylabel, label, lw))
 
-summarize(system, result, verbose; plots)
-
+# summarize(system, result, verbose; plots)
 summarize(system, result, verbose; plots, format = :html)
 
 # generate animations of the mode shapes

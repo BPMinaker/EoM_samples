@@ -5,14 +5,14 @@ using EoM
 build_examples()
 include(joinpath("examples", "input_ex_smd.jl"))
 
-k = 1.0
+k = 16.0
 m = 1.0
 
 # here we redefine the input function, so we can call it using any value of c
 f(x) = input_ex_smd(; k, m, c = x)
 
 # then we define the range of values for c
-vpts = 0:0.03:3
+vpts = 0:0.1:10
 
 # then we call the function using the dot notation
 system = f.(vpts)

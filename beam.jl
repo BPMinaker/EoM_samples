@@ -10,15 +10,13 @@ l = 0.5
 n = 2
 
 system = input_ex_beam(; EI1, EI2, mpul, l, n)
-
-verbose = true
-output = run_eom!(system, verbose)
-result = analyze(output, verbose)
+output = run_eom!(system, true)
+result = analyze(output, true)
 
 bode = [1 0; 0 1]
-summarize(system, result, verbose; bode)
-
+# summarize(system, result, verbose; bode)
 summarize(system, result, verbose; bode, format = :html)
+
 using EoM_X3D
 animate_modes(system, result)
 

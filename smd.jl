@@ -33,7 +33,7 @@ system = input_ex_smd(; k, m, c)
 
 # the advantage of this form is that now `m`, `c`, and `k` are available to use elsewhere in the code, if we wanted, and if we call `input_ex_smd(; k, m, c)` again after any changes to `m`, `c`, or `k`, the updated values are used
 
-# the return variable `system` is a `structured` variable, i.e., a container variable that holds a hold of other variables inside it; these variables that are inside are called the properties, and you can find them using:
+# the return variable `system` is a `structured` variable, i.e., a container variable that holds a lot of other variables inside it; these variables that are inside are called the properties, and you can find them using:
 
 println("Properties of the system variable...")
 println(propertynames(system))
@@ -58,7 +58,7 @@ result = analyze(output, true)
 
 # the analysis converts the system to a standard state space form (A,B,C,D), where the E matrix is eliminated, the size of the A matrix is usually smaller after this happens, and almost certainly not the same as if we derived it by hand, even though it has the same properties
 
-# `result` is also a structured variable that holds a number of vectors, such as `ss_eqns`; again, in this case there is only one set of `ss_eqns`, so it is a vector of length one
+# `result` is also a structured variable that holds a number of vectors, such as `ss_eqns`
 
 # println(propertynames(result))
 # println(result.ss_eqns)
@@ -69,11 +69,13 @@ result = analyze(output, true)
 
 # we can also print the natural frequencies, the damping ratios, the time constants, and the wavelengths; in this case, there are two of each, but they are all duplicate pairs, as they are calculated from conjugate eigenvalues
 
-# to make a convenient result, we can send the system definition, the analysis results to a helper function called `summarize()` that prints all the results in nice tables or plots as necessary
+# to make a convenient result, we can send the system definition and the analysis results to a helper function called `summarize()` that prints all the results in nice tables or plots as necessary
 
-summarize(system, result; bode = [0, 0, 1])
+# summarize(system, result; bode = [0, 0, 1])
 
 # here, we make the Bode (i.e., frequency response) plot using the third ouput (kx) only, because the Bode plot should be dimensionless, i.e., input and output should have the same units, so we plot the ratio of spring force to applied force, as a function of frequency; the spring force is proportional to displacement, so we are really looking at displacement response, but in a nondimensional way; we should see a resonance near the natural frequency, as long as the damping ratio is below 0.707; note that at low frequencies, the spring force will nearly equal the applied force, so the Bode plot will tend toward 1.0, or 0 [dB] (remember the decibel is a logarithmic unit); at high frequency, the applied force changes direction so quickly that the mass doesn't have time to respond, so the motion becomes very small, i.e., 0.0 or -∞ [dB]
+
+# before we actually call the summary function, let's add in some time history solutions too
 
 # now, the ODE solver library in Julia is great, and has a number of very sophisticated algorithms, and can solve just about any type of ODE; however, in this case, our problem is quite a simple one, a linear ODE; for a linear ODE, it is often preferable to use a simpler ODE solver; there is one in the EoM library called `splsim()` (for sparse linear simulation); it uses something called `discrete time` to convert the differential equation to a difference equation, which it can solve very quickly
 
@@ -85,7 +87,7 @@ t = 0:0.02:20
 
 # define input forcing function; here we chose to excite the system near its natural frequency, making sure that our step 0.02 seconds is fine enough to get a good sample of the input; a step of 0.02 is 50 times per second, and the rule of thumb is we'd like 10 samples in any sinewave (bare minimum is 2), so we can comfortably sample a 5 Hz signal with this stepsize
 
-# note that unlike Matlab, Julia makes a distinction between a vector of vectors and a matrix; we can acess a vector of vectors like so: a[2][3] to the get third entry in the second vector, where for a matrix a[2,3] gives the entry in the second row, third column; here, we pick the first entry in the first vector of the natural frequency, and choose an excitation frequency that's very close to that
+# here, we choose an excitation frequency that's very close to the natural frequency, well below 5 Hz
 
 w = 0.95 * result.omega_n[1]
 
@@ -97,10 +99,11 @@ u(x, t) = sin(2pi * w * t)
 
 y = splsim(result.ss_eqns, u, t)
 
+# note that unlike Matlab, Julia makes a distinction between a vector of vectors and a matrix; we can acess a vector of vectors like so: a[2][3] to the get third entry in the second vector, where for a matrix a[2,3] gives the entry in the second row, third column
+
 # the return argument `y` is a vector of vectors, one output vector for each time point, i.e., y[1] = y(t=0), y[2] = y(t=0.02); to read `y`, we use the `hcat()` function for horizontal concatenation (i.e., sticking column vectors together to form a matrix), and the `splatting` operator `...` to read all the entries from `y`; you can think of it as a short form for [y[1] y[2] ... y[end]]; we stick all the columns together, because we want to plot rows of the resulting matrix, so we transpose `res` using the apostrophe operator
 
-res = hcat(y...)'
-u_t = u.(0, t)
+res = [hcat(y...)' u.(0, t)]
 
 # our result will have four columns: the displacement, the velocity, the spring force, and the applied force; we get the applied force by attaching the result of the input function, so we can plot them together; we use the dot operator on the vector of time values; in this case the 0 in the input is ignored by the `u()` function, but the `sin()` function is evaluated for each entry in the `t` vector
 
@@ -114,7 +117,7 @@ xlabel = "Time [s]"
 ylabel = "z [m], z dot [m/s], f [N]"
 label = ["z" "zdot" "f"]
 
-p1 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
+p1 = plot(t, res[:,[1, 2, 4]]; lw, xlabel, ylabel, label)
 
 # the plot is created and stored but not shown
 # we could send it to the screen using: display(p1)
@@ -124,20 +127,16 @@ p1 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
 
 w = 0.5 * result.omega_n[1]
 y = splsim(result.ss_eqns, u, t)
-res = hcat(y...)'
-u_t = u.(0, t)
-
-p2 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
+res = [hcat(y...)' u.(0, t)]
+p2 = plot(t, res[:,[1, 2, 4]]; lw, xlabel, ylabel, label)
 
 w = 2.0 * result.omega_n[1]
 y = splsim(result.ss_eqns, u, t)
-res = hcat(y...)'
-u_t = u.(0, t)
+res = [hcat(y...)' u.(0, t)]
+p3 = plot(t, res[:,[1, 2, 4]]; lw, xlabel, ylabel, label)
 
-p3 = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
+# now let's display all out results, along with the extra plots; the `bode` argument says only generate the bode plot of the third output
 
-# now let's display all out results, along with the extra plots
-# the `bode` argument says only generate the bode plot of the third output
 bode = [0, 0, 1]
 plots = [p1, p2, p3]
 summarize(system, result; bode, plots)

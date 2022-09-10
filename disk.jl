@@ -10,7 +10,8 @@ system = f.(vpts)
 output = run_eom!.(system)
 result = analyze.(output)
 
-summarize(system, vpts, result)
+summarize(system, vpts, result, format = :html)
 
 println("Done.")
+
 

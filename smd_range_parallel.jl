@@ -33,6 +33,14 @@ output2 = run_eom!.(system2)
 result2 = analyze.(output2)
 end
 
+
+@time begin
+result3 = analyze.(run_eom!.(f.(vpts)))
+end
+
+
+
+
 # we could also write to html output instead of the screen
 # summarize(system, vpts, result; ss = [], bode = [0,0,1], vpt_name = ["c" "Damping coefficient" "Ns/m"], format = :html)
 

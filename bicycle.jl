@@ -12,8 +12,8 @@ result = analyze.(output, vpts .== 0.1)
 
 ss = []
 bode = []
-# summarize(system, vpts, result, true; ss, bode)
-summarize(system[10], result[10], true; ss, bode, format = :html)
+summarize(system, vpts, result, true; ss, bode)
+# summarize(system[10], result[10], true; ss, bode, format = :html)
 
 using EoM_X3D
 animate_modes(system[10], result[10])

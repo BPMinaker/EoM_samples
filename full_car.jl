@@ -15,8 +15,8 @@ system = input_ex_full_car(; m, a, b, tf, tr, cf, cr, Iy)
 output = run_eom!(system)
 result = analyze(output)
 
-# summarize(system, result)
-summarize(system, result, format = :html)
+summarize(system, result)
+# summarize(system, result, format = :html)
 
 # using EoM_X3D
 # animate_modes(system, result)

@@ -16,7 +16,7 @@ system = f.(vpts)
 output = run_eom!.(system, verbose)
 result = analyze.(output, verbose)
 
-# summarize(system, vpts, result, vpt_name = ["k" "Stiffness" "N/m"], ss = [0, 0, 0])
-summarize(system, vpts, result, vpt_name = ["k" "Stiffness" "N/m"], ss = [0, 0, 0], format = :html)
+summarize(system, vpts, result, vpt_name = ["k" "Stiffness" "N/m"], ss = [0, 0, 0])
+# summarize(system, vpts, result, vpt_name = ["k" "Stiffness" "N/m"], ss = [0, 0, 0], format = :html)
 
 println("Done.")

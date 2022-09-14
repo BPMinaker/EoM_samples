@@ -14,8 +14,8 @@ output = run_eom!(system, true)
 result = analyze(output, true)
 
 bode = [1 0; 0 1]
-# summarize(system, result, verbose; bode)
-summarize(system, result, verbose; bode, format = :html)
+summarize(system, result, verbose; bode)
+# summarize(system, result, verbose; bode, format = :html)
 
 using EoM_X3D
 animate_modes(system, result)

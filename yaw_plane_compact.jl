@@ -15,9 +15,10 @@ result = analyze.(output, vpts .== 1)
 
 ss = [1, 1, 1, 1, 0, 0]
 bode = [0, 1, 1, 0, 0, 1]
-summarize(system, vpts, result; ss, bode, format = :html)
+summarize(system, vpts, result; ss, bode)
+# summarize(system, vpts, result; ss, bode, format = :html)
 
-n = findfirst(vpts .== 20)
-summarize(system[n], result[n]; ss, bode, format = :html)
+# n = findfirst(vpts .== 20)
+# summarize(system[n], result[n]; ss, bode)
 
 println("Done.")

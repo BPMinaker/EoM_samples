@@ -11,7 +11,7 @@ output = run_eom!.(system, vpts .== 0)
 result = analyze.(output, vpts .== 0)
 
 bode = [1 0; 1 0; 0 1]
-# summarize(system, vpts, result; bode, ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
-summarize(system, vpts, result; bode, ss = [], vpt_name = ["r" "Angular speed" "rad/s"], format = :html)
+summarize(system, vpts, result; bode, ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
+# summarize(system, vpts, result; bode, ss = [], vpt_name = ["r" "Angular speed" "rad/s"], format = :html)
 
 println("Done.")

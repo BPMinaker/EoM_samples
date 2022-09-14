@@ -16,8 +16,8 @@ system = f.(vpts)
 output = run_eom!.(system)
 result = analyze.(output)
 
-# summarize(system, vpts, result, vpt_name = ["a/l" "Mass centre location" ""])
-summarize(system, vpts, result, vpt_name = ["a/l" "Mass centre location" ""], format = :html)
+summarize(system, vpts, result, vpt_name = ["a/l" "Mass centre location" ""])
+# summarize(system, vpts, result, vpt_name = ["a/l" "Mass centre location" ""], format = :html)
 
 println("Done.")
 

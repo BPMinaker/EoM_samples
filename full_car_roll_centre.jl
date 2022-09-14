@@ -82,7 +82,7 @@ xlabel = "Time [s]"
 label = ["LF" "LR" "RF" "RR"]
 plots = []
 
-ylabel = "Tire slip angles [degree]"
+ylabel = "Tire slip α [degree]"
 push!(plots, plot(t, slip; xlabel, ylabel, label, lw, xlims))
 
 ylabel = "Lateral forces [N]"
@@ -102,7 +102,7 @@ label = "G Lift [m]"
 ylabel = "G Lift [m]"
 push!(plots, plot(t, y[:, 10]; xlabel, ylabel, label, lw, xlims))
 
-label = ["Steer" "Roll" "Pitch" "Slip" "Understeer"]
+label = ["Steer δ" "Roll ϕ" "Pitch θ" "Slip β" "Understeer"]
 ylabel = "Angles [degree]"
 push!(plots, plot(t, [180 / π * steer.(t) y[:, 11:13] -y[:, 9] * (a + b) / u + 180 / π * steer.(t)]; xlabel, ylabel, label, lw, xlims))
 

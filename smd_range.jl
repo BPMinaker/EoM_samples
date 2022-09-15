@@ -27,9 +27,7 @@ result = analyze.(output)
 summarize(system, vpts, result; ss = [], bode = [0,0,1], vpt_name = ["c" "Damping coefficient" "Ns/m"])
 
 # we could also write to html output instead of the screen
-# summarize(system, vpts, result; ss = [], bode = [0,0,1], vpt_name = ["c" "Damping coefficient" "Ns/m"], format = :html)
 
-# using EoM_TeX
-# write_report(system, vpts, result; bode = [0,0,1])
+# summarize(system, vpts, result; ss = [], bode = [0,0,1], vpt_name = ["c" "Damping coefficient" "Ns/m"], format = :html)
 
 println("Done.")

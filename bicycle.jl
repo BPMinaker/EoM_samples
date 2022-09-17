@@ -15,7 +15,7 @@ bode = []
 summarize(system, vpts, result, true; ss, bode)
 # summarize(system[10], result[10], true; ss, bode, format = :html)
 
-using EoM_X3D
-animate_modes(system[10], result[10])
+# using EoM_X3D
+# animate_modes(system[10], result[10])
 
 println("Done.")

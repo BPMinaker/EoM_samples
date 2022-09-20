@@ -9,14 +9,14 @@ l = 1
 u = l
 I = 0.21 * m * l^2
 
-f(x) = input_ex_shimmy(;m, k, a = x * l, b = l - (x * l), u, I)
+f(x) = input_ex_shimmy(; m, k, a=x * l, b=l - (x * l), u, I)
 vpts = 0:0.01:1
 
 system = f.(vpts)
 output = run_eom!.(system)
 result = analyze.(output)
 
-summarize(system, vpts, result, vpt_name = ["a/l" "Mass centre location" ""])
+summarize(system, vpts, result, vpt_name=["a/l" "Mass centre location" ""])
 # summarize(system, vpts, result, vpt_name = ["a/l" "Mass centre location" ""], format = :html)
 
 println("Done.")

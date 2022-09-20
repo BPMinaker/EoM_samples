@@ -31,7 +31,7 @@ result = analyze(output, true)
 
 # get static tire normal loads (kN)
 # display(getfield.(system.flex_points,:name))
-Z0 = vcat(getfield.(system.flex_points[[1, 2, 5, 6]],:preload)...)
+Z0 = vcat(getfield.(system.flex_points[[1, 2, 5, 6]], :preload)...)
 
 # a smooth step function, 3 degrees, with its midpoint (i.e. 1.5) at t = 2
 # the 0.5 terms change the range from -1...1 to 0...1
@@ -42,7 +42,7 @@ end
 
 # assume LF, LR, RF, RR sequence
 # compute applied tire force
-function u_in(x,t)
+function u_in(x, t)
     # get sensor outputs (D=0)
     y = result.ss_eqns.C * x
     # get total normal load
@@ -55,7 +55,7 @@ end
 
 # simple nonlinear tire with load sensitivity
 function tire(Z, slip)
-    -(1.2 .- 3.0e-5 .* Z) .* Z .* tanh.(8.2 .* slip) 
+    -(1.2 .- 3.0e-5 .* Z) .* Z .* tanh.(8.2 .* slip)
 end
 
 println("Solving time history...")
@@ -67,11 +67,11 @@ y = hcat(y...)'
 t = t[1:4:end]
 y = y[1:4:end, :]
 
-ZZ = Z0' .- y[:,[1, 2, 5, 6]]
+ZZ = Z0' .- y[:, [1, 2, 5, 6]]
 slip = y[:, [3, 4, 7, 8]] - steer.(t) .* [1, 0, 1, 0]'
 
 YY = tire.(ZZ, slip)
-acc = sum(YY, dims=2)/(m + 2 * muf + 2 * mur)
+acc = sum(YY, dims=2) / (m + 2 * muf + 2 * mur)
 slip *= 180 / π
 
 # set plot text, etc
@@ -89,14 +89,14 @@ ylabel = "Lateral forces [N]"
 push!(plots, plot(t, YY; xlabel, ylabel, label, lw, xlims))
 
 ylabel = "Yaw moment [Nm]"
-push!(plots, plot(t, sum(a * YY[:,[1,3]] - b * YY[:,[2,4]], dims = 2); xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, sum(a * YY[:, [1, 3]] - b * YY[:, [2, 4]], dims=2); xlabel, ylabel, label, lw, xlims))
 
 ylabel = "Vertical forces [N]"
-push!(plots, plot(t, ZZ; xlabel, ylabel, label, lw, xlims, ylims = (0, Inf)))
+push!(plots, plot(t, ZZ; xlabel, ylabel, label, lw, xlims, ylims=(0, Inf)))
 
 label = ["F" "R"]
 ylabel = "Lateral weight transfer [N]"
-push!(plots, plot(t, 0.5 * [ZZ[:,3] - ZZ[:,1] ZZ[:,4] - ZZ[:,2]]; xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]; xlabel, ylabel, label, lw, xlims))
 
 label = "G Lift [m]"
 ylabel = "G Lift [m]"

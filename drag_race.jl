@@ -36,7 +36,7 @@ te = LinearInterpolation(wi, ti)
 # calculate shift speeds (at redline)
 vmax = redline * 2pi / 60 * re / slip / fd ./ gear
 println("Shift speeds [km/h]:")
-display(round.(3.6 * vmax, digits = 2))
+display(round.(3.6 * vmax, digits=2))
 
 # suspension stiffness and damping - the default values should be close enough
 cf = 4000 # front suspension damping [Ns/m]
@@ -55,8 +55,8 @@ output = run_eom!(system)
 # we need these for the tire model, so save them in convenient notation
 Zf0 = system.flex_points[1].preload[1]
 Zr0 = system.flex_points[2].preload[1]
-println("Static Zf=", round(Zf0, digits = 2), " N")
-println("Static Zr=", round(Zr0, digits = 2), " N")
+println("Static Zf=", round(Zf0, digits=2), " N")
+println("Static Zr=", round(Zr0, digits=2), " N")
 
 # do some analysis, to convert the equations to state space form (don't try to decompose because too many repeated zero eigenvalues makes the algorithm fail)
 result = analyze(output)
@@ -130,11 +130,11 @@ function u(x, t)
         Xf = mu * Zf
     end
 
-    if Xf > (1 - rdf)/rdf * Xr
-        Xf = (1 - rdf)/rdf * Xr
+    if Xf > (1 - rdf) / rdf * Xr
+        Xf = (1 - rdf) / rdf * Xr
     end
-    if Xr > rdf/(1 - rdf) * Xf
-        Xr = rdf/(1 - rdf) * Xf
+    if Xr > rdf / (1 - rdf) * Xf
+        Xr = rdf / (1 - rdf) * Xf
     end
 
     # include rolling resistance loss, and note sign function to reverse force if needed, set traction force
@@ -175,14 +175,14 @@ interp_tu = LinearInterpolation(y[:, 2], t)
 # find quarter mile time and speed, round it, and print
 if y[end, 1] > 402.336
     tf = interp_ts(402.336)
-    println("Quarter mile time: ", round(tf, digits = 2), " s at ", round(interp_ut(tf), digits = 1), " km/h.")
+    println("Quarter mile time: ", round(tf, digits=2), " s at ", round(interp_ut(tf), digits=1), " km/h.")
 else
     println("Simulation ended before 1/4 mile!  Increase the time interval.")
 end
 
 # find 0-60 time, round it, and print
 if y[end, 2] > 96.5606
-    println("0-60 mph time: ", round(interp_tu(96.5606), digits = 2), " s.")
+    println("0-60 mph time: ", round(interp_tu(96.5606), digits=2), " s.")
 else
     println("Simulation ended below 60 mph!")
 end
@@ -204,14 +204,14 @@ ylabel = "Velocity [km/h]"
 push!(plots, plot(t, y[:, 2]; xlabel, ylabel, label, lw))
 
 ylabel = "Accl'n [g]"
-push!(plots, plot(t, y[:, 3]; ylims = (0, Inf), xlabel, ylabel, label, lw))
+push!(plots, plot(t, y[:, 3]; ylims=(0, Inf), xlabel, ylabel, label, lw))
 
 label = ["Z_r [kN]" "Z_f [kN]"]
 ylabel = "Axle vertical load [N]"
-push!(plots, plot(t, y[:, [4, 6]]; ylims = (0, Inf), xlabel, ylabel, label, lw))
+push!(plots, plot(t, y[:, [4, 6]]; ylims=(0, Inf), xlabel, ylabel, label, lw))
 
 # pass all the results and plots, skip the Bode plots for now
-summarize(system, result; plots, bode = [])
+summarize(system, result; plots, bode=[])
 
 # using DelimitedFiles
 # writedlm(joinpath("output","data.txt"), [t y])

@@ -10,7 +10,7 @@ a = 1.6
 b = 1.5
 
 # define a dummy function that just calls our input function, but also adds the parameters we just set
-f(x) = input_ex_yaw_plane(; u = x, m, a, b)
+f(x) = input_ex_yaw_plane(; u=x, m, a, b)
 
 # here we set the speed in `vpts`, which gets sent one at a time to the `f()` function, which finally sends them to the `input_ex_yaw_plane()` function, where they determine the value of `u`
 vpts = 1:0.5:30
@@ -28,7 +28,7 @@ result = analyze.(output, vpts .== 1)
 
 # now, let's also do some time domain solutions; define the input function of the state (x) and time (t), but in this case, ignore the state
 function u(x, t)
-    EoM.pulse(t, 1, 3) * 2 * sin(pi * (t - 1))
+    EoM.pulse(t, 1, 3) * 2 * sin(π * (t - 1))
 end
 
 # define time interval

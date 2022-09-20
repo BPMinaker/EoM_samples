@@ -12,8 +12,8 @@ tw = 1.94 - 0.23
 r = 0.346
 vpts = 10
 
-f(x) = input_full_car_a_arm_pushrod(; u = x, a, b, tw, r)
-system = f(vpts) 
+f(x) = input_full_car_a_arm_pushrod(; u=x, a, b, tw, r)
+system = f(vpts)
 output = run_eom!(system)
 result = analyze(output)
 

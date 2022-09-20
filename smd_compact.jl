@@ -29,13 +29,13 @@ xlabel = "Time [s]"
 ylabel = "z [m], z dot [m/s], f [N]"
 label = ["z" "zdot" "f"]
 
-my_plot = plot(t, [res[:,[1, 2] ] u_t]; lw, xlabel, ylabel, label)
+my_plot = plot(t, [res[:, [1, 2]] u_t]; lw, xlabel, ylabel, label)
 # we can display the plot like:
 # display(my_plot)
 # or we can add it to a vector of plots, and send it to the `summarize()` function
 plots = [my_plot]
 
-summarize(system, result; plots, bode = [0,0,1])
+summarize(system, result; plots, bode=[0, 0, 1])
 
 # we could also write to html output instead of the screen
 # summarize(system, result; plots, bode = [0,0,1], format = :html)

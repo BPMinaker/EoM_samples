@@ -13,10 +13,10 @@ mt = 2000
 It = 3000
 vpts = 1:0.5:35
 
-f(x) = input_ex_truck_trailer(; u = x, m, Iz, d, e, h, mt, It)
+f(x) = input_ex_truck_trailer(; u=x, m, Iz, d, e, h, mt, It)
 system = f.(vpts)
 output = run_eom!.(system, vpts .== 1)
-result = analyze.(output,  vpts .== 1)
+result = analyze.(output, vpts .== 1)
 
 # equations are known, let's solve a time history
 # pulse function is 1 from t=1 to t=3, zero otherwise

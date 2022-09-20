@@ -20,7 +20,7 @@ result = analyze(output)
 
 summarize(system, result)
 
-input_delay!(system, result, (a+b)/10, [1, 2])
+input_delay!(system, result, (a + b) / 10, [1, 2])
 
 summarize(system, result)
 

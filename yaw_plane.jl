@@ -53,32 +53,33 @@ y_dist = res[5, :]
 
 xlabel = "Time [s]"
 lw = 2 # thicker line weight
+size = (600, 300)
 
 # plot yaw rate vs time
 ylabel = "Yaw rate [deg/s], Steer angle [deg]"
 label = ["Yaw rate" "Steer angle"]
-plots = [plot(t, [r δ]; xlabel, ylabel, label, lw)]
+plots = [plot(t, [r δ]; xlabel, ylabel, label, lw, size)]
 
 # plot body slip angle vs time
 ylabel = "Body slip angle [deg], Steer angle [deg]"
 label = ["Body slip angle" "Steer angle"]
-push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw))
+push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw, size))
 
 # plot understeer angle vs time
 ylabel = "Understeer angle [deg], Steer angle [deg]"
 label = ["Understeer angle" "Steer angle"]
-push!(plots, plot(t, [α_u δ]; xlabel, ylabel, label, lw))
+push!(plots, plot(t, [α_u δ]; xlabel, ylabel, label, lw, size))
 
 # plot lateral acceleration vs time
 ylabel = "Lateral acceleration [g], Steer angle [deg]"
 label = ["Lateral acceleration" "Steer angle"]
-push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw))
+push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
 
 # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
 xlabel = "x [m]"
 ylabel = "y [m]"
 label = ""
-push!(plots, plot(vel * t, y_dist; xlabel, ylabel, label, lw))
+push!(plots, plot(vel * t, y_dist; xlabel, ylabel, label, lw, size))
 
 # write all the results; steady state plots of outputs 1 through 4 (5 and 6 don't reach steady state), and Bode of only 2 and 3, as they are the only ones where input and output have the same units
 

@@ -37,7 +37,7 @@ Z0 = vcat(getfield.(system.flex_points[[1, 2, 5, 6]], :preload)...)
 # the 0.5 terms change the range from -1...1 to 0...1
 # the 4 determines how quickly the step occurs
 function steer(t)
-    3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5) * π / 180
+    3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
 end
 
 # assume LF, LR, RF, RR sequence
@@ -48,7 +48,7 @@ function u_in(x, t)
     # get total normal load
     Z = Z0 - y[[1, 2, 5, 6]]
     # get slip angles
-    slip = y[[3, 4, 7, 8]] .- steer(t) * [1, 0, 1, 0]
+    slip = y[[3, 4, 7, 8]] .- steer(t) * [1, 0, 1, 0] * π / 180
     # compute tire force, cancel linear tire
     tire(Z, slip) + [cfy, cry, cfy, cry] .* y[[3, 4, 7, 8]]
 end
@@ -68,7 +68,7 @@ t = t[1:4:end]
 y = y[1:4:end, :]
 
 ZZ = Z0' .- y[:, [1, 2, 5, 6]]
-slip = y[:, [3, 4, 7, 8]] - steer.(t) .* [1, 0, 1, 0]'
+slip = y[:, [3, 4, 7, 8]] - steer.(t) .* [1, 0, 1, 0]' * π / 180
 
 YY = tire.(ZZ, slip)
 acc = sum(YY, dims=2) / (m + 2 * muf + 2 * mur)
@@ -88,9 +88,6 @@ push!(plots, plot(t, slip; xlabel, ylabel, label, lw, xlims))
 ylabel = "Lateral forces [N]"
 push!(plots, plot(t, YY; xlabel, ylabel, label, lw, xlims))
 
-ylabel = "Yaw moment [Nm]"
-push!(plots, plot(t, sum(a * YY[:, [1, 3]] - b * YY[:, [2, 4]], dims=2); xlabel, ylabel, label, lw, xlims))
-
 ylabel = "Vertical forces [N]"
 push!(plots, plot(t, ZZ; xlabel, ylabel, label, lw, xlims, ylims=(0, Inf)))
 
@@ -98,13 +95,16 @@ label = ["F" "R"]
 ylabel = "Lateral weight transfer [N]"
 push!(plots, plot(t, 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]; xlabel, ylabel, label, lw, xlims))
 
-label = "G Lift [m]"
-ylabel = "G Lift [m]"
+label = ""
+ylabel = "Yaw moment [Nm]"
+push!(plots, plot(t, sum(a * YY[:, [1, 3]] - b * YY[:, [2, 4]], dims=2); xlabel, ylabel, label, lw, xlims))
+
+ylabel = "G Lift [mm]"
 push!(plots, plot(t, y[:, 10]; xlabel, ylabel, label, lw, xlims))
 
 label = ["Steer δ" "Roll ϕ" "Pitch θ" "Slip β" "Understeer"]
 ylabel = "Angles [degree]"
-push!(plots, plot(t, [180 / π * steer.(t) y[:, 11:13] -y[:, 9] * (a + b) / u + 180 / π * steer.(t)]; xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, [steer.(t) y[:, 11:13] -y[:, 9] * (a + b) / u + steer.(t)]; xlabel, ylabel, label, lw, xlims))
 
 label = ["ru" "Σf/m" "vdot"]
 ylabel = "acc [m/ss]"

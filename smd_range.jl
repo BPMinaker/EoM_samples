@@ -1,7 +1,6 @@
 using EoM
 
 # this file repeats the spring mass damper example, but shows how we can analyze a series of systems, using Julia's dot notation
-
 build_examples()
 include(joinpath("examples", "input_ex_smd.jl"))
 
@@ -27,7 +26,6 @@ result = analyze.(output)
 summarize(system, vpts, result; ss=[], bode=[0, 0, 1], vpt_name=["c" "Damping coefficient" "Ns/m"])
 
 # we could also write to html output instead of the screen
-
 # summarize(system, vpts, result; ss = [], bode = [0,0,1], vpt_name = ["c" "Damping coefficient" "Ns/m"], format = :html)
 
 println("Done.")

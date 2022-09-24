@@ -1,7 +1,6 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "input_ex_yaw_plane.jl"))
+include(joinpath("models", "input_ex_yaw_plane.jl"))
 
 m = 1500
 a = 1.5

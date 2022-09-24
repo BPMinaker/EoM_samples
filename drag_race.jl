@@ -1,10 +1,8 @@
 using EoM, Interpolations, Plots
 plotly() # choose plot engine
 
-# call EoM function to build example input systems
-build_examples()
 # read in the function that will define our drag race vehicle model
-include(joinpath("examples", "input_ex_drag_race.jl"))
+include(joinpath("models", "input_ex_drag_race.jl"))
 
 # set the values of the parameters here
 # tire radius in meters, for example, for 195/50-R16

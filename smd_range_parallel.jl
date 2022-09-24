@@ -2,8 +2,7 @@ using EoM
 
 # this file repeats the spring mass damper example, but shows how we can analyze a series of systems, using Julia's dot notation
 
-build_examples()
-include(joinpath("examples", "input_ex_smd.jl"))
+include(joinpath("models", "input_ex_smd.jl"))
 
 k = 1.0
 m = 1.0

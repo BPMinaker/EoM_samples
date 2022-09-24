@@ -1,7 +1,6 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "input_ex_bicycle_rider.jl"))
+include(joinpath("models", "input_ex_bicycle_rider.jl"))
 
 f(x) = input_ex_bicycle_rider(u=x)
 vpts = 0.2:0.2:10

@@ -1,7 +1,6 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "input_ex_beam.jl"))
+include(joinpath("models", "input_ex_beam.jl"))
 
 EI1 = 100
 EI2 = 3 * EI1

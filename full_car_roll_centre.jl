@@ -1,8 +1,7 @@
 using EoM, Plots
 plotly()
 
-build_examples()
-include(joinpath("examples", "input_ex_roll_centre.jl"))
+include(joinpath("models", "input_ex_roll_centre.jl"))
 
 m = 1800
 u = 20

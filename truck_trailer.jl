@@ -1,8 +1,7 @@
 using EoM, Plots
 plotly()
 
-build_examples()
-include(joinpath("examples", "input_ex_truck_trailer.jl"))
+include(joinpath("models", "input_ex_truck_trailer.jl"))
 # here you can enter your vehicle specs by name
 m = 16975 / 9.81
 Iz = 3508

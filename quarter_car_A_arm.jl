@@ -1,9 +1,8 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "quarter_car_a_arm_pushrod.jl"))
-include(joinpath("examples", "susp.jl"))
-include(joinpath("examples", "tire.jl"))
+include(joinpath("models", "quarter_car_a_arm_pushrod.jl"))
+include(joinpath("models", "susp.jl"))
+include(joinpath("models", "tire.jl"))
 
 # here you can enter your vehicle specs by name
 a = 2.65 * 0.58

@@ -1,7 +1,6 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "input_ex_top.jl"))
+include(joinpath("models", "input_ex_top.jl"))
 f(x) = input_ex_top(r=x)
 
 vpts = 0:10/50:10

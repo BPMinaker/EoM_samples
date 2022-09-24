@@ -1,7 +1,6 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "input_ex_rotor.jl"))
+include(joinpath("models", "input_ex_rotor.jl"))
 
 vpts = 0.0:2pi/50:2pi
 f(x) = input_ex_rotor(; r=x)

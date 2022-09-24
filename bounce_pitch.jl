@@ -1,7 +1,6 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "input_ex_bounce_pitch.jl"))
+include(joinpath("models", "input_ex_bounce_pitch.jl"))
 m = 2000
 a = 1.5
 b = 1.3

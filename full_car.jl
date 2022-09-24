@@ -1,7 +1,6 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "input_ex_full_car.jl"))
+include(joinpath("models", "input_ex_full_car.jl"))
 
 m = 2000
 a = 2.65 * 0.58

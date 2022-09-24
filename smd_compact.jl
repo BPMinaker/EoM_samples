@@ -1,8 +1,7 @@
 using EoM, Plots
 plotly()
 
-build_examples()
-include(joinpath("examples", "input_ex_smd.jl"))
+include(joinpath("models", "input_ex_smd.jl"))
 
 k = 5
 m = 1

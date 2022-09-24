@@ -4,14 +4,9 @@
 using EoM, Plots
 plotly() # choose plotting engine
 
-# we ask EoM to build a folder of example systems like the spring mass damper; you can build your own input files for other systems, but EoM has many examples; you should look into those files to see the structure of an EoM input file
-
-# the `true` flag is optional, to get feedback on the progress of `build_examples()`
-build_examples(true)
-
 # now, we load the function `input_ex_smd()`, which contains the definition of the spring mass damper system; we make Julia aware of the function by `including` the file that contains it; the `joinpath()` function inserts the appropriate separator, i.e., a forward slash or backslash, depending on the platform (Windows/Mac); you can `include` input files for systems you write yourself in the same way
 
-include(joinpath("examples", "input_ex_smd.jl"))
+include(joinpath("models", "input_ex_smd.jl"))
 
 # one of the cool features of Julia is that it allows `keyword arguments`, i.e., you can pass many arguments to a function, but you can include the name of the argument, so it doesn't matter if you mix up the order; the example input file `input_ex_smd.jl` allows you to redefine the values of the mass (m), the stiffness (k), and the damping (c) by defining the function like this:
 # function input_ex_smd(; m = 1.0, c = 0.1, k = 10.0) 

@@ -1,7 +1,6 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "input_n_dof.jl"))
+include(joinpath("models", "input_n_dof.jl"))
 
 system = input_n_dof(n=10)
 output = run_eom!(system, true)

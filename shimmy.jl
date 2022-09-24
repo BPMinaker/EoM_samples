@@ -1,7 +1,6 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "input_ex_shimmy.jl"))
+include(joinpath("models", "input_ex_shimmy.jl"))
 
 m = 5
 k = 0.3 * m

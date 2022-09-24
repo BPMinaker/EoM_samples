@@ -1,7 +1,6 @@
 using EoM
 
-build_examples()
-include(joinpath("examples", "input_ex_pendulum.jl"))
+include(joinpath("models", "input_ex_pendulum.jl"))
 
 system = input_ex_pendulum()
 

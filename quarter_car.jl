@@ -1,8 +1,7 @@
 using EoM, Plots
 plotly()
 
-build_examples()
-include(joinpath("examples", "input_ex_quarter_car.jl"))
+include(joinpath("models", "input_ex_quarter_car.jl"))
 
 # here you can enter your vehicle specs by name
 ms = 500

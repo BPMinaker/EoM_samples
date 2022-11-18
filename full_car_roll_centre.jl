@@ -1,5 +1,10 @@
-using EoM, Plots
+using EoM, Plots, ForwardDiff
 plotly()
+
+# define a simple nonlinear tire with load sensitivity
+function tire(Z, slip)
+    -(1.2 .- 3.0e-5 .* Z) .* Z .* tanh.(8.2 .* slip)
+end
 
 include(joinpath("models", "input_ex_roll_centre.jl"))
 
@@ -23,14 +28,27 @@ hG = 0.5
 cfy = 40000
 cry = 40000
 
-# build system description
+# build system description with approximate cornering stiffnesses
+system = input_full_car_rc(; m, u, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur, hf, hr, hG, cfy, cry)
+output = run_eom!(system, true)
+
+# get static tire normal loads (kN)
+# assume LF, LR, RF, RR sequence
+# display(getfield.(system.flex_points,:name))
+Z0 = vcat(getfield.(system.flex_points[[1, 2, 5, 6]], :preload)...)
+
+# recompute cornering stiffnesses
+yf(x) = tire(Z0[1], x)
+dyf(x) = ForwardDiff.derivative(yf, x)
+cfy = -dyf(0)
+yr(x) = tire(Z0[2], x)
+dyr(x) = ForwardDiff.derivative(yr, x)
+cry = -dyr(0)
+
+# rebuild the equations of motion using the updated cornering stiffnesses
 system = input_full_car_rc(; m, u, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur, hf, hr, hG, cfy, cry)
 output = run_eom!(system, true)
 result = analyze(output, true)
-
-# get static tire normal loads (kN)
-# display(getfield.(system.flex_points,:name))
-Z0 = vcat(getfield.(system.flex_points[[1, 2, 5, 6]], :preload)...)
 
 # a smooth step function, 3 degrees, with its midpoint (i.e. 1.5) at t = 2
 # the 0.5 terms change the range from -1...1 to 0...1
@@ -50,11 +68,6 @@ function u_in(x, t)
     slip = y[[3, 4, 7, 8]] .- steer(t) * [1, 0, 1, 0] * π / 180
     # compute tire force, cancel linear tire
     tire(Z, slip) + [cfy, cry, cfy, cry] .* y[[3, 4, 7, 8]]
-end
-
-# simple nonlinear tire with load sensitivity
-function tire(Z, slip)
-    -(1.2 .- 3.0e-5 .* Z) .* Z .* tanh.(8.2 .* slip)
 end
 
 println("Solving time history...")
@@ -88,7 +101,7 @@ ylabel = "Lateral forces [N]"
 push!(plots, plot(t, YY; xlabel, ylabel, label, lw, xlims))
 
 ylabel = "Vertical forces [N]"
-push!(plots, plot(t, ZZ; xlabel, ylabel, label, lw, xlims, ylims=(0, Inf)))
+push!(plots, plot(t, ZZ; xlabel, ylabel, label, lw, xlims))
 
 label = ["F" "R"]
 ylabel = "Lateral weight transfer [N]"

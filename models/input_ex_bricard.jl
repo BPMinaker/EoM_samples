@@ -1,18 +1,5 @@
 function input_ex_bricard(; l = 0.2, m = 1.0, g = 9.81)
 
-    ## Copyright (C) 2017, Bruce Minaker
-    ## input_ex_bricad.jl is free software; you can redistribute it and/or modify it
-    ## under the terms of the GNU General Public License as published by
-    ## the Free Software Foundation; either version 2, or (at your option)
-    ## any later version.
-    ##
-    ## input_ex_bricard.jl is distributed in the hope that it will be useful, but
-    ## WITHOUT ANY WARRANTY; without even the implied warranty of
-    ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    ## General Public License for more details at www.gnu.org/copyleft/gpl.html.
-    ##
-    ##--------------------------------------------------------------------
-
     the_system = mbd_system("Bricard mechanism")
 
     p0 = [0, 0, 0]

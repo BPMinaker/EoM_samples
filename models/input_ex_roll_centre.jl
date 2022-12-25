@@ -1,18 +1,5 @@
 function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, kf=17000, kr=19000, cf=1000, cr=1200, m=16975 / 9.81, Ix=818, Iy=3267, Iz=3508, kt=180000, muf=35, mur=30, hf=0.1, hr=0.2, hG=0.4, krf=100, krr=100, cfy=40000, cry=40000, r = 0.3)
 
-    ## Copyright (C) 2017, Bruce Minaker
-    ## input_ex_full_car.jl is free software; you can redistribute it and/or modify it
-    ## under the terms of the GNU General Public License as published by
-    ## the Free Software Foundation; either version 2, or (at your option)
-    ## any later version.
-    ##
-    ## input_ex_full_car.jl is distributed in the hope that it will be useful, but
-    ## WITHOUT ANY WARRANTY; without even the implied warranty of
-    ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    ## General Public License for more details at www.gnu.org/copyleft/gpl.html.
-    ##
-    ##--------------------------------------------------------------------
-
     the_system = mbd_system("Full Car Model with Swing Axles")
 
     # add one body representing the chassis

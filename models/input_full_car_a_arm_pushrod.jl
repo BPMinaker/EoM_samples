@@ -1,18 +1,5 @@
 function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, cr = 40000, m = 1400, Ix = 800, Iy = 2000, Iz = 2200, r = 0.3, tw = 1.5, cs = 2000, ks = 60000)
 
-    ## Copyright (C) 2017, Bruce Minaker
-    ## full_car_a_arm_pushrod.jl is free software; you can redistribute it and/or modify it
-    ## under the terms of the GNU General Public License as published by
-    ## the Free Software Foundation; either version 2, or (at your option)
-    ## any later version.
-    ##
-    ## full_car_a_arm_pushrod.jl is distributed in the hope that it will be useful, but
-    ## WITHOUT ANY WARRANTY; without even the implied warranty of
-    ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    ## General Public License for more details at www.gnu.org/copyleft/gpl.html.
-    ##
-    ##--------------------------------------------------------------------
-
     the_system = mbd_system("Full Car A-Arm Pushrod")
 
     item = body("Chassis")

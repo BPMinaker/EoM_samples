@@ -1,18 +1,8 @@
 using LinearAlgebra
 
 function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u = 10.0, g = 9.81, str = "L ", front = true)
-    ## Copyright (C) 2019, Bruce Minaker
-    ## susp.jl is free software, you can redistribute it and/or modify it
-    ## under the terms of the GNU General Public License as published by
-    ## the Free Software Foundation, either version 2, or (at your option)
-    ## any later version.
-    ##
-    ## susp.jl is distributed in the hope that it will be useful, but
-    ## WITHOUT ANY WARRANTY, without even the implied warranty of
-    ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    ## General Public License for more details at www.gnu.org/copyleft/gpl.html.
-    ##
-    ##--------------------------------------------------------------------
+
+    # Copyright (C) 2019, Bruce Minaker
 
     velocity = [u, 0, 0]
 
@@ -22,7 +12,7 @@ function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u 
         sgn = -1
     end
 
-    ####% LF Suspension bodys
+    # LF Suspension bodys
 
     item = body(str * "Wheel+hub")
     item.mass = 10
@@ -96,7 +86,7 @@ function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u 
     item.location = sue - [0.05, 0, 0] * sgn
     add_item!(item, the_system)
 
-    #### Springs
+    # Springs
 
     item = flex_point(str * "Damper mount bushing")
     item.body[1] = str * "Damper mount"
@@ -117,8 +107,7 @@ function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u 
     item.damping = cs
     add_item!(item, the_system)
 
-
-    #### LF Suspension constraints
+    # LF Suspension constraints
 
     item = rigid_point(str * "Damper mount slider")
     item.body[1] = str * "Damper mount"

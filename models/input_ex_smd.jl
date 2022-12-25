@@ -1,18 +1,5 @@
 function input_ex_smd(; m = 1.0, c = 0.1, k = 10.0)
 
-    ## Copyright (C) 2017, Bruce Minaker
-    ## input_ex_smd.jl is free software; you can redistribute it and/or modify it
-    ## under the terms of the GNU General Public License as published by
-    ## the Free Software Foundation; either version 2, or (at your option)
-    ## any later version.
-    ##
-    ## input_ex_smd.jl is distributed in the hope that it will be useful, but
-    ## WITHOUT ANY WARRANTY; without even the implied warranty of
-    ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    ## General Public License for more details at www.gnu.org/copyleft/gpl.html.
-    ##
-    ##--------------------------------------------------------------------
-
     # a classic spring mass damper problem
     the_system = mbd_system("Spring Mass Damper")
 

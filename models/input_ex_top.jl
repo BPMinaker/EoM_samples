@@ -1,20 +1,7 @@
 function input_ex_top(; r = 1, m = 1e-2, h = 4e-2, It = 3e-4, Ia = 4e-4, g = 9.81)
 
-    ## Copyright (C) 2017, Bruce Minaker
-    ## input_ex_disk.jl is free software; you can redistribute it and/or modify it
-    ## under the terms of the GNU General Public License as published by
-    ## the Free Software Foundation; either version 2, or (at your option)
-    ## any later version.
-    ##
-    ## input_ex_disk.jl is distributed in the hope that it will be useful, but
-    ## WITHOUT ANY WARRANTY; without even the implied warranty of
-    ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    ## General Public License for more details at www.gnu.org/copyleft/gpl.html.
-    ##
-    ##--------------------------------------------------------------------
-
-    ## The classic spinning top problem
-    ## See the paper Stability analysis of rigid multibody mechanical systems with holonomic and nonholonomic constraints by M. Pappalardo et al, Arch Appl Mech (2020) 90:1961–2005
+    # The classic spinning top problem
+    # See the paper Stability analysis of rigid multibody mechanical systems with holonomic and nonholonomic constraints by M. Pappalardo et al, Arch Appl Mech (2020) 90:1961–2005
 
     the_system = mbd_system("Spinning Top")
 

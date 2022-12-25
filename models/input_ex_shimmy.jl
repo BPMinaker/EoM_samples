@@ -1,24 +1,10 @@
 function input_ex_shimmy(; m = 5, k = 0.3 * m, a = 0.5, b = 0.5, u = a + b, I = 0.21 * m * (a + b)^2)
+
+    # Copyright (C) 2018, Bruce Minaker
+    #  Implement the wheel shimmy problem from Schwab and Meijaard paper
+    #  Schwab,A.L., Meijaard,J.P., Dynamics Of Flexible Multibody Systems With Non-Holonomic Constraints: A Finite Element Approach, Multibody System Dynamics 10: (2003) pp. 107-123
+
     the_system = mbd_system("Shimmy Problem")
-
-    ## Copyright (C) 2018, Bruce Minaker
-    ## This file is intended for use with Octave.
-    ## input_ex_shimmy.jl is free software, you can redistribute it and/or modify it
-    ## under the terms of the GNU General Public License as published by
-    ## the Free Software Foundation, either version 2, or (at your option)
-    ## any later version.
-    ##
-    ## input_ex_shimmy.jl is distributed in the hope that it will be useful, but
-    ## WITHOUT ANY WARRANTY, without even the implied warranty of
-    ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    ## General Public License for more details at www.gnu.org/copyleft/gpl.html.
-    ##
-    ##--------------------------------------------------------------------
-
-    ##  Implement the wheel shimmy problem from Schwab and Meijaard paper
-    ##  Schwab,A.L., Meijaard,J.P., Dynamics Of Flexible Multibody Systems With Non-Holonomic Constraints: A Finite Element Approach, Multibody System Dynamics 10: (2003) pp. 107-123
-
-
 
     item = body("chassis")
     item.mass = m

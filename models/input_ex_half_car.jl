@@ -1,20 +1,7 @@
 function input_ex_half_car(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 38000, cf = 1000, cr = 1200, m = 16975 / 9.81, Iy = 3267, kt = 300000, muf = 50, mur = 50)
 
-    ## Copyright (C) 2017, Bruce Minaker
-    ## input_ex_half_car.jl is free software; you can redistribute it and/or modify it
-    ## under the terms of the GNU General Public License as published by
-    ## the Free Software Foundation; either version 2, or (at your option)
-    ## any later version.
-    ##
-    ## input_ex_half_car.jl is distributed in the hope that it will be useful, but
-    ## WITHOUT ANY WARRANTY; without even the implied warranty of
-    ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    ## General Public License for more details at www.gnu.org/copyleft/gpl.html.
-    ##
-    ##--------------------------------------------------------------------
-
-    ## A half car model
-    ## Note tire and suspension properties are for both left and right sides summed
+    # A half car model
+    # Note tire and suspension properties are for both left and right sides summed
     the_system = mbd_system("Half Car Model")
 
     # add one body representing the chassis

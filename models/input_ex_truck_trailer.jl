@@ -1,18 +1,5 @@
 function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 80000, cr = 80000, m = 16975 / 9.81, Iz = 3508, d = 2.7, e = 2.7, h = 0.3, ct = 80000, mt = 2000, It = 3000)
 
-    ## Copyright (C) 2017, Bruce Minaker
-    ## input_ex_truck_trailer.jl is free software; you can redistribute it and/or modify it
-    ## under the terms of the GNU General Public License as published by
-    ## the Free Software Foundation; either version 2, or (at your option)
-    ## any later version.
-    ##
-    ## input_ex_truck_trailer.jl is distributed in the hope that it will be useful, but
-    ## WITHOUT ANY WARRANTY; without even the implied warranty of
-    ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    ## General Public License for more details at www.gnu.org/copyleft/gpl.html.
-    ##
-    ##--------------------------------------------------------------------
-
     ## The classic truck and trailer model
     ## a = front axle to truck cg
     ## b = rear axle to truck cg
@@ -26,6 +13,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     ## cf = front cornering stiffness (total)
     ## cr = rear cornering stiffness (total)
     ## ct = trailer cornering stiffness (total)
+
     the_system = mbd_system("Truck Trailer")
 
     if (u == 0)

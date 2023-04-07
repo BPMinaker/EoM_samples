@@ -7,15 +7,15 @@ include(joinpath("models", "input_ex_drag_race.jl"))
 # set the values of the parameters here
 # tire radius in meters, for example, for 195/50-R16
 re = (8 * 25.4 + 0.5 * 195) / 1000
-eta = 0.9 # driveline efficiency
-gear = [5, 4, 3, 2, 1] # ratios, starting from 1st
+η = 0.9 # driveline efficiency
+gear = [6, 5, 4, 3, 2, 1] # ratios, starting from 1st
 fd = 4.1 # final drive ratio
 a = 1.2 # cg location [m]
 b = 1.4
 
-m = 1500 # mass
+m = 1600 # mass
 h_G = 0.4 # height of centre of mass [m]
-mu = 0.9 # friction limit
+μ = 0.9 # friction limit
 # assume 5% tire slip, for purpose of computing shift speeds
 slip = 1.05
 rdf = 1.0 # rear drive fraction
@@ -24,15 +24,15 @@ rdf = 1.0 # rear drive fraction
 # engine torque [Nm] in evenly spaced engine speed increments from 0 to redline
 # we need to fudge a little and have a torque value even at zero speed, otherwise no launch
 ti = [30, 50, 75, 115, 150, 160, 150, 120]
-wi = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000]
-redline = wi[end]
+ωi = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000]
+redline = ωi[end]
 
 # make the fit, linear is not the best, but good enough
-te = LinearInterpolation(wi, ti)
-# te is now a callable function, i.e., te(w) returns torque (in Nm) at engine speed w (in rpms)
+te = LinearInterpolation(ωi, ti)
+# te is now a callable function, i.e., te(ω) returns torque (in Nm) at engine speed ω (in rpms)
 
 # calculate shift speeds (at redline)
-vmax = redline * 2pi / 60 * re / slip / fd ./ gear
+vmax = redline * 2π / 60 * re / slip / fd ./ gear
 println("Shift speeds [km/h]:")
 display(round.(3.6 * vmax, digits=2))
 
@@ -56,7 +56,7 @@ Zr0 = system.flex_points[2].preload[1]
 println("Static Zf=", round(Zf0, digits=2), " N")
 println("Static Zr=", round(Zr0, digits=2), " N")
 
-# do some analysis, to convert the equations to state space form (don't try to decompose because too many repeated zero eigenvalues makes the algorithm fail)
+# do some analysis, to convert the equations to state space form
 result = analyze(output)
 
 # save the state space matrices in a convenient notation
@@ -89,10 +89,10 @@ function u(x, t)
 
 
     # calculate air resistance from outputs
-    rho = 1.23
+    ρ = 1.23
     af = 2.85
     cd = 0.35
-    u_vec[1] = rho / 2 * af * cd * y[2] * abs(y[2]) # use speed times abs(speed) instead of speed squared to switch force direction if we are moving backwards (which should never happen, but sometimes the rolling resistance model can cause weird things at very low speed)
+    u_vec[1] = ρ / 2 * af * cd * y[2] * abs(y[2]) # use speed times abs(speed) instead of speed squared to switch force direction if we are moving backwards (which should never happen, but sometimes the rolling resistance model can cause weird things at very low speed)
 
     # find which gear we should use
     # note the .< returns a vector, i.e, (y[2] .< vmax) returns a vector of true or false where the current speed is below the shift point, we use findnext to find the index of the first true
@@ -102,17 +102,17 @@ function u(x, t)
     end
 
     # find engine speed (in rpm)
-    w = y[2] * gear[n] * fd * slip * 60 / 2pi / re
+    ω = y[2] * gear[n] * fd * slip * 60 / 2π / re
 
     # if somehow we are moving backwards, set w=0, to prevent interpolation error (although it means we must have an issue somewhere else!)
     # note the shortcut conditional, in lieu of if statement
-    w < 0 && (w = 0)
+    ω < 0 && (ω = 0)
 
     # rev limiter, again shortcut conditional
-    w > redline && (w = redline)
+    ω > redline && (ω = redline)
 
     # calculate traction force (axle torque/radius)
-    X = te(w) * gear[n] * fd * eta / re
+    X = te(ω) * gear[n] * fd * η / re
     Xr = rdf * X
     Xf = (1 - rdf) * X
 
@@ -121,11 +121,11 @@ function u(x, t)
     Zf = Zf0 - y[6] - y[7]
 
     # check for wheelspin, conditional
-    if Xr > mu * Zr
-        Xr = mu * Zr
+    if Xr > μ * Zr
+        Xr = μ * Zr
     end
-    if Xf > mu * Zf
-        Xf = mu * Zf
+    if Xf > μ * Zf
+        Xf = μ * Zf
     end
 
     if Xf > (1 - rdf) / rdf * Xr

@@ -108,17 +108,6 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.axis = [1, 0, 0]
     add_item!(item, the_system)
 
-
-    # item = rigid_point("LR susp")
-    # item.body[1] = "LR wheel"
-    # item.body[2] = "chassis"
-    # item.location = [-b, tr / 2, hr]
-    # item.forces = 2
-    # item.moments = 3
-    # item.axis = [0, 0, 1]
-    # add_item!(item, the_system)
-
-
     # anti-roll
     item = body("LF anti-roll arm")
     item.location = [a - 0.2, tf / 2 - r / 2, r - 0.1]
@@ -127,7 +116,6 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item = body("LR anti-roll arm")
     item.location = [-b + 0.2, tr / 2 - r / 2, r - 0.1]
     add_item!(item, the_system)
-
 
     item = rigid_point("LF anti-roll hinge")
     item.body[1] = "LF anti-roll arm"
@@ -147,7 +135,6 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.axis = [0, 1, 0]
     add_item!(item, the_system)
 
-
     item = link("LF drop link")
     item.body[1] = "LF anti-roll arm"
     item.body[2] = "LF axle"
@@ -162,9 +149,8 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.location[2] = [-b, tr / 2 - r / 2, r]
     add_item!(item, the_system)
 
-
     # anti-roll bars
-    # note that the right side entries will come from the mirror
+    # note that the right side bodies will come from the mirror
     item = spring("F anti-roll")
     item.body[1] = "LF anti-roll arm"
     item.body[2] = "RF anti-roll arm"
@@ -206,7 +192,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
 
 
     # tire vertical stifness
-    item = flex_point("LF tire, Z")
+    item = flex_point("LF tire, k_t")
     item.body[1] = "LF wheel"
     item.body[2] = "ground"
     item.stiffness = [kt, 0]
@@ -218,7 +204,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.rolling_axis = [0, 1, 0]
     add_item!(item, the_system)
 
-    item = flex_point("LR tire, Z")
+    item = flex_point("LR tire, k_t")
     item.body[1] = "LR wheel"
     item.body[2] = "ground"
     item.stiffness = [kt, 0]
@@ -230,8 +216,8 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.rolling_axis = [0, 1, 0]
     add_item!(item, the_system)
 
-
-    item = flex_point("LF tire, Y")
+    # tire cornering stiffness
+    item = flex_point("LF tire, c_f")
     item.body[1] = "LF wheel"
     item.body[2] = "ground"
     item.damping = [cfy / u, 0]
@@ -241,7 +227,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.axis = [0, 1, 0]
     add_item!(item, the_system)
 
-    item = flex_point("LR tire, Y")
+    item = flex_point("LR tire, c_r")
     item.body[1] = "LR wheel"
     item.body[2] = "ground"
     item.damping = [cry / u, 0]
@@ -251,10 +237,8 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.axis = [0, 1, 0]
     add_item!(item, the_system)
 
-
-
     # tire lateral force
-    item = actuator("LF tire, Y")
+    item = actuator("Y_lf")
     item.body[1] = "LF wheel"
     item.body[2] = "ground"
     item.location[1] = [a, tf / 2, 0]
@@ -262,7 +246,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.units = "N"
     add_item!(item, the_system)
 
-    item = actuator("LR tire, Y")
+    item = actuator("Y_lr")
     item.body[1] = "LR wheel"
     item.body[2] = "ground"
     item.location[1] = [-b, tr / 2, 0]
@@ -270,9 +254,8 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.units = "N"
     add_item!(item, the_system)
 
-
     # tire measure vertical force
-    item = sensor("LF tire, Z")
+    item = sensor("Z_lf")
     item.body[1] = "LF wheel"
     item.body[2] = "ground"
     item.gain = kt
@@ -281,7 +264,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.units = "N"
     add_item!(item, the_system)
 
-    item = sensor("LR tire, Z")
+    item = sensor("Z_lr")
     item.body[1] = "LR wheel"
     item.body[2] = "ground"
     item.gain = kt
@@ -290,9 +273,8 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.units = "N"
     add_item!(item, the_system)
 
-
     # tire, measure slip angle
-    item = sensor("LF tire, alpha")
+    item = sensor("α_lf")
     item.body[1] = "LF wheel"
     item.body[2] = "ground"
     item.location[1] = [a, tf / 2, 0]
@@ -303,7 +285,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.units = "radian"
     add_item!(item, the_system)
 
-    item = sensor("LR tire, alpha")
+    item = sensor("α_lr")
     item.body[1] = "LR wheel"
     item.body[2] = "ground"
     item.location[1] = [-b, tr / 2, 0]
@@ -328,7 +310,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     add_item!(item, the_system)
 
     # measure the bounce, pitch, and roll
-    item = sensor("zG")
+    item = sensor("z_G")
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, 0.25]
@@ -337,7 +319,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.units = "mm"
     add_item!(item, the_system)
 
-    item = sensor("phi")
+    item = sensor("ϕ")
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, 0.25]
@@ -347,7 +329,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.units = "degree"
     add_item!(item, the_system)
 
-    item = sensor("theta")
+    item = sensor("θ")
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, 0.25]
@@ -357,7 +339,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.units = "degree"
     add_item!(item, the_system)
 
-    item = sensor("beta")
+    item = sensor("β")
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, 0.25]

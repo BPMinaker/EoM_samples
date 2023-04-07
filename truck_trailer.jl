@@ -35,7 +35,13 @@ y = splsim(result[n].ss_eqns, steer, t)
 # merge vector of vectors into matrix, so we can pull out individual outputs (rows) to plot
 res = hcat(y...)
 # evaluate the steer angle so we can include it in the plots 
-delta = steer.(0, t)
+δ = steer.(0, t)
+
+r = res[1, :]
+β = res[2, :]
+α_u = res[3, :]
+γ = res[4, :]
+a_lat = res[5, :]
 
 xlabel = "Time [s]"
 lw = 2 # thicker line weight
@@ -43,27 +49,27 @@ lw = 2 # thicker line weight
 # plot yaw rate vs time
 ylabel = "Yaw rate [deg/s], Steer angle [deg]"
 label = ["Yaw rate" "Steer angle"]
-plots = [plot(t, [res[1, :] delta]; xlabel, ylabel, label, lw)]
+plots = [plot(t, [r δ]; xlabel, ylabel, label, lw)]
 
 # plot body slip angle vs time
 ylabel = "Body slip angle [deg], Steer angle [deg]"
 label = ["Body slip angle" "Steer angle"]
-push!(plots, plot(t, [res[2, :] delta]; xlabel, ylabel, label, lw))
+push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw))
 
 # plot understeer angle vs time
 ylabel = "Understeer angle [deg], Steer angle [deg]"
 label = ["Understeer angle" "Steer angle"]
-push!(plots, plot(t, [res[3, :] delta]; xlabel, ylabel, label, lw))
+push!(plots, plot(t, [α_u δ]; xlabel, ylabel, label, lw))
 
 # plot trailer sway angle vs time
 ylabel = "Sway angle [deg], Steer angle [deg]"
 label = ["Sway angle" "Steer angle"]
-push!(plots, plot(t, [res[4, :] delta]; xlabel, ylabel, label, lw))
+push!(plots, plot(t, [γ δ]; xlabel, ylabel, label, lw))
 
 # plot lateral acceleration vs time
 ylabel = "Lateral acceleration [g], Steer angle [deg]"
 label = ["Lateral acceleration" "Steer angle"]
-push!(plots, plot(t, [res[5, :] delta]; xlabel, ylabel, label, lw))
+push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw))
 
 bode = [0, 1, 1, 1, 0]
 summarize(system, vpts, result, true; plots, bode)

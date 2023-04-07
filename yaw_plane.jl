@@ -5,7 +5,7 @@ include(joinpath("models", "input_ex_yaw_plane.jl"))
 
 # here you can enter your vehicle specs by name, including m, Iz, a, b, cf, cr; make sure you add the property you want to set to the argument list of `input_ex_yaw_plane()` below after you set it; properties you don't set will use defaults defined in `input_ex_yaw_plane()`
 m = 1500
-a = 1.6
+a = 1.3
 b = 1.5
 
 # define a dummy function that just calls our input function, but also adds the parameters we just set
@@ -57,22 +57,22 @@ size = (600, 300)
 
 # plot yaw rate vs time
 ylabel = "Yaw rate [deg/s], Steer angle [deg]"
-label = ["Yaw rate" "Steer angle"]
+label = ["Yaw rate r" "Steer angle δ"]
 plots = [plot(t, [r δ]; xlabel, ylabel, label, lw, size)]
 
 # plot body slip angle vs time
 ylabel = "Body slip angle [deg], Steer angle [deg]"
-label = ["Body slip angle" "Steer angle"]
+label = ["Body slip angle β" "Steer angle δ"]
 push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw, size))
 
 # plot understeer angle vs time
 ylabel = "Understeer angle [deg], Steer angle [deg]"
-label = ["Understeer angle" "Steer angle"]
+label = ["Understeer angle α_u" "Steer angle δ"]
 push!(plots, plot(t, [α_u δ]; xlabel, ylabel, label, lw, size))
 
 # plot lateral acceleration vs time
 ylabel = "Lateral acceleration [g], Steer angle [deg]"
-label = ["Lateral acceleration" "Steer angle"]
+label = ["Lateral acceleration" "Steer angle δ"]
 push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
 
 # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m

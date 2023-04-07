@@ -122,8 +122,12 @@ label = ["ru" "Σf/m" "vdot"]
 ylabel = "acc [m/ss]"
 push!(plots, plot(t, [y[:, 14] acc acc - y[:, 14]]; xlabel, ylabel, label, lw, xlims))
 
+bode = zeros(16, 4)
+bode[15, 1:4] = [1, 1, 1, 1]
+ss = bode
 
-summarize(system, result; plots)
+
+summarize(system, result; plots, bode, ss)
 # summarize(system, result; plots, format = :html)
 
 # generate animations of the mode shapes

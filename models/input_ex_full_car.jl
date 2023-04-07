@@ -12,38 +12,24 @@ function input_ex_full_car(; u = 0, a = 1.189, b = 2.885 - 1.189, tf = 1.595, tr
     add_item!(item, the_system)
     add_item!(weight(item), the_system)
 
-    item = body("left front unsprung")
+    item = body("LF unsprung")
     item.mass = muf
     item.location = [a, tf / 2, 0.1]
     item.velocity = [u, 0, 0]
     add_item!(item, the_system)
     add_item!(weight(item), the_system)
 
-    item = body("right front unsprung")
-    item.mass = muf
-    item.location = [a, -tf / 2, 0.1]
-    item.velocity = [u, 0, 0]
-    add_item!(item, the_system)
-    add_item!(weight(item), the_system)
-
-    item = body("left rear unsprung")
+    item = body("LR unsprung")
     item.mass = mur
     item.location = [-b, tr / 2, 0.1]
     item.velocity = [u, 0, 0]
     add_item!(item, the_system)
     add_item!(weight(item), the_system)
 
-    item = body("right rear unsprung")
-    item.mass = mur
-    item.location = [-b, -tr / 2, 0.1]
-    item.velocity = [u, 0, 0]
-    add_item!(item, the_system)
-    add_item!(weight(item), the_system)
-
     # front suspension
-    item = flex_point("left front spring")
+    item = flex_point("LF spring")
     item.body[1] = "chassis"
-    item.body[2] = "left front unsprung"
+    item.body[2] = "LF unsprung"
     item.location = [a, tf / 2, 0.25] # front axle "a" m ahead of cg
     item.forces = 1
     item.moments = 0
@@ -52,21 +38,10 @@ function input_ex_full_car(; u = 0, a = 1.189, b = 2.885 - 1.189, tf = 1.595, tr
     item.damping = [cf, 0]
     add_item!(item, the_system)
 
-    item = flex_point("right front spring")
-    item.body[1] = "chassis"
-    item.body[2] = "right front unsprung"
-    item.location = [a, -tf / 2, 0.25]  ## Front axle "a" m ahead of cg
-    item.forces = 1
-    item.moments = 0
-    item.axis = [0, 0, 1]  ## Spring acts in z direction
-    item.stiffness = [kf, 0]  ## Linear stiffness "kf" N/m; (torsional stiffness zero, not a torsion spring so has no effect
-    item.damping = [cf, 0]
-    add_item!(item, the_system)
-
     # rear suspension
-    item = flex_point("left rear spring")
+    item = flex_point("LR spring")
     item.body[1] = "chassis"
-    item.body[2] = "left rear unsprung"
+    item.body[2] = "LR unsprung"
     item.location = [-b, tr / 2, 0.25]  ## Front axle "a" m ahead of cg
     item.forces = 1
     item.moments = 0
@@ -75,20 +50,10 @@ function input_ex_full_car(; u = 0, a = 1.189, b = 2.885 - 1.189, tf = 1.595, tr
     item.damping = [cr, 0]
     add_item!(item, the_system)
 
-    item = flex_point("right rear spring")
-    item.body[1] = "chassis"
-    item.body[2] = "right rear unsprung"
-    item.location = [-b, -tr / 2, 0.25]  ## Front axle "a" m ahead of cg
-    item.forces = 1
-    item.moments = 0
-    item.axis = [0, 0, 1]  # spring acts in z direction
-    item.stiffness = [kr, 0]  # linear stiffness "kr" N/m; (torsional stiffness zero, not a torsion spring so has no effect
-    item.damping = [cr, 0]
-    add_item!(item, the_system)
 
     # tires
-    item = flex_point("left front tire")
-    item.body[1] = "left front unsprung"
+    item = flex_point("LF tire")
+    item.body[1] = "LF unsprung"
     item.body[2] = "ground"
     item.stiffness = [kt, 0]
     item.damping = [0, 0]
@@ -98,19 +63,8 @@ function input_ex_full_car(; u = 0, a = 1.189, b = 2.885 - 1.189, tf = 1.595, tr
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
-    item = flex_point("right front tire")
-    item.body[1] = "right front unsprung"
-    item.body[2] = "ground"
-    item.stiffness = [kt, 0]
-    item.damping = [0, 0]
-    item.location = [a, -tf / 2, 0.15]
-    item.forces = 1
-    item.moments = 0
-    item.axis = [0, 0, 1]
-    add_item!(item, the_system)
-
-    item = flex_point("left rear tire")
-    item.body[1] = "left rear unsprung"
+    item = flex_point("LR tire")
+    item.body[1] = "LR unsprung"
     item.body[2] = "ground"
     item.stiffness = [kt, 0]
     item.damping = [0, 0]
@@ -120,20 +74,10 @@ function input_ex_full_car(; u = 0, a = 1.189, b = 2.885 - 1.189, tf = 1.595, tr
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
-    item = flex_point("right rear tire")
-    item.body[1] = "right rear unsprung"
-    item.body[2] = "ground"
-    item.stiffness = [kt, 0]
-    item.damping = [0, 0]
-    item.location = [-b, -tr / 2, 0.15]
-    item.forces = 1
-    item.moments = 0
-    item.axis = [0, 0, 1]
-    add_item!(item, the_system)
 
     # suspension constraints
-    item = rigid_point("left front susp")
-    item.body[1] = "left front unsprung"
+    item = rigid_point("LF susp")
+    item.body[1] = "LF unsprung"
     item.body[2] = "chassis"
     item.location = [a, tf / 2, 0.1]
     item.forces = 2
@@ -141,28 +85,10 @@ function input_ex_full_car(; u = 0, a = 1.189, b = 2.885 - 1.189, tf = 1.595, tr
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
-    item = rigid_point("right front susp")
-    item.body[1] = "right front unsprung"
-    item.body[2] = "chassis"
-    item.location = [a, -tf / 2, 0.1]
-    item.forces = 2
-    item.moments = 3
-    item.axis = [0, 0, 1]
-    add_item!(item, the_system)
-
-    item = rigid_point("left rear susp")
-    item.body[1] = "left rear unsprung"
+    item = rigid_point("LR susp")
+    item.body[1] = "LR unsprung"
     item.body[2] = "chassis"
     item.location = [-b, tr / 2, 0.1]
-    item.forces = 2
-    item.moments = 3
-    item.axis = [0, 0, 1]
-    add_item!(item, the_system)
-
-    item = rigid_point("right rear susp")
-    item.body[1] = "right rear unsprung"
-    item.body[2] = "chassis"
-    item.location = [-b, -tr / 2, 0.1]
     item.forces = 2
     item.moments = 3
     item.axis = [0, 0, 1]
@@ -188,9 +114,11 @@ function input_ex_full_car(; u = 0, a = 1.189, b = 2.885 - 1.189, tf = 1.595, tr
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
+    mirror!(the_system)
+
     # force motion
     item = actuator("u_lf")
-    item.body[1] = "left front unsprung"
+    item.body[1] = "LF unsprung"
     item.body[2] = "ground"
     item.location[1] = [a, tf / 2, 0.25]
     item.location[2] = [a, tf / 2, 0]

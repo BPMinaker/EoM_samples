@@ -40,15 +40,16 @@ z0 = zoft.(0, t)
 xlabel = "Time [s]"
 ylabel = "Displacement [m]"
 lw = 2
+size = (800, 600)
 
 label = ["Sprung mass" "Ground"]
-plots = [plot(t, [z1 z0]; xlabel, ylabel, label, lw)]
+plots = [plot(t, [z1 z0]; xlabel, ylabel, label, lw, size)]
 
 label = ["Suspension travel" "Ground"]
-push!(plots, plot(t, [z12 z0]; xlabel, ylabel, label, lw))
+push!(plots, plot(t, [z12 z0]; xlabel, ylabel, label, lw, size))
 
 label = ["Tire compression" "Ground"]
-push!(plots, plot(t, [z20 z0]; xlabel, ylabel, label, lw))
+push!(plots, plot(t, [z20 z0]; xlabel, ylabel, label, lw, size))
 
 summarize(system, result, verbose; plots)
 # summarize(system, result, verbose; plots, format = :html)

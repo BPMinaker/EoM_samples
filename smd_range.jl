@@ -3,14 +3,15 @@ using EoM
 # this file repeats the spring mass damper example, but shows how we can analyze a series of systems, using Julia's dot notation
 include(joinpath("models", "input_ex_smd.jl"))
 
-k = 16.0
+# set stiffness and mass so that natural frequency is 1 Hz (2π rad/s), note that ζ = 1 (critical damping) is therefore c = 4π
+k = 4π^2
 m = 1.0
 
 # here we redefine the input function, so we can call it using any value of c
 f(x) = input_ex_smd(; k, m, c=x)
 
-# then we define the range of values for c
-vpts = 0:0.1:10
+# then we define the range of values for c, from 0 to 1.5 times critical
+vpts = (0.01:0.01:1.5) * 4π
 
 # then we call the function using the dot notation
 system = f.(vpts)

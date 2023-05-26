@@ -11,6 +11,6 @@ summarize(system, result)
 # summarize(system, result, format = :html)
 
 # using EoM_X3D
-#Banimate_modes(system, result)
+# animate_modes(system, result)
 
 println("Done.")

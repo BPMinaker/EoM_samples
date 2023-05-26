@@ -13,7 +13,9 @@ function input_ex_beam(; EI1 = 1, EI2 = 1, mpul = 1, l = 1, n = 1)
     # ω_3 = 7.885^2 ...
     # note L = nl
 
-    # println(((1.875 / (n * l))^2 * (EI / mpul)^0.5) / 2pi)
+    #println(((1.875 / (n * l))^2 * (EI1 / mpul)^0.5) / 2pi)
+
+    #println(((1.875 / (n * l))^2 * (EI2 / mpul)^0.5) / 2pi)
 
     the_system = mbd_system("Beam")
 

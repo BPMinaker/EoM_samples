@@ -190,23 +190,25 @@ t = t[1:5:end]
 y = y[1:5:end, :]
 
 # set plot text, etc
-lw = 2 # thicker plot lineweight
 xlabel = "Time [s]"
-label = ""
 ylabel = "Distance [m]"
+label = ""
+lw = 2 # thicker plot lineweight
+size = (800, 400)
+
 # make the first plot and save it in a vector
-plots = [plot(t, y[:, 1]; xlabel, ylabel, label, lw)]
+plots = [plot(t, y[:, 1]; xlabel, ylabel, label, lw, size)]
 
 # update label, make the next plot, and push it onto the plot vector
 ylabel = "Velocity [km/h]"
-push!(plots, plot(t, y[:, 2]; xlabel, ylabel, label, lw))
+push!(plots, plot(t, y[:, 2]; xlabel, ylabel, label, lw, size))
 
 ylabel = "Accl'n [g]"
-push!(plots, plot(t, y[:, 3]; ylims=(0, Inf), xlabel, ylabel, label, lw))
+push!(plots, plot(t, y[:, 3]; ylims=(0, Inf), xlabel, ylabel, label, lw, size))
 
 label = ["Z_r [kN]" "Z_f [kN]"]
 ylabel = "Axle vertical load [N]"
-push!(plots, plot(t, y[:, [4, 6]]; ylims=(0, Inf), xlabel, ylabel, label, lw))
+push!(plots, plot(t, y[:, [4, 6]]; ylims=(0, Inf), xlabel, ylabel, label, lw, size))
 
 # pass all the results and plots, skip the Bode plots for now
 summarize(system, result; plots, bode=[])

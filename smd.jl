@@ -107,12 +107,13 @@ res = [hcat(y...)' u.(0, t)]
 println("Plotting...")
 
 # here there are some keyword arguments for the lineweight and the labels
-lw = 2
 xlabel = "Time [s]"
 ylabel = "z [m], z dot [m/s], f [N]"
 label = ["z" "zdot" "f"]
+lw = 2
+size = (800, 600)
 
-p1 = plot(t, res[:,[1, 2, 4]]; lw, xlabel, ylabel, label)
+p1 = plot(t, res[:,[1, 2, 4]]; xlabel, ylabel, label, lw, size)
 
 # the plot is created and stored but not shown
 # we could send it to the screen using: display(p1)
@@ -123,12 +124,12 @@ p1 = plot(t, res[:,[1, 2, 4]]; lw, xlabel, ylabel, label)
 w = 0.5 * result.omega_n[1]
 y = splsim(result.ss_eqns, u, t)
 res = [hcat(y...)' u.(0, t)]
-p2 = plot(t, res[:,[1, 2, 4]]; lw, xlabel, ylabel, label)
+p2 = plot(t, res[:,[1, 2, 4]]; xlabel, ylabel, label, lw, size)
 
 w = 2.0 * result.omega_n[1]
 y = splsim(result.ss_eqns, u, t)
 res = [hcat(y...)' u.(0, t)]
-p3 = plot(t, res[:,[1, 2, 4]]; lw, xlabel, ylabel, label)
+p3 = plot(t, res[:,[1, 2, 4]]; xlabel, ylabel, label, lw, size)
 
 # now let's display all out results, along with the extra plots; the `bode` argument says only generate the bode plot of the third output
 

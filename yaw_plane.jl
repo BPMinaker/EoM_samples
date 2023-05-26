@@ -4,12 +4,18 @@ plotly()
 include(joinpath("models", "input_ex_yaw_plane.jl"))
 
 # here you can enter your vehicle specs by name, including m, Iz, a, b, cf, cr; make sure you add the property you want to set to the argument list of `input_ex_yaw_plane()` below after you set it; properties you don't set will use defaults defined in `input_ex_yaw_plane()`
-m = 1500
-a = 1.3
-b = 1.5
+m = 1600
+fwf = 0.58
+wb = 2.6
+
+b = wb * fwf
+a = wb - b
+Iz = 2600
+cf = 70000
+cr = 80000
 
 # define a dummy function that just calls our input function, but also adds the parameters we just set
-f(x) = input_ex_yaw_plane(; u=x, m, a, b)
+f(x) = input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr)
 
 # here we set the speed in `vpts`, which gets sent one at a time to the `f()` function, which finally sends them to the `input_ex_yaw_plane()` function, where they determine the value of `u`
 vpts = 1:0.5:30
@@ -50,10 +56,12 @@ r = res[1, :]
 α_u = res[3, :]
 a_lat = res[4, :]
 y_dist = res[5, :]
+α_f = res[7, :]
+α_r = res[8, :]
 
 xlabel = "Time [s]"
 lw = 2 # thicker line weight
-size = (600, 300)
+size = (800, 600)
 
 # plot yaw rate vs time
 ylabel = "Yaw rate [deg/s], Steer angle [deg]"
@@ -65,10 +73,16 @@ ylabel = "Body slip angle [deg], Steer angle [deg]"
 label = ["Body slip angle β" "Steer angle δ"]
 push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw, size))
 
-# plot understeer angle vs time
+# # plot understeer angle vs time
+# ylabel = "Understeer angle [deg], Steer angle [deg]"
+# label = ["Understeer angle α_u" "Steer angle δ"]
+# push!(plots, plot(t, [α_u δ]; xlabel, ylabel, label, lw, size))
+
+# plot slip angles vs time
 ylabel = "Understeer angle [deg], Steer angle [deg]"
-label = ["Understeer angle α_u" "Steer angle δ"]
-push!(plots, plot(t, [α_u δ]; xlabel, ylabel, label, lw, size))
+label = ["Slip angle α_f" "Slip angle α_r" "Understeer angle α_u" "Steer angle δ"]
+push!(plots, plot(t, [α_f α_r α_u δ]; xlabel, ylabel, label, lw, size))
+
 
 # plot lateral acceleration vs time
 ylabel = "Lateral acceleration [g], Steer angle [deg]"
@@ -81,10 +95,12 @@ ylabel = "y [m]"
 label = ""
 push!(plots, plot(vel * t, y_dist; xlabel, ylabel, label, lw, size))
 
+
+
 # write all the results; steady state plots of outputs 1 through 4 (5 and 6 don't reach steady state), and Bode of only 2 and 3, as they are the only ones where input and output have the same units
 
-ss = [1, 1, 1, 1, 0, 0]
-bode = [0, 1, 1, 0, 0, 0]
+ss = [1, 1, 1, 1, 0, 0, 1, 1]
+bode = [0, 1, 1, 0, 0, 0, 1, 1]
 
 summarize(system, vpts, result; plots, ss, bode)
 # summarize(system, vpts, result; plots, ss, bode, format = :html)

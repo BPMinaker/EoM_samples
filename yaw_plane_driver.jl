@@ -9,24 +9,18 @@ m = 1500
 a = 1.5
 b = 1.6
 
-# define a dummy function that just calls our input function, but also adds the parameters we just set
-
+# define the system
 u = 30
 system = input_ex_yaw_plane(; u, m, a, b)
 
-# here we set the speed in vpts, which gets passed as the vpts argument in run_eom, which in turn gets sent one at a time to the temp function, which finally sends them to the input_ex_yaw_plane function
-
 # generate the equations of motion
-
 output = run_eom!(system, true)
 
 # do the eigenvalues, freq resp
-
 result = analyze(output, true)
 
 # define time interval
-
-t = 0:0.05:20
+t = 0:0.02:20
 
 # now lets try some closed loop feedback, where the driver input depends on the location; define the road geometry; note that we assume small heading angles in the linear equations, so can't do circuits yet
 
@@ -61,56 +55,61 @@ function steer_driver(y, t)
     heading_error = heading_t - heading
 
     # compute the appropriate steer angle to return to the road
-    180 / pi * ((a + b) * curvature + 1.1 * heading_error + 0.1 * offset_error)
+    180 / π * ((a + b) * curvature + 1.1 * heading_error + 0.1 * offset_error)
 end
 
 # define a dummy function to convert the driver model from a function of the output to a function of the state, because the solver requires the input to be a function of the state
-
-steer(x, t) = steer_driver(result.ss_eqns[1].C * x, t)
+steer(x, t) = steer_driver(result.ss_eqns.C * x, t)
 
 # solve the equation of motion with the closed loop driver model
-
 y = splsim(result.ss_eqns, steer, t)
 
-# go back and figure out what steer angle the sriver model used, so we can plot it
+# go back and figure out what steer angle the driver model used, so we can plot it
+δ = steer_driver.(y, t)
 
-#delta = steer_driver.(y, t)
+res = hcat(y...)
+r = res[1, :]
+β = res[2, :]
+α_u = res[3, :]
+a_lat = res[4, :]
+y_dist = res[5, :]
+α_f = res[7, :]
+α_r = res[8, :]
 
-# merge vector of vectors for plotting
-res = [hcat(y...)' steer_driver.(y, t)]
-
-# Plot yaw rate vs time
 xlabel = "Time [s]"
-ylabel = "Yaw rate [deg/s], Steer angle [deg]"
-label = ["Yaw rate" "Steer angle"]
 lw = 2 # thicker line weight
-plots = [plot(t, res[:, [1, end]]; xlabel, ylabel, label, lw)]
+size = (800, 400)
+
+# plot yaw rate vs time
+ylabel = "Yaw rate [deg/s], Steer angle [deg]"
+label = ["Yaw rate r" "Steer angle δ"]
+plots = [plot(t, [r δ]; xlabel, ylabel, label, lw, size)]
 
 # plot body slip angle vs time
 ylabel = "Body slip angle [deg], Steer angle [deg]"
-label = ["Body slip angle" "Steer angle"]
-push!(plots, plot(t, res[:, [2, end]]; xlabel, ylabel, label, lw))
+label = ["Body slip angle β" "Steer angle δ"]
+push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw, size))
 
-# plot understeer angle vs time
+# # plot understeer angle vs time
+# ylabel = "Understeer angle [deg], Steer angle [deg]"
+# label = ["Understeer angle α_u" "Steer angle δ"]
+# push!(plots, plot(t, [α_u δ]; xlabel, ylabel, label, lw, size))
+
+# plot slip angles vs time
 ylabel = "Understeer angle [deg], Steer angle [deg]"
-label = ["Understeer angle" "Steer angle"]
-push!(plots, plot(t, res[:, [3, end]]; xlabel, ylabel, label, lw))
+label = ["Slip angle α_f" "Slip angle α_r" "Understeer angle α_u" "Steer angle δ"]
+push!(plots, plot(t, [α_f α_r α_u δ]; xlabel, ylabel, label, lw, size))
 
 # plot lateral acceleration vs time
 ylabel = "Lateral acceleration [g], Steer angle [deg]"
-label = ["Lateral acceleration" "Steer angle"]
-push!(plots, plot(t, res[:, [4, end]]; xlabel, ylabel, label, lw))
+label = ["Lateral acceleration" "Steer angle δ"]
+push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
 
-# plot heading angle
-ylabel = "Heading angle [deg], Track angle, Steer angle [deg]"
-label = ["Heading angle" "Steer angle"]
-push!(plots, plot(t, [180 / pi * res[:, 6] res[:, end]]; xlabel, ylabel, label, lw))
-
-# plot path
+# plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
 xlabel = "x [m]"
 ylabel = "y [m]"
-label = ["Vehicle path" "Track"]
-push!(plots, plot(u * t, [res[:, 5] first.(track.(u * t))]; xlabel, ylabel, label, lw))
+label = ["y" " target y"]
+push!(plots, plot(u * t, [y_dist [track.(u * t)[i][1] for i=1:length(t)]]; xlabel, ylabel, label, lw, size))
 
 # write all the stuff to the output; skip steady state, Bode plots
 ss = []

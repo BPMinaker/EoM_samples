@@ -51,7 +51,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.body[2] = "ground"
     item.location[1] = [a, 0, 0]
     item.location[2] = [a, 0.1, 0]
-    item.gain = cf * pi / 180 # degree to radian
+    item.gain = cf * π / 180 # degree to radian
     item.units = "degree"
     add_item!(item, the_system)
 
@@ -61,7 +61,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.body[2] = "ground"
     item.location[1] = [-b, 0, 0]
     item.location[2] = [-b, -0.1, 0]
-    item.gain = cr * pi / 180
+    item.gain = cr * π / 180
     #add_item!(item,the_system)
 
     # constrain to planar motion
@@ -94,7 +94,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[2] = [0, 0, 0.1]
     item.twist = 1 # angular
     item.order = 2 # velocity
-    item.gain = 180 / pi # radian to degree
+    item.gain = 180 / π # radian to degree
     item.units = "degree/s"
     add_item!(item, the_system)
 
@@ -106,7 +106,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[2] = [0, 0.1, 0]
     item.order = 2 # velocity
     item.frame = 0 # local frame
-    item.gain = 180 / pi / u # radian to degree
+    item.gain = 180 / π / u # radian to degree
     item.units = "degree"
     add_item!(item, the_system)
 
@@ -118,7 +118,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[2] = [0, 0, 0.1]
     item.twist = 1 # angular
     item.order = 2 # velocity
-    item.gain = -180 * (a + b) / pi / u # radian to degree
+    item.gain = -180 * (a + b) / π / u # radian to degree
     item.actuator = "δ_f"
     item.actuator_gain = 1 # input is already in degrees
     item.units = "degree"
@@ -151,9 +151,40 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[1] = [0, 0, 0]
     item.location[2] = [0, 0, 0.1]
     item.twist = 1 # angular
-    item.gain = 180 / pi
+    item.gain = 180 / π
     item.units = "degree"
     add_item!(item, the_system)
+
+
+    # measure the front slip angle
+    item = sensor("α_f")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [a, 0, 0]
+    item.location[2] = [a, 0.1, 0]
+    item.order = 2 # velocity
+    item.frame = 0 # local frame
+    item.gain = 180 / π / u # radian to degree
+    item.actuator = "δ_f"
+    item.actuator_gain = -1 # input is already in degrees
+    item.units = "degree"
+    add_item!(item, the_system)
+
+
+    # measure the rear slip angle
+    item = sensor("α_r")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [-b, 0, 0]
+    item.location[2] = [-b, 0.1, 0]
+    item.order = 2 # velocity
+    item.frame = 0 # local frame
+    item.gain = 180 / π / u # radian to degree
+#    item.actuator = "δ_r"
+#    item.actuator_gain = -1 # input is already in degrees
+    item.units = "degree"
+    add_item!(item, the_system)
+
 
     the_system
 

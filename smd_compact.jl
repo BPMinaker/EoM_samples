@@ -23,12 +23,13 @@ y = splsim(result.ss_eqns, u, t)
 res = hcat(y...)'
 u_t = u.(0, t)
 
-lw = 2
 xlabel = "Time [s]"
 ylabel = "z [m], z dot [m/s], f [N]"
 label = ["z" "zdot" "f"]
+lw = 2
+size = (800, 600)
 
-my_plot = plot(t, [res[:, [1, 2]] u_t]; lw, xlabel, ylabel, label)
+my_plot = plot(t, [res[:, [1, 2]] u_t]; xlabel, ylabel, label, lw, size)
 # we can display the plot like:
 # display(my_plot)
 # or we can add it to a vector of plots, and send it to the `summarize()` function

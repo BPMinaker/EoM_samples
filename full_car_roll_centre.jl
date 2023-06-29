@@ -88,6 +88,7 @@ slip *= 180 / π
 
 # set plot text, etc
 lw = 2 # thicker plot lineweight
+size = (800, 600)
 xlims = (0, Inf)
 
 xlabel = "Time [s]"
@@ -95,32 +96,32 @@ label = ["LF" "LR" "RF" "RR"]
 plots = []
 
 ylabel = "Tire slip α [degree]"
-push!(plots, plot(t, slip; xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, slip; xlabel, ylabel, label, lw, size, xlims))
 
 ylabel = "Lateral forces [N]"
-push!(plots, plot(t, YY; xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, YY; xlabel, ylabel, label, lw, size, xlims))
 
 ylabel = "Vertical forces [N]"
-push!(plots, plot(t, ZZ; xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, ZZ; xlabel, ylabel, label, lw, size, xlims))
 
 label = ["F" "R"]
 ylabel = "Lateral weight transfer [N]"
-push!(plots, plot(t, 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]; xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]; xlabel, ylabel, label, lw, size, xlims))
 
 label = ""
 ylabel = "Yaw moment [Nm]"
-push!(plots, plot(t, sum(a * YY[:, [1, 3]] - b * YY[:, [2, 4]], dims=2); xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, sum(a * YY[:, [1, 3]] - b * YY[:, [2, 4]], dims=2); xlabel, ylabel, label, lw, size, xlims))
 
 ylabel = "G Lift [mm]"
-push!(plots, plot(t, y[:, 10]; xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, y[:, 10]; xlabel, ylabel, label, lw, size, xlims))
 
 label = ["Steer δ" "Roll ϕ" "Pitch θ" "Slip β" "Understeer"]
 ylabel = "Angles [degree]"
-push!(plots, plot(t, [steer.(t) y[:, 11:13] -y[:, 9] * (a + b) / u + steer.(t)]; xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, [steer.(t) y[:, 11:13] -y[:, 9] * (a + b) / u + steer.(t)]; xlabel, ylabel, label, lw, size, xlims))
 
 label = ["ru" "Σf/m" "vdot"]
 ylabel = "acc [m/ss]"
-push!(plots, plot(t, [y[:, 14] acc acc - y[:, 14]]; xlabel, ylabel, label, lw, xlims))
+push!(plots, plot(t, [y[:, 14] acc acc - y[:, 14]]; xlabel, ylabel, label, lw, size, xlims))
 
 bode = zeros(16, 4)
 bode[15, 1:4] = [1, 1, 1, 1]

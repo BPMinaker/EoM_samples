@@ -141,9 +141,4 @@ summarize(system, result; bode, plots)
 
 # summarize(system, result; bode, plots, format = :html)
 
-
-# or alternatively, if you have LaTeX installed, you can generate nicely formatted pdf reports
-# using EoM_TeX
-# write_report(system, result; bode)
-
 println("Done.")

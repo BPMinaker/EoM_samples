@@ -108,7 +108,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.body[2] = "ground"
     item.location[1] = [a, 0, 0]
     item.location[2] = [a, 0.1, 0]
-    item.gain = cr * pi / 180
+    item.gain = cf * π / 180
     item.units = "degree"
     add_item!(item, the_system)
 
@@ -120,7 +120,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.location[2] = [0, 0, 0.1]
     item.twist = 1 # angular
     item.order = 2 # velocity
-    item.gain = 180 / pi # radian to degree
+    item.gain = 180 / π # radian to degree
     item.units = "degree/s"
     add_item!(item, the_system)
 
@@ -131,7 +131,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.location[2] = [0, 0.1, 0]
     item.order = 2 # velocity
     item.frame = 0 # local frame
-    item.gain = 180 / pi / u # radian to degree
+    item.gain = 180 / π / u # radian to degree
     item.units = "degree"
     add_item!(item, the_system)
 
@@ -143,7 +143,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.location[2] = [0, 0, 0.1]
     item.twist = 1 # angular
     item.order = 2 # velocity
-    item.gain = -180 * (a + b) / pi / u # radian to degree
+    item.gain = -180 * (a + b) / π / u # radian to degree
     item.actuator = "δ_f"
     item.actuator_gain = 1 # input is already in degrees
     item.units = "degree"
@@ -155,7 +155,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.location[1] = [-d, 0, 0]
     item.location[2] = [-d, 0, 0.1]
     item.twist = 1 # angular
-    item.gain = 180 / pi # radian to degree
+    item.gain = 180 / π # radian to degree
     item.units = "degree"
     add_item!(item, the_system)
 

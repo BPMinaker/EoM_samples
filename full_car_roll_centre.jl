@@ -98,10 +98,10 @@ plots = []
 ylabel = "Tire slip α [degree]"
 push!(plots, plot(t, slip; xlabel, ylabel, label, lw, size, xlims))
 
-ylabel = "Lateral forces [N]"
+ylabel = "Lateral forces ΣY [N]"
 push!(plots, plot(t, YY; xlabel, ylabel, label, lw, size, xlims))
 
-ylabel = "Vertical forces [N]"
+ylabel = "Vertical forces ΣZ [N]"
 push!(plots, plot(t, ZZ; xlabel, ylabel, label, lw, size, xlims))
 
 label = ["F" "R"]
@@ -109,7 +109,7 @@ ylabel = "Lateral weight transfer [N]"
 push!(plots, plot(t, 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]; xlabel, ylabel, label, lw, size, xlims))
 
 label = ""
-ylabel = "Yaw moment [Nm]"
+ylabel = "Yaw moment N [Nm]"
 push!(plots, plot(t, sum(a * YY[:, [1, 3]] - b * YY[:, [2, 4]], dims=2); xlabel, ylabel, label, lw, size, xlims))
 
 ylabel = "G Lift [mm]"

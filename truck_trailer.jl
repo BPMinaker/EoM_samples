@@ -49,27 +49,27 @@ size = (800, 400)
 
 # plot yaw rate vs time
 ylabel = "Yaw rate [deg/s], Steer angle [deg]"
-label = ["Yaw rate" "Steer angle"]
+label = ["Yaw rate r" "Steer angle δ"]
 plots = [plot(t, [r δ]; xlabel, ylabel, label, lw, size)]
 
 # plot body slip angle vs time
 ylabel = "Body slip angle [deg], Steer angle [deg]"
-label = ["Body slip angle" "Steer angle"]
+label = ["Body slip angle β" "Steer angle δ"]
 push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw, size))
 
 # plot understeer angle vs time
 ylabel = "Understeer angle [deg], Steer angle [deg]"
-label = ["Understeer angle" "Steer angle"]
+label = ["Understeer angle" "Steer angle δ"]
 push!(plots, plot(t, [α_u δ]; xlabel, ylabel, label, lw, size))
 
 # plot trailer sway angle vs time
 ylabel = "Sway angle [deg], Steer angle [deg]"
-label = ["Sway angle" "Steer angle"]
+label = ["Sway angle γ" "Steer angle δ"]
 push!(plots, plot(t, [γ δ]; xlabel, ylabel, label, lw, size))
 
 # plot lateral acceleration vs time
 ylabel = "Lateral acceleration [g], Steer angle [deg]"
-label = ["Lateral acceleration" "Steer angle"]
+label = ["Lateral acceleration" "Steer angle δ"]
 push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
 
 bode = [0, 1, 1, 1, 0]

@@ -1,4 +1,4 @@
-function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, cr = 40000, m = 1400, Ix = 800, Iy = 2000, Iz = 2200, r = 0.3, tw = 1.5, cs = 2000, ks = 60000)
+function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, cr = 40000, m = 1400, Ix = 800, Iy = 2000, Iz = 2200, r = 0.3, tw = 1.5, cs = 2000, ks = 60000, kt = 150000, ct = 100)
 
     the_system = mbd_system("Full Car A-Arm Pushrod")
 
@@ -12,10 +12,10 @@ function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, 
     add_item!(weight(item), the_system)
 
     susp!(the_system; str = "LF ", front = true, a, tw, r, u, cs, ks)
-    tire!(the_system; str = "LF ", front = true, a, tw, cf, u)
+    tire!(the_system; str = "LF ", front = true, a, tw, cf, kt, ct, u)
 
     susp!(the_system; a = -b, str = "LR ", front = false, tw, r, u, cs, ks)
-    tire!(the_system; a = -b, cf = cr, str = "LR ", front = false, tw, u)
+    tire!(the_system; a = -b, cf = cr, str = "LR ", front = false, tw, kt, ct, u)
 
     item = spring("Anti-roll bar")
     item.body[1] = "LF Anti-roll arm"
@@ -73,27 +73,37 @@ function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, 
     item.body[2] = "ground"
     item.location[1] = [a, tw / 2, r]
     item.location[2] = [a, tw / 2, r - 0.1]
-    item.actuator = "u_LF "
+    item.actuator = "u_LF"
+    item.units = "m"
+    add_item!(item, the_system)
+
+    item = actuator("u_LF")
+    item.body[1] = "LF Wheel+hub"
+    item.body[2] = "ground"
+    item.location[1] = [a, tw / 2, 0]
+    item.location[2] = [a, tw / 2, -0.1]
+    item.gain = kt
+    item.rate_gain = ct
     item.units = "m"
     add_item!(item, the_system)
 
     #=
-    item=actuator("L")
-    item.body[1]="Chassis"
-    item.body[2]="ground"
-    item.location[1]=[0,0,0.5]
-    item.location[2]=[0.1,0,0.5]
-    item.twist=1
-    item.gain=1000
+    item = actuator("L")
+    item.body[1] = "Chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0,0,0.5]
+    item.location[2] = [0.1,0,0.5]
+    item.twist = true
+    item.gain = 1000
     add_item!(item,the_system)
 
-    item=sensor("ϕ")
-    item.body[1]="Chassis"
-    item.body[2]="ground"
-    item.location[1]=[0,0,0.5]
-    item.location[2]=[0.1,0,0.5]
-    item.twist=1
-    item.gain=180/pi
+    item = sensor("ϕ")
+    item.body[1] = "Chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0,0,0.5]
+    item.location[2] = [0.1,0,0.5]
+    item.twist = true
+    item.gain = 180 / π
     add_item!(item,the_system)
     =#
 

@@ -3,7 +3,7 @@ using EoM
 include(joinpath("models", "input_ex_top.jl"))
 f(x) = input_ex_top(r=x)
 
-vpts = 0:10/50:10
+vpts = 0:10/125:10
 system = f.(vpts)
 
 output = run_eom!.(system, vpts .== 0)

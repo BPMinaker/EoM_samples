@@ -6,7 +6,7 @@ include(joinpath("models", "input_ex_quarter_car.jl"))
 ms = 500
 mu = 50
 kt = 150000
-vpts = 15000:200:25000
+vpts = 15000:80:25000
 cs = 500
 
 f(x) = input_ex_quarter_car(; ks=x, ms, mu, kt, cs)

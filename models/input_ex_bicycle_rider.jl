@@ -127,7 +127,7 @@ function input_ex_bicycle_rider(; u = 0.1, m = 85, h = -0.9, g = -9.81)
     item.location[1] = location1
     item.location[2] = location2
     item.twist = true
-    item.units = "Nm"
+    item.units = "N*m"
     add_item!(item, the_system)
 
     item = sensor("δ") # steer angle is one output

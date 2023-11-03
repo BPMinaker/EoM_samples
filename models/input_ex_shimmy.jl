@@ -67,6 +67,14 @@ function input_ex_shimmy(; m = 5, k = 0.3 * m, a = 0.5, b = 0.5, u = a + b, I = 
     item.units = "N"
     add_item!(item, the_system)
 
+    item = sensor("mass motion")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 0]
+    item.location[2] = [0, 0.1, 0]
+    item.units = "m"
+    add_item!(item, the_system)
+
     the_system
 
 end

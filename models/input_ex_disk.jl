@@ -57,18 +57,18 @@ function input_ex_disk(; u = 0.1, m = 4, r = 0.5, g = 9.81)
     item.location[2] = [0.1, 0, r]
     item.twist = 1
     item.gain = m * g * r
-    item.units = "Nm"
+    item.units = "N*m"
     add_item!(item, the_system)
 
-    item = sensor("mgrrψdot")
+    item = sensor("mgrrψdot/u")
     item.body[1] = "wheel"
     item.body[2] = "ground"
     item.location[1] = [0, 0, r]
     item.location[2] = [0, 0, r + 0.1]
     item.twist = 1
-    item.gain = m * g * r *r
+    item.gain = m * g * r / u
     item.order = 2
-    item.units = "Nm"
+    item.units = "N*m"
     add_item!(item, the_system)
 
     item = actuator("L")
@@ -77,7 +77,7 @@ function input_ex_disk(; u = 0.1, m = 4, r = 0.5, g = 9.81)
     item.location[1] = [0, 0, r]
     item.location[2] = [0.1, 0, r]
     item.twist = 1
-    item.units = "Nm"
+    item.units = "N*m"
     add_item!(item, the_system)
 
     the_system

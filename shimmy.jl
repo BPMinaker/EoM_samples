@@ -9,7 +9,7 @@ u = l
 I = 0.21 * m * l^2
 
 f(x) = input_ex_shimmy(; m, k, a=x * l, b=l - (x * l), u, I)
-vpts = 0:0.01:1
+vpts = 0:0.008:1
 
 system = f.(vpts)
 output = run_eom!.(system)

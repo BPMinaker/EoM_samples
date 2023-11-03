@@ -2,7 +2,7 @@ using EoM
 
 include(joinpath("models", "input_ex_rotor.jl"))
 
-vpts = 0.0:2pi/50:2pi
+vpts = 0.0:2pi/125:2pi
 f(x) = input_ex_rotor(; r=x)
 
 system = f.(vpts)

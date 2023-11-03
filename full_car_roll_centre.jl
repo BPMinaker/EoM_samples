@@ -53,13 +53,11 @@ result = analyze(output, true)
 # a smooth step function, 3 degrees, with its midpoint (i.e. 1.5) at t = 2
 # the 0.5 terms change the range from -1...1 to 0...1
 # the 4 determines how quickly the step occurs
-function steer(t)
-    3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
-end
+steer(t) = 3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
 
 # assume LF, LR, RF, RR sequence
 # compute applied tire force
-function u_in(x, t)
+function input(x, t)
     # get sensor outputs (D=0)
     y = result.ss_eqns.C * x
     # get total normal load
@@ -73,7 +71,7 @@ end
 println("Solving time history...")
 t = 0:0.002:8
 
-y = splsim(result.ss_eqns, u_in, t)
+y = splsim(result.ss_eqns, input, t)
 y = hcat(y...)'
 
 t = t[1:4:end]
@@ -88,14 +86,14 @@ slip *= 180 / π
 
 # set plot text, etc
 lw = 2 # thicker plot lineweight
-size = (800, 600)
+size = (800, 400)
 xlims = (0, Inf)
 
 xlabel = "Time [s]"
 label = ["LF" "LR" "RF" "RR"]
 plots = []
 
-ylabel = "Tire slip α [degree]"
+ylabel = "Tire slip α [°]"
 push!(plots, plot(t, slip; xlabel, ylabel, label, lw, size, xlims))
 
 ylabel = "Lateral forces ΣY [N]"
@@ -116,11 +114,11 @@ ylabel = "G Lift [mm]"
 push!(plots, plot(t, y[:, 10]; xlabel, ylabel, label, lw, size, xlims))
 
 label = ["Steer δ" "Roll ϕ" "Pitch θ" "Slip β" "Understeer"]
-ylabel = "Angles [degree]"
+ylabel = "Angles [°]"
 push!(plots, plot(t, [steer.(t) y[:, 11:13] -y[:, 9] * (a + b) / u + steer.(t)]; xlabel, ylabel, label, lw, size, xlims))
 
 label = ["ru" "Σf/m" "vdot"]
-ylabel = "acc [m/ss]"
+ylabel = "acc [m s^-2]"
 push!(plots, plot(t, [y[:, 14] acc acc - y[:, 14]]; xlabel, ylabel, label, lw, size, xlims))
 
 bode = zeros(16, 4)

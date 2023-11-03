@@ -44,7 +44,17 @@ function quarter_car_a_arm_pushrod(; u = 10, a = 1.2, cf = 40000, m = 400, r = 0
     item.body[2] = "ground"
     item.location[1] = [a, tw / 2, r]
     item.location[2] = [a, tw / 2, r - 0.1]
-    item.actuator = "u_LF "
+    item.actuator = "u_LF"
+    item.units = "m"
+    add_item!(item, the_system)
+
+    item = actuator("u_LF")
+    item.body[1] = "LF Wheel+hub"
+    item.body[2] = "ground"
+    item.location[1] = [a, tw / 2, 0]
+    item.location[2] = [a, tw / 2, -0.1]
+    item.gain = kt
+    item.rate_gain = ct
     item.units = "m"
     add_item!(item, the_system)
 

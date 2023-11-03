@@ -24,7 +24,7 @@ res = hcat(y...)'
 u_t = u.(0, t)
 
 xlabel = "Time [s]"
-ylabel = "z [m], z dot [m/s], f [N]"
+ylabel = "z [m], z dot [m s^-1], f [N]"
 label = ["z" "zdot" "f"]
 lw = 2
 size = (800, 600)
@@ -35,9 +35,9 @@ my_plot = plot(t, [res[:, [1, 2]] u_t]; xlabel, ylabel, label, lw, size)
 # or we can add it to a vector of plots, and send it to the `summarize()` function
 plots = [my_plot]
 
-summarize(system, result; plots, bode=[0, 0, 1])
+summarize(system, result; plots)
 
 # we could also write to html output instead of the screen
-# summarize(system, result; plots, bode = [0,0,1], format = :html)
+# summarize(system, result; plots, format = :html)
 
 println("Done.")

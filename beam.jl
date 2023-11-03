@@ -18,8 +18,8 @@ result = analyze(output, true)
 
 bode = [1 0; 0 1]
 verbose = true
-summarize(system, result, verbose; bode)
-# summarize(system, result, verbose; bode, format = :html)
+summarize(system, result; bode)
+# summarize(system, result; bode, format = :html)
 
 # using EoM_X3D
 # animate_modes(system, result)

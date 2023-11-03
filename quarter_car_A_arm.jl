@@ -1,6 +1,6 @@
 using EoM
 
-include(joinpath("models", "quarter_car_a_arm_pushrod.jl"))
+include(joinpath("models", "input_quarter_car_a_arm_pushrod.jl"))
 include(joinpath("models", "susp.jl"))
 include(joinpath("models", "tire.jl"))
 

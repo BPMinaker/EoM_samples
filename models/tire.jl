@@ -51,14 +51,4 @@ function tire!(the_system; a = 1.2, tw = 1.5, kt = 150000, ct = 100, cf = 30000,
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
-    item = actuator("u_$str")
-    item.body[1] = str * "Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [a, tw / 2, 0]
-    item.location[2] = [a, tw / 2, -0.1]
-    item.gain = kt
-    item.rate_gain = ct
-    item.units = "m"
-    add_item!(item, the_system)
-
 end ## Leave

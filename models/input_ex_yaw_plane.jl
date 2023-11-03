@@ -52,7 +52,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[1] = [a, 0, 0]
     item.location[2] = [a, 0.1, 0]
     item.gain = cf * π / 180 # degree to radian
-    item.units = "degree"
+    item.units = "°"
     add_item!(item, the_system)
 
     # rear wheel steer, off by default
@@ -62,6 +62,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[1] = [-b, 0, 0]
     item.location[2] = [-b, -0.1, 0]
     item.gain = cr * π / 180
+    item.units = "°"
     #add_item!(item,the_system)
 
     # constrain to planar motion
@@ -95,7 +96,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.twist = 1 # angular
     item.order = 2 # velocity
     item.gain = 180 / π # radian to degree
-    item.units = "degree/s"
+    item.units = "°/s"
     add_item!(item, the_system)
 
     # measure the body slip angle
@@ -107,7 +108,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.order = 2 # velocity
     item.frame = 0 # local frame
     item.gain = 180 / π / u # radian to degree
-    item.units = "degree"
+    item.units = "°"
     add_item!(item, the_system)
 
     # measure the understeer angle
@@ -121,7 +122,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.gain = -180 * (a + b) / π / u # radian to degree
     item.actuator = "δ_f"
     item.actuator_gain = 1 # input is already in degrees
-    item.units = "degree"
+    item.units = "°"
     add_item!(item, the_system)
 
     # measure the lateral acceleration in g
@@ -132,7 +133,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[2] = [0, 0.1, 0]
     item.order = 3 # acceleration
     item.gain = 1 / 9.81 # g
-    item.units = "g"
+    item.units = "ge"
     add_item!(item, the_system)
 
     # note that the y location will not reach steady state with constant delta input, so adding the sensor will give an error if the steady state gain is computed, but is included so that a time history can be computed
@@ -152,7 +153,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[2] = [0, 0, 0.1]
     item.twist = 1 # angular
     item.gain = 180 / π
-    item.units = "degree"
+    item.units = "°"
     add_item!(item, the_system)
 
 
@@ -167,7 +168,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.gain = 180 / π / u # radian to degree
     item.actuator = "δ_f"
     item.actuator_gain = -1 # input is already in degrees
-    item.units = "degree"
+    item.units = "°"
     add_item!(item, the_system)
 
 
@@ -182,9 +183,8 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.gain = 180 / π / u # radian to degree
 #    item.actuator = "δ_r"
 #    item.actuator_gain = -1 # input is already in degrees
-    item.units = "degree"
+    item.units = "°"
     add_item!(item, the_system)
-
 
     the_system
 

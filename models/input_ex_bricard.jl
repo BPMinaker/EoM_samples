@@ -97,7 +97,7 @@ function input_ex_bricard(; l = 0.2, m = 1.0, g = 9.81)
     item.location[1] = p0
     item.location[2] = p0 + [0, 0, 0.1]
     item.twist = true
-    item.units = "Nm"
+    item.units = "N*m"
     add_item!(item, the_system)
 
     item = sensor("mglψ")
@@ -107,7 +107,7 @@ function input_ex_bricard(; l = 0.2, m = 1.0, g = 9.81)
     item.location[2] = p0 + [0, 0, 0.1]
     item.twist = true
     item.gain = m * g * l
-    item.units = "Nm"
+    item.units = "N*m"
     add_item!(item, the_system)
 
     the_system

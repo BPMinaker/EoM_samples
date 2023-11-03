@@ -282,7 +282,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.order = 2
     item.frame = 0
     item.gain = 1 / u
-    item.units = "radian"
+    item.units = "rad"
     add_item!(item, the_system)
 
     item = sensor("α_lr")
@@ -293,7 +293,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.order = 2
     item.frame = 0
     item.gain = 1 / u
-    item.units = "radian"
+    item.units = "rad"
     add_item!(item, the_system)
 
     mirror!(the_system) # note that the mirror can't go any further without adressing the change in the location in the sequence of items in the main file
@@ -306,7 +306,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.twist = 1
     item.order = 2
     item.gain = 180 / pi
-    item.units = "degree/s"
+    item.units = "°/s"
     add_item!(item, the_system)
 
     # measure the bounce, pitch, and roll
@@ -326,7 +326,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.location[2] = [-0.1, 0, 0.25]
     item.gain = 180 / pi
     item.twist = 1
-    item.units = "degree"
+    item.units = "°"
     add_item!(item, the_system)
 
     item = sensor("θ")
@@ -336,7 +336,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.location[2] = [0, -0.1, 0.25]
     item.gain = 180 / pi
     item.twist = 1
-    item.units = "degree"
+    item.units = "°"
     add_item!(item, the_system)
 
     item = sensor("β")
@@ -347,7 +347,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.order = 2 # velocity
     item.frame = 0 # local frame
     item.gain = 180 / pi / u # radian to degree
-    item.units = "degree"
+    item.units = "°"
     add_item!(item, the_system)
 
     item = sensor("ru")
@@ -358,7 +358,7 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.gain = u
     item.order = 2 # velocity
     item.twist = 1
-    item.units = "m/ss"
+    item.units = "m/s/s"
     add_item!(item, the_system)
 
     item = sensor("(kf+kr)zG")

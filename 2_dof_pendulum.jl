@@ -1,9 +1,8 @@
 using EoM
 
-include(joinpath("models", "input_ex_pendulum.jl"))
+include(joinpath("models", "input_ex_2_dof_pendulum.jl"))
 
-system = input_ex_pendulum()
-
+system = input_ex_pendulum_2()
 output = run_eom!(system)
 result = analyze(output)
 

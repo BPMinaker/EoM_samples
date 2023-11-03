@@ -30,7 +30,7 @@ function track(x)
 
     y(x) = EoM.pulse(x, 50, 100) * (2 - 2 * cos(2pi / 100 * (x - 50))) + EoM.pulse(x, 100, 150) * 4 + EoM.pulse(x, 150, 200) * (2 + 2 * cos(2pi / 100 * (x - 150)))
 
-    # use automatic differentiation to find the heading angle and curvature; as long as the angles are small we can approximate slope with the derivative and the curvature as the second derivative; automatic differentiation is a powerful numerical technique to compute the derivative of any function, using the fact that every function must be computed using basic arithmetic operations
+    # use automatic differentiation to find the heading angle and curvature; as long as the angles are small we can approximate slope with the derivative and the curvature as the second derivative; automatic differentiation is a powerful numerical (i.e. not symbolic!) technique to compute the derivative of any function, using the fact that every function must be computed using basic arithmetic operations
 
     dy(x) = ForwardDiff.derivative(y, x)
     d2y(x) = ForwardDiff.derivative(dy, x)
@@ -114,6 +114,6 @@ push!(plots, plot(u * t, [y_dist [track.(u * t)[i][1] for i=1:length(t)]]; xlabe
 # write all the stuff to the output; skip steady state, Bode plots
 ss = []
 bode = []
-summarize(system, result, false; plots, ss, bode)
+summarize(system, result; plots, ss, bode)
 
 println("Done.")

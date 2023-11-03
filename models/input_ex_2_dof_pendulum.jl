@@ -1,9 +1,9 @@
-function input_ex_pendulum(; m = 10.0, l = 0.5, r = 0.05^0.5, Ix = 5.5 - m * r^2)
+function input_ex_pendulum_2(; m = 10.0, l = 0.5, r = 0.05^0.5, Ix = 5.5 - m * r^2)
 
     # Copyright (C) 2021, Bruce Minaker
     # the pendulum example from Anderson Practice of Engineering Dynamics
   
-    the_system = mbd_system("Pendulum")
+    the_system = mbd_system("Two dof pendulum")
 
     g = 9.807
 

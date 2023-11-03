@@ -7,7 +7,7 @@ ms = 500
 mu = 50
 kt = 150000
 ks = 18000
-vpts = 500:50:3000
+vpts = 500:20:3000
 
 f(x) = input_ex_quarter_car(; ks, ms, mu, kt, cs=x)
 verbose = (vpts .== 500)

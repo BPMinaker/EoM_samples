@@ -121,18 +121,21 @@ function u(x, t)
     Zf = Zf0 - y[6] - y[7]
 
     # check for wheelspin, conditional
-    if Xr > μ * Zr
-        Xr = μ * Zr
+    Xrmax = μ * Zr
+    Xfmax = μ * Zf
+    if Xr > Xrmax
+        Xr = Xrmax
+        Xfmax = min((1 - rdf) / rdf * Xr, Xfmax)
     end
-    if Xf > μ * Zf
-        Xf = μ * Zf
+    if Xf > Xfmax
+        Xf = Xfmax
+        Xrmax = min(rdf / (1 - rdf) * Xf, Xrmax)
     end
-
-    if Xf > (1 - rdf) / rdf * Xr
-        Xf = (1 - rdf) / rdf * Xr
+    if Xr > Xrmax
+        Xr = Xrmax
     end
-    if Xr > rdf / (1 - rdf) * Xf
-        Xr = rdf / (1 - rdf) * Xf
+    if Xf > Xfmax
+        Xf = Xfmax
     end
 
     # include rolling resistance loss, and note sign function to reverse force if needed, set traction force

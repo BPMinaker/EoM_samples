@@ -3,7 +3,7 @@ using EoM
 include(joinpath("models", "input_ex_disk.jl"))
 
 f(x) = input_ex_disk(u=x)
-vpts = 0:3/50:3
+vpts = 0:3/125:3
 
 system = f.(vpts)
 output = run_eom!.(system)

@@ -27,21 +27,20 @@ result = analyze.(output)
 size = (800, 400)
 lw = 2
 
-r = -20:25/150:5
 t = 0:5/150:5
-p = plot(xlabel = "s [rad/s]", ylabel = "ms^2 + cs + k")
-q = plot(xlabel = "Time [s]", ylabel = "x [m]")
+s = -20:25/150:5
+plots = [plot(xlabel = "Time [s]", ylabel = "x [m]"), plot(xlabel = "s [rad/s]", ylabel = "p(s) [N/m]")]
 
 for i in eachrow([result vpts])[1:10:end]
-    pp = fromroots(i[1].e_val)
-    plot!(p, r, pp.(r) ; label = "c = $(my_round(i[2]))", lw, size)
-    
     h = impulse(i[1].ss_eqns, t)
-    plot!(q, t, hcat(h...)'[:,1]; label = "c = $(my_round(i[2]))", lw, size)
+    plot!(plots[1], t, hcat(h...)'[:,1]; label = "c = $(my_round(i[2]))", lw, size)
+    
+    p = fromroots(i[1].e_val)
+    plot!(plots[2], s, p.(s) ; label = "c = $(my_round(i[2]))", lw, size)
 end
 
 # the `summarize()` function has been written using another feature of Julia, called `multiple dispatch`, which allows the same function to do different things, depending on the type of arguments, `summarize()` recognizes if system and result are vectors, and if so, it drops the tables, and gives series of plots instead
-summarize(system, vpts, result; ss=[], vpt_name=["c" "Damping coefficient" "N/(m/s)"], plots = [q, p])
+summarize(system, vpts, result; ss=[], vpt_name=["c" "Damping coefficient" "N/(m/s)"], plots)
 
 # we could also write to html output instead of the screen
 # summarize(system, vpts, result; ss = [], vpt_name = ["c" "Damping coefficient" "N/(m/s)"], format = :html)

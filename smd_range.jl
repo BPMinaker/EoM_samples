@@ -24,13 +24,12 @@ output = run_eom!.(system)
 # we take the vector of output equations, and analyze all of them, again using dot notation
 result = analyze.(output)
 
-
 size = (800, 400)
 lw = 2
 
 r = -20:25/150:5
 t = 0:5/150:5
-p = plot(xlabel = "s [s^-1]", ylabel = "ms^2 + cs + k")
+p = plot(xlabel = "s [rad/s]", ylabel = "ms^2 + cs + k")
 q = plot(xlabel = "Time [s]", ylabel = "x [m]")
 
 for i in eachrow([result vpts])[1:10:end]

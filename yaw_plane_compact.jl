@@ -21,7 +21,7 @@ ss = [1, 1, 1, 1, 0, 0, 1, 1]
 summarize(system, vpts, result; ss) 
 #summarize(system, vpts, result; ss, format = :html)
 
-# n = findfirst(vpts .== 20)
-# summarize(system[n], result[n]; ss, bode)
+# n = argmin(abs.(vpts .- 20))
+# summarize(system[n], result[n]; ss)
 
 println("Done.")

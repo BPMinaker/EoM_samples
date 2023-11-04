@@ -49,15 +49,6 @@ function input_ex_smd(; m = 1.0, c = 0.1, k = 10.0)
     item.units = "m"
     add_item!(item, the_system)
 
-    item = sensor("z dot")
-    item.body[1] = "block"
-    item.body[2] = "ground"
-    item.location[1] = [0, 0, 1]
-    item.location[2] = [0, 0, 0]
-    item.order = 2 # velocity
-    item.units = "m/s"
-    add_item!(item, the_system)
-
     item = sensor("kz")
     item.body[1] = "block"
     item.body[2] = "ground"

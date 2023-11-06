@@ -1,4 +1,36 @@
-function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, kf=17000, kr=19000, cf=1000, cr=1200, m=16975 / 9.81, Ix=818, Iy=3267, Iz=3508, kt=180000, muf=35, mur=30, hf=0.1, hr=0.2, hG=0.4, krf=100, krr=100, cfy=40000, cry=40000, r = 0.3)
+
+# define struct to hold all the parameters and their default values, so we don't have to list them all in the function definition
+@kwdef mutable struct params_list
+    m = 1800 # mass
+    u = 20 # speed
+    a = 1.5 # wheelbase, front
+    b = 1.5
+    tf = 1.6 # track width, front
+    tr = 1.6
+    kf = 30000 # suspension stiffness, front
+    kr = 30000
+    cf = 2500 # suspension damping, front
+    cr = 2500
+    krf = 500 # anti-roll stiffness, front
+    krr = 500
+    muf = 20 # unsprung mass, front
+    mur = 20
+    hf = 0.2 # roll centre height, front
+    hr = 0.2
+    hG = 0.5 # mass centre height
+    cfy = 40000 # cornering stiffness, front
+    cry = 40000
+    Ix=818 # moments of inertia
+    Iy=3267
+    Iz=3508
+    kt=180000 # tire vertical stiffness
+    r = 0.3 # wheel radius
+end
+
+function input_full_car_rc(;params::params_list)
+
+    # unpack all the parameters
+    (; m, u, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur, hf, hr, hG, cfy, cry, Ix, Iy, Iz, kt, r) = params
 
     the_system = mbd_system("Full Car Model with Swing Axles")
 
@@ -26,7 +58,6 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     add_item!(item, the_system)
     add_item!(weight(item), the_system)
 
-
     item = body("LF axle")
     item.mass = 0
     item.location = [a, tf / 2 - 0.15, r]
@@ -50,7 +81,6 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.axis = [1, 0, 0]
     add_item!(item, the_system)
 
-
     item = rigid_point("LF wheel bearing")
     item.body[1] = "LF wheel"
     item.body[2] = "LF axle"
@@ -69,7 +99,6 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.axis = [0, 1, 0]
     add_item!(item, the_system)
 
-
     item = rigid_point("LF wheel, X")
     item.body[1] = "LF wheel"
     item.body[2] = "ground"
@@ -87,7 +116,6 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     item.moments = 0
     item.axis = [1, 0, 0]
     add_item!(item, the_system)
-
 
     # suspension constraints
     item = rigid_point("LF susp")
@@ -383,3 +411,6 @@ function input_full_car_rc(; u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, 
     the_system
 
 end
+
+
+# u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, kf=17000, kr=19000, cf=1000, cr=1200, m=16975 / 9.81, Ix=818, Iy=3267, Iz=3508, kt=180000, muf=35, mur=30, hf=0.1, hr=0.2, hG=0.4, krf=100, krr=100, cfy=40000, cry=40000, r = 0.3

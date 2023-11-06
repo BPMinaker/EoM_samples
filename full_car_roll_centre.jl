@@ -1,35 +1,19 @@
 using EoM, Plots, ForwardDiff
 plotly()
 
-# define a simple nonlinear tire with load sensitivity
-function tire(Z, slip)
-    -(1.2 .- 3.0e-5 .* Z) .* Z .* tanh.(8.2 .* slip)
-end
-
 include(joinpath("models", "input_ex_roll_centre.jl"))
 
-m = 1800
+# see the input file for the list of parameters and their default values
+# build the list of parameters, and set those that are not using defaults
+# here the value of m and u are set, but we can add many more if we like
+m = 1500
 u = 20
-a = 1.5
-b = 1.5
-tf = 1.6
-tr = 1.6
-kf = 30000
-kr = 30000
-cf = 2500
-cr = 2500
-krf = 500
-krr = 500
-muf = 20
-mur = 20
-hf = 0.2
-hr = 0.2
-hG = 0.5
-cfy = 40000
-cry = 40000
+params = params_list(; m, u) # make sure to include them all here!!!
 
 # build system description with approximate cornering stiffnesses
-system = input_full_car_rc(; m, u, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur, hf, hr, hG, cfy, cry)
+system = input_full_car_rc(; params)
+
+# generate eom
 output = run_eom!(system, true)
 
 # get static tire normal loads (kN)
@@ -37,16 +21,23 @@ output = run_eom!(system, true)
 # display(getfield.(system.flex_points,:name))
 Z0 = vcat(getfield.(system.flex_points[[1, 2, 5, 6]], :preload)...)
 
+# define a simple nonlinear tire with load sensitivity
+tire(Z, slip) = -(1.2 .- 3.0e-5 .* Z) .* Z .* tanh.(8.2 .* slip)
+
 # recompute cornering stiffnesses
+# define the lateral force function at the actual vertical load
 yf(x) = tire(Z0[1], x)
+# differentiate by slip angle
 dyf(x) = ForwardDiff.derivative(yf, x)
-cfy = -dyf(0)
+# evaluate a slip angle of zero
+params.cfy = -dyf(0)
+# repeat for rear
 yr(x) = tire(Z0[2], x)
 dyr(x) = ForwardDiff.derivative(yr, x)
-cry = -dyr(0)
+params.cry = -dyr(0)
 
 # rebuild the equations of motion using the updated cornering stiffnesses
-system = input_full_car_rc(; m, u, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur, hf, hr, hG, cfy, cry)
+system = input_full_car_rc(;params)
 output = run_eom!(system, true)
 result = analyze(output, true)
 
@@ -62,10 +53,10 @@ function input(x, t)
     y = result.ss_eqns.C * x
     # get total normal load
     Z = Z0 - y[[1, 2, 5, 6]]
-    # get slip angles
+    # get slip angles from lateral velocity, subtract steer on front
     slip = y[[3, 4, 7, 8]] .- steer(t) * [1, 0, 1, 0] * π / 180
     # compute tire force, cancel linear tire
-    tire(Z, slip) + [cfy, cry, cfy, cry] .* y[[3, 4, 7, 8]]
+    tire(Z, slip) + [params.cfy, params.cry, params.cfy, params.cry] .* y[[3, 4, 7, 8]]
 end
 
 println("Solving time history...")
@@ -81,14 +72,13 @@ ZZ = Z0' .- y[:, [1, 2, 5, 6]]
 slip = y[:, [3, 4, 7, 8]] - steer.(t) .* [1, 0, 1, 0]' * π / 180
 
 YY = tire.(ZZ, slip)
-acc = sum(YY, dims=2) / (m + 2 * muf + 2 * mur)
+acc = sum(YY, dims=2) / (params.m + 2 * params.muf + 2 * params.mur)
 slip *= 180 / π
 
 # set plot text, etc
 lw = 2 # thicker plot lineweight
 size = (800, 400)
 xlims = (0, Inf)
-
 xlabel = "Time [s]"
 label = ["LF" "LR" "RF" "RR"]
 plots = []
@@ -108,21 +98,22 @@ push!(plots, plot(t, 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]; xlabel, yl
 
 label = ""
 ylabel = "Yaw moment N [Nm]"
-push!(plots, plot(t, sum(a * YY[:, [1, 3]] - b * YY[:, [2, 4]], dims=2); xlabel, ylabel, label, lw, size, xlims))
+push!(plots, plot(t, sum(params.a * YY[:, [1, 3]] - params.b * YY[:, [2, 4]], dims=2); xlabel, ylabel, label, lw, size, xlims))
 
 ylabel = "G Lift [mm]"
 push!(plots, plot(t, y[:, 10]; xlabel, ylabel, label, lw, size, xlims))
 
 label = ["Steer δ" "Roll ϕ" "Pitch θ" "Slip β" "Understeer"]
 ylabel = "Angles [°]"
-push!(plots, plot(t, [steer.(t) y[:, 11:13] -y[:, 9] * (a + b) / u + steer.(t)]; xlabel, ylabel, label, lw, size, xlims))
+push!(plots, plot(t, [steer.(t) y[:, 11:13] -y[:, 9] * (params.a + params.b) / params.u + steer.(t)]; xlabel, ylabel, label, lw, size, xlims))
 
 label = ["ru" "Σf/m" "vdot"]
 ylabel = "acc [m s^-2]"
 push!(plots, plot(t, [y[:, 14] acc acc - y[:, 14]]; xlabel, ylabel, label, lw, size, xlims))
 
+# pick the outputs for the Bode plots
 bode = zeros(16, 4)
-bode[15, 1:4] = [1, 1, 1, 1]
+bode[15, :] = [1, 1, 1, 1]
 ss = bode
 
 

@@ -2,13 +2,20 @@ using EoM
 
 include(joinpath("models", "input_ex_beam.jl"))
 
-h = 2 * 0.0254
-b = 1 * 0.0254
-t = 0.060 * 0.0254
+mmpi = 0.0254
+h = 2 * mmpi
+b = 1 * mmpi
+t = 0.060 * mmpi
+E = 200e9 # Pa
+ρ = 7850  # kg/m^3
 
-EI1 = 200e9 * (b*h^3 - (b - 2*t) * (h - 2*t)^3) / 12
-EI2 = 200e9 * (b^3*h - (b - 2*t)^3 * (h - 2*t)) / 12
-mpul = 7850 * (b*h - (b - 2*t) * (h - 2*t))
+I1 = (b*h^3 - (b - 2*t) * (h - 2*t)^3) / 12
+I2 = (b^3*h - (b - 2*t)^3 * (h - 2*t)) / 12
+
+EI1 = E * I1
+EI2 = E * I2
+mpul = ρ * (b*h - (b - 2*t) * (h - 2*t))
+
 l = 1
 n = 1
 

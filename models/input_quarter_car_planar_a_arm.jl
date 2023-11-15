@@ -1,9 +1,35 @@
-function input_quarter_car_planar_a_arm(; u = 10, a = 1.2, cf = 40000, m = 400, mu = 40, r = 0.3, tw = 1.5, ks= 80000, cs = 4000, kt = 150000, ct = 100, hui = 0.49, huo = 0.49, hli = 0.15, hlo = 0.15, wui = 0.43, wuo = tw / 2 - 0.05, wli = 0.43, wlo = tw / 2 - 0.05, Y = 1000, g = 9.81)
 
-    rr,L,rc = kinematics(;r_A=[wui, hui], r_B=[wuo, huo], r_C=[wli, hli], r_D=[wlo, hlo], r_E=[tw/2, 0])
+# define struct to hold all the parameters and their default values, so we don't have to list them all in the function definition
+@kwdef mutable struct params_list
+    u = 10
+    a = 1.2
+    cf = 40000
+    m = 400
+    mu = 40
+    r = 0.3
+    tw = 1.5
+    ks = 80000
+    cs = 4000
+    kt = 150000
+    ct = 100
+    hui = 0.49
+    huo = 0.49
+    hli = 0.15
+    hlo = 0.15
+    wui = 0.43
+    wuo = 0.745
+    wli = 0.43
+    wlo = 0.745
+    Y = 1000
+    g = 9.81
+end
+
+function input_quarter_car_planar_a_arm(; params::params_list=params_list())
+
+    (; u, a, cf, m, mu, r, tw, ks, cs, kt, ct, hui, huo, hli, hlo, wui, wuo, wli, wlo, Y, g) = params
 
     the_system = mbd_system("Quarter Car A-Arm")
-    the_system.scratch = [rr, L, rc]
+    the_system.scratch = kinematics(; r_A=[wui, hui], r_B=[wuo, huo], r_C=[wli, hli], r_D=[wlo, hlo], r_E=[tw/2, 0])
 
     item = body("Chassis")
     item.mass = m

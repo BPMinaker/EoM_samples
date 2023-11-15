@@ -20,10 +20,10 @@
     hG = 0.5 # mass centre height
     cfy = 40000 # cornering stiffness, front
     cry = 40000
-    Ix=818 # moments of inertia
-    Iy=3267
-    Iz=3508
-    kt=180000 # tire vertical stiffness
+    Ix = 818 # moments of inertia
+    Iy = 3267
+    Iz = 3508
+    kt = 180000 # tire vertical stiffness
     r = 0.3 # wheel radius
 end
 

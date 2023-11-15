@@ -8,7 +8,9 @@ include(joinpath("models", "input_ex_roll_centre.jl"))
 # here the value of m and u are set, but we can add many more if we like
 m = 1500
 u = 20
-params = params_list(; m, u) # make sure to include them all here!!!
+cfy = 0
+cry = 0
+params = params_list(; m, u, cfy, cry) # make sure to include them all here!!!
 
 # build system description with approximate cornering stiffnesses
 system = input_full_car_rc(; params)
@@ -21,8 +23,17 @@ output = run_eom!(system, true)
 # display(getfield.(system.flex_points,:name))
 Z0 = vcat(getfield.(system.flex_points[[1, 2, 5, 6]], :preload)...)
 
-# define a simple nonlinear tire with load sensitivity
-tire(Z, slip) = -(1.2 .- 3.0e-5 .* Z) .* Z .* tanh.(8.2 .* slip)
+# define a nonlinear tire with load sensitivity
+function tire(Z, slip)
+    mtm = [1.6929, -55.2084E-6, 1.27128, 1601.8 * 180 / pi, 6494.6, 4.7966E-3 * 180 / pi, -0.3875E-3, 1.0]
+    C = mtm[1]
+    D = (mtm[2] * Z .+ mtm[3]) .* Z
+    B = mtm[4] * sin.(2 * atan.(Z / mtm[5])) / C ./ D
+    Bslip = B .* slip
+    E = mtm[7] * Z .+ mtm[8]
+
+    -D .* sin.(C * atan.((1.0 .- E) .* Bslip + E .* atan.(Bslip)))
+end
 
 # recompute cornering stiffnesses
 # define the lateral force function at the actual vertical load
@@ -108,7 +119,7 @@ ylabel = "Angles [°]"
 push!(plots, plot(t, [steer.(t) y[:, 11:13] -y[:, 9] * (params.a + params.b) / params.u + steer.(t)]; xlabel, ylabel, label, lw, size, xlims))
 
 label = ["ru" "Σf/m" "vdot"]
-ylabel = "acc [m s^-2]"
+ylabel = "acc [m/s^2]"
 push!(plots, plot(t, [y[:, 14] acc acc - y[:, 14]]; xlabel, ylabel, label, lw, size, xlims))
 
 # pick the outputs for the Bode plots

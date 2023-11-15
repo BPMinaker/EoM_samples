@@ -80,9 +80,7 @@ println("Computing time history...")
 
 t = 0:0.02:20
 
-
 h = impulse(result.ss_eqns, t)
-
 
 # define input forcing function; here we chose to excite the system near its natural frequency, making sure that our step 0.02 seconds is fine enough to get a good sample of the input; a step of 0.02 is 50 times per second, and the rule of thumb is we'd like 10 samples in any sinewave (bare minimum is 2), so we can comfortably sample a 5 Hz signal with this stepsize
 

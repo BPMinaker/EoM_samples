@@ -25,62 +25,38 @@ wlo = tw / 2 - 0.05
 r = 0.32
 u = 10
 
-ptr(x) = input_quarter_car_planar_a_arm(; params=params_list(; a, tw, r, u, wuo, wlo, Y=x))
-system = ptr.(vpt)
-setfield!.(system, :name, "Quarter Car A-arm - long arms")
-output = run_eom!.(system)
-result = analyze.(output)
+ptr1(x) = input_quarter_car_planar_a_arm(; params=params_list(; a, tw, r, u, Y=x, wuo, wlo))
+ptr2(x) = input_quarter_car_planar_a_arm(; params=params_list(; a, tw, r, u, Y=x, wuo, wlo, wui=0.53, wli=0.53))
+ptr3(x) = input_quarter_car_planar_a_arm(; params=params_list(; a, tw, r, u, Y=x, wuo, wlo, wui=0.53))
 
-rr, L, rc = system[1].scratch
-display(rr)
+pvec = [ptr1, ptr2, ptr3]
 
-h=[]
-hh = impulse.(getfield.(result, :ss_eqns), [t])
-for i in hh[idx]
-    push!(h, hcat(i...)[1,:])
+name = [
+"Quarter Car A-arm - long arms",
+"Quarter Car A-arm - short arms",
+"Quarter Car A-arm - mixed arms"
+]
+
+for i in 1:3
+
+    system = pvec[i].(vpt)
+    setfield!.(system, :name, name[i])
+    output = run_eom!.(system)
+    result = analyze.(output)
+
+    rr, L, rc = system[1].scratch
+    display(rr)
+
+    h=[]
+    hh = impulse.(getfield.(result, :ss_eqns), [t])
+    for i in hh[idx]
+        push!(h, hcat(i...)[1,:])
+    end
+
+    plots = [plot(t, hcat(h...); xlabel, ylabel, label, size, lw)]
+    summarize(system, vpt, result; plots, vpt_name, ss)
+
 end
-
-plots = [plot(t, hcat(h...); xlabel, ylabel, label, size, lw)]
-summarize(system, vpt, result; plots, vpt_name, ss)
-
-##########
-
-ptr(x) = input_quarter_car_planar_a_arm(; params=params_list(; a, tw, r, u, Y=x, wuo, wlo, wui=0.53, wli=0.53))
-system = ptr.(vpt)
-output = run_eom!.(system)
-result = analyze.(output)
-
-rr, L, rc = system[1].scratch
-display(rr)
-
-h=[]
-hh = impulse.(getfield.(result, :ss_eqns), [t])
-for i in hh[idx]
-    push!(h, hcat(i...)[1,:])
-end
-
-plots = [plot(t, hcat(h...); xlabel, ylabel, label, size, lw)]
-summarize(system, vpt, result; plots, vpt_name, ss)
-
-##########
-
-ptr(x) = input_quarter_car_planar_a_arm(; params=params_list(; a, tw, r, u, Y=x, wuo, wlo, wui=0.53))
-system = ptr.(vpt)
-setfield!.(system, :name, "Quarter Car A-arm - mixed arms")
-output = run_eom!.(system)
-result = analyze.(output)
-
-rr, L, rc = system[1].scratch
-display(rr)
-
-h=[]
-hh = impulse.(getfield.(result, :ss_eqns), [t])
-for i in hh[idx]
-    push!(h, hcat(i...)[1,:])
-end
-
-plots = [plot(t, hcat(h...); xlabel, ylabel, label, size, lw)]
-summarize(system, vpt, result; plots, vpt_name, ss)
 
 
 # animate_modes(system[1], result[1], overwrite = false)

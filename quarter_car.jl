@@ -52,10 +52,11 @@ label = ["Tire compression" "Ground"]
 push!(plots, plot(t, [z20 z0]; xlabel, ylabel, label, lw, size))
 
 summarize(system, result; plots)
-summarize(system, result; plots, format = :html)
+# summarize(system, result; plots, format = :html)
+# uncomment to save to html
 
 # generate animations of the mode shapes
-using EoM_X3D
-animate_modes(system, result, scale=0.2)
+# using EoM_X3D
+# animate_modes(system, result, scale=0.2)
 
 println("Done.")

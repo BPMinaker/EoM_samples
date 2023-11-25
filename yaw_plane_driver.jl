@@ -45,7 +45,7 @@ function steer_driver(y, t)
 
     # get vehicle location and heading from sensors (y is the output vector)
     offset = y[5]
-    heading = y[6] * pi/180 # convert back to radians
+    heading = y[6] * π / 180 # convert back to radians
 
     # get the road location, heading
     offset_t, heading_t, curvature = track(u * t)
@@ -109,7 +109,7 @@ push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
 xlabel = "x [m]"
 ylabel = "y [m]"
 label = ["y" " target y"]
-push!(plots, plot(u * t, [y_dist [track.(u * t)[i][1] for i=1:length(t)]]; xlabel, ylabel, label, lw, size))
+push!(plots, plot(u * t, [y_dist first.(track.(u * t))]; xlabel, ylabel, label, lw, size))
 
 # write all the stuff to the output; skip steady state, Bode plots
 ss = []

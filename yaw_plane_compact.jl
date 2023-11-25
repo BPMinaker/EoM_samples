@@ -12,13 +12,13 @@ cf = 70000
 cr = 80000
 vpts = 1:0.3:40
 
-f(x) = input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr)
+f(x) = input_ex_yaw_plane(; u = x, m, a, b, Iz, cf, cr)
 system = f.(vpts)
 output = run_eom!.(system, vpts .== 1)
 result = analyze.(output, vpts .== 1)
 
 ss = [1, 1, 1, 1, 0, 0, 1, 1]
-summarize(system, vpts, result; ss) 
+summarize(system, vpts, result; ss)
 #summarize(system, vpts, result; ss, format = :html)
 
 # n = argmin(abs.(vpts .- 20))

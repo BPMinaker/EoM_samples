@@ -15,7 +15,7 @@ cf = 70000
 cr = 80000
 
 # define a dummy function that just calls our input function, but also adds the parameters we just set
-f(x) = input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr)
+f(x) = input_ex_yaw_plane(; u = x, m, a, b, Iz, cf, cr)
 
 # here we set the speed in `vpts`, which gets sent one at a time to the `f()` function, which finally sends them to the `input_ex_yaw_plane()` function, where they determine the value of `u`
 vpts = 0.4:0.4:40

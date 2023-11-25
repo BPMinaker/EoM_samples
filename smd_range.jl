@@ -10,7 +10,7 @@ m = 1.0
 c_cr = 2 * (k * m)^0.5
 
 # here we redefine the input function, so we can call it using any value of c
-f(x) = input_ex_smd(; k, m, c=x)
+f(x) = input_ex_smd(; k, m, c = x)
 
 # then we define the range of values for c, from 0 to 1.5 times critical
 vpts = (0:1.5/150:1.5) * c_cr
@@ -30,11 +30,11 @@ size = (800, 400)
 
 xlabel = "Time [s]"
 ylabel = "x [m]"
-push!(plots, plot(;xlabel, ylabel, size))
+push!(plots, plot(; xlabel, ylabel, size))
 
-xlabel="s [rad/s]"
-ylabel="p(s) [N/m]"
-push!(plots, plot(;xlabel, ylabel, size))
+xlabel = "s [rad/s]"
+ylabel = "p(s) [N/m]"
+push!(plots, plot(; xlabel, ylabel, size))
 
 t = 0:5/150:5
 s = -20:25/150:5
@@ -51,7 +51,7 @@ for i in eachrow([result vpts])[1:10:end]
 end
 
 # the `summarize()` function has been written using another feature of Julia, called `multiple dispatch`, which allows the same function to do different things, depending on the type of arguments, `summarize()` recognizes if system and result are vectors, and if so, it drops the tables, and gives series of plots instead
-summarize(system, vpts, result; ss=[], vpt_name, plots)
+summarize(system, vpts, result; ss = [], vpt_name, plots)
 
 # we could also write to html output instead of the screen
 # summarize(system, vpts, result; ss = [], vpt_name, format = :html)

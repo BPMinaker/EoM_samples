@@ -12,7 +12,7 @@ mt = 2000
 It = 3000
 vpts = 0.4:0.4:40
 
-f(x) = input_ex_truck_trailer(; u=x, m, Iz, d, e, h, mt, It)
+f(x) = input_ex_truck_trailer(; u = x, m, Iz, d, e, h, mt, It)
 system = f.(vpts)
 output = run_eom!.(system, vpts .== 1)
 result = analyze.(output, vpts .== 1)

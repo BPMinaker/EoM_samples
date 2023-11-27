@@ -27,7 +27,7 @@ n = findfirst(vpts .== 18)
 
 system = system[n]
 result = result[n]
-system.name *= " 18 m s^-1"
+system.name *= " 18 m/s"
 
 # equations are known, let's solve a time history
 
@@ -57,7 +57,7 @@ lw = 2 # thicker line weight
 size = (800, 400)
 
 # plot yaw rate vs time
-ylabel = "Yaw rate [° s^-1], Steer angle [°]"
+ylabel = "Yaw rate [°/s], Steer angle [°]"
 label = ["Yaw rate r" "Steer angle δ"]
 plots = [plot(t, [r δ]; xlabel, ylabel, label, lw, size)]
 

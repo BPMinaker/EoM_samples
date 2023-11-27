@@ -80,8 +80,6 @@ println("Computing time history...")
 
 t = 0:0.02:20
 
-h = impulse(result.ss_eqns, t)
-
 # define input forcing function; here we chose to excite the system near its natural frequency, making sure that our step 0.02 seconds is fine enough to get a good sample of the input; a step of 0.02 is 50 times per second, and the rule of thumb is we'd like 10 samples in any sinewave (bare minimum is 2), so we can comfortably sample a 5 Hz signal with this stepsize
 
 # here, we choose an excitation frequency that's very close to the natural frequency, well below 5 Hz
@@ -110,15 +108,12 @@ println("Plotting...")
 
 # here there are some keyword arguments for the lineweight and the labels
 xlabel = "Time [s]"
-ylabel = "z [m]"
-label = "z"
 lw = 2
 size = (800, 400)
-p1 = plot(t, hcat(h...)'[:, 1]; xlabel, ylabel, label, lw, size)
 
 label = ["z" "f"]
 ylabel = "z [m], f [N]"
-p2 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
+p1 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
 
 # the plot is created and stored but not shown
 # we could send it to the screen using: display(p1)
@@ -129,16 +124,16 @@ p2 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
 w = 0.5 * result.omega_n[1]
 y = splsim(result.ss_eqns, u, t)
 res = [hcat(y...)' u.(0, t)]
-p3 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
+p2 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
 
 w = 2.0 * result.omega_n[1]
 y = splsim(result.ss_eqns, u, t)
 res = [hcat(y...)' u.(0, t)]
-p4 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
+p3 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
 
 # now let's display all out results, along with the extra plots
 
-plots = [p1, p2, p3, p4]
+plots = [p1, p2, p3]
 summarize(system, result; plots)
 
 # alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; you can change the folder name and filename with keyword arguments `folder` and `filename` if you really want; the default filename is taken from the model name in the input file; the data is also written to individual files as `output/date/filename/time/plot_1.html`, etc., which won't get overwritten if you run the analysis again, but the main html output file does, so you can leave it open in your browser and just refresh if you rerun the simulation with new values

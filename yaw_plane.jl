@@ -24,18 +24,18 @@ vpts = 0.4:0.4:40
 system = f.(vpts)
 
 # generate the equations of motion, but many times, for every different value of forward speed
-# vpts .==1 is a vector of true/false, true on the first value, false everywhere else
-# we use it to get a verbose output only on the first set of equations of motion
-output = run_eom!.(system, vpts .== 1)
+output = run_eom!.(system)
 
 # do the eigenvalues, freq resp, etc, for each forward speed
-result = analyze.(output, vpts .== 1)
+result = analyze.(output)
 
 # now, let's also do some time domain solutions; define the steer angle as a function of time
-# pulse function is 1 from t=1 to t=3, 0 otherwise
-# sin(pi * t) has a wavelength of 2 seconds (2 pi/ pi), same as pulse
-steer(t) = EoM.pulse(t, 1, 3) * 2 * sin(π * (t - 1))
-input(~, t) = steer(t) # define input function to be steer but to also accept x and then ignore it
+# cos ramp to constant two degrees, cos ramp back to zero
+steer(t) = EoM.pulse(t, 1, 1.5) * (1 - cos(2π * (t - 1))) + EoM.pulse(t, 1.5, 2) * 2 + EoM.pulse(t, 2, 2.5) * (1 + cos(2π * (t - 2)))
+
+# define input function to be steer but to also accept x and then ignore it
+# add an identical -ve steer five seconds later
+input(~, t) = steer(t) - steer(t - 3)
 
 # define time interval
 t = 0:0.05:20
@@ -58,7 +58,7 @@ a_lat = res[4, :]
 y_dist = res[5, :]
 α_f = res[7, :]
 α_r = res[8, :]
-δ = steer.(t)
+δ = input.(0, t)
 
 xlabel = "Time [s]"
 lw = 2 # thicker line weight
@@ -90,13 +90,10 @@ ylabel = "y [m]"
 label = ""
 push!(plots, plot(u * t, y_dist; xlabel, ylabel, label, lw, size))
 
-
-
 # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
-
 ss = [1, 1, 1, 1, 0, 0, 1, 1]
 
 summarize(system, vpts, result; plots, ss)
-summarize(system, vpts, result; plots, ss, format = :html)
+# summarize(system, vpts, result; plots, ss, format = :html)
 
 println("Done.")

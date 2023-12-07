@@ -55,18 +55,18 @@ result = analyze(output, true)
 
 # `result` is also a structured variable that holds a number of vectors, such as `ss_eqns`
 
-# println(propertynames(result))
-# println(result.ss_eqns)
+println(propertynames(result))
+println(result.ss_eqns)
 
 # the results of the eigenvalue analysis are available; here we can use `display()` instead of `println()` as it formats vectors and matrices nicely; note that a second order system has two eigenvalues, but they are complex conjugates
 
-# display(result.e_val)
+display(result.e_val)
 
 # we can also print the natural frequencies, the damping ratios, the time constants, and the wavelengths; in this case, there are two of each, but they are all duplicate pairs, as they are calculated from conjugate eigenvalues
 
 # to make a convenient result, we can send the system definition and the analysis results to a helper function called `summarize()` that prints all the results in nice tables or plots as necessary
 
-# summarize(system, result; bode = [0, 0, 1])
+summarize(system, result)
 
 # here, we make the Bode (i.e., frequency response) plot using the third ouput (kx) only, because the Bode plot should be dimensionless, i.e., input and output should have the same units, so we plot the ratio of spring force to applied force, as a function of frequency; the spring force is proportional to displacement, so we are really looking at displacement response, but in a nondimensional way; we should see a resonance near the natural frequency, as long as the damping ratio is below 0.707; note that at low frequencies, the spring force will nearly equal the applied force, so the Bode plot will tend toward 1.0, or 0 [dB] (remember the decibel is a logarithmic unit); at high frequency, the applied force changes direction so quickly that the mass doesn't have time to respond, so the motion becomes very small, i.e., 0.0 or -∞ [dB]
 
@@ -88,9 +88,9 @@ w = 0.95 * result.omega_n[1]
 
 # the input function we pass to `splsim()` has to be defined as a function of the state and time, i.e., it takes two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input
 
-u(x, t) = sin(2pi * w * t)
+u(~, t) = sin(2π * w * t)
 
-# we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time vector to EoM's own linear ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has three entries: z, z_dot, and kz; we could choose the initial state if we wanted ,but `splsim()` will just use zeroes if we don't specify anything else
+# we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time vector to EoM's own linear ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has entries z and kz; we could choose the initial state if we wanted ,but `splsim()` will just use zeroes if we don't specify anything else
 
 y = splsim(result.ss_eqns, u, t)
 
@@ -100,7 +100,7 @@ y = splsim(result.ss_eqns, u, t)
 
 res = [hcat(y...)' u.(0, t)]
 
-# our result will have four columns: the displacement, the velocity, the spring force, and the applied force; we get the applied force by attaching the result of the input function, so we can plot them together; we use the dot operator on the vector of time values; in this case the 0 in the input is ignored by the `u()` function, but the `sin()` function is evaluated for each entry in the `t` vector
+# our result will have three columns: the displacement, the spring force, and the applied force; we get the applied force by attaching the result of the input function, so we can plot them together; we use the dot operator on the vector of time values; in this case the 0 in the input is ignored by the `u()` function, but the `sin()` function is evaluated for each entry in the `t` vector
 
 # we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, velocity, and applied force, which are all packed back into a matrix
 
@@ -138,6 +138,6 @@ summarize(system, result; plots)
 
 # alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; you can change the folder name and filename with keyword arguments `folder` and `filename` if you really want; the default filename is taken from the model name in the input file; the data is also written to individual files as `output/date/filename/time/plot_1.html`, etc., which won't get overwritten if you run the analysis again, but the main html output file does, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
 
-# summarize(system, result; bode, plots, format = :html)
+# summarize(system, result; plots, format = :html)
 
 println("Done.")

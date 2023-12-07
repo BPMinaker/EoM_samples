@@ -106,13 +106,13 @@ res = [hcat(y...)' u.(0, t)]
 
 println("Plotting...")
 
-# here there are some keyword arguments for the lineweight and the labels
+# here there are some keyword arguments for the labels, etc.
 xlabel = "Time [s]"
+ylabel = "z [m], f [N]"
+label = ["z" "f"]
 lw = 2
 size = (800, 400)
 
-label = ["z" "f"]
-ylabel = "z [m], f [N]"
 p1 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
 
 # the plot is created and stored but not shown

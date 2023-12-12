@@ -18,7 +18,7 @@ output = run_eom!.(system, vpts .== 1)
 result = analyze.(output, vpts .== 1)
 
 summarize(system, vpts, result)
-summarize(system, vpts, result; format = :html)
+# summarize(system, vpts, result; format = :html)
 
 
 # let's isolate one speed and expand
@@ -27,7 +27,7 @@ n = findfirst(vpts .== 18)
 
 system = system[n]
 result = result[n]
-system.name *= " 18 m/s"
+system.name *= " 18 m per s"
 
 # equations are known, let's solve a time history
 
@@ -82,6 +82,6 @@ label = ["Lateral acceleration" "Steer angle δ"]
 push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
 
 summarize(system, result; plots)
-summarize(system, result; plots, format = :html)
+# summarize(system, result; plots, format = :html)
 
 println("Done.")

@@ -108,12 +108,12 @@ println("Plotting...")
 
 # here there are some keyword arguments for the labels, etc.
 xlabel = "Time [s]"
-ylabel = "z [m], f [N]"
-label = ["z" "f"]
+ylabel = "z [m], kz [N], f [N]"
+label = ["z" "kz" "f"]
 lw = 2
 size = (800, 400)
 
-p1 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
+p1 = plot(t, res; xlabel, ylabel, label, lw, size)
 
 # the plot is created and stored but not shown
 # we could send it to the screen using: display(p1)
@@ -124,12 +124,12 @@ p1 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
 w = 0.5 * result.omega_n[1]
 y = splsim(result.ss_eqns, u, t)
 res = [hcat(y...)' u.(0, t)]
-p2 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
+p2 = plot(t, res; xlabel, ylabel, label, lw, size)
 
 w = 2.0 * result.omega_n[1]
 y = splsim(result.ss_eqns, u, t)
 res = [hcat(y...)' u.(0, t)]
-p3 = plot(t, res[:, [1, 3]]; xlabel, ylabel, label, lw, size)
+p3 = plot(t, res; xlabel, ylabel, label, lw, size)
 
 # now let's display all out results, along with the extra plots
 

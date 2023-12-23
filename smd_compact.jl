@@ -20,8 +20,7 @@ y = splsim(result.ss_eqns, u, t)
 
 # time history done, now make plots
 
-res = hcat(y...)'
-u_t = u.(0, t)
+res = [hcat(y...)' u.(0, t)]
 
 xlabel = "Time [s]"
 ylabel = "z [m], kz [N], f [N]"
@@ -29,7 +28,7 @@ label = ["z" "kz" "f"]
 lw = 2
 size = (800, 400)
 
-my_plot = plot(t, [res u_t]; xlabel, ylabel, label, lw, size)
+my_plot = plot(t, res; xlabel, ylabel, label, lw, size)
 # we can display the plot like:
 # display(my_plot)
 # or we can add it to a vector of plots, and send it to the `summarize()` function

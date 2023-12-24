@@ -23,10 +23,8 @@ system = input_ex_beam(; EI1, EI2, mpul, l, n)
 output = run_eom!(system, true)
 result = analyze(output, true)
 
-bode = [1 0; 0 1]
-verbose = true
-summarize(system, result; bode)
-# summarize(system, result; bode, format = :html)
+summarize(system, result)
+# summarize(system, result; format = :html)
 
 # using EoM_X3D
 # animate_modes(system, result)

@@ -1,38 +1,36 @@
 
-# define struct to hold all the parameters and their default values, so we don't have to list them all in the function definition
 @kwdef mutable struct params_list
-    m = 1800 # mass
-    u = 20 # speed
+    m = 1800. # mass
+    u = 20. # speed
     a = 1.5 # wheelbase, front
     b = 1.5
     tf = 1.6 # track width, front
     tr = 1.6
-    kf = 30000 # suspension stiffness, front
-    kr = 30000
-    cf = 2500 # suspension damping, front
-    cr = 2500
-    krf = 500 # anti-roll stiffness, front
-    krr = 500
-    muf = 20 # unsprung mass, front
-    mur = 20
+    kf = 30000. # suspension stiffness, front
+    kr = 30000.
+    cf = 2500. # suspension damping, front
+    cr = 2500.
+    krf = 500. # anti-roll stiffness, front
+    krr = 500.
+    muf = 20. # unsprung mass, front
+    mur = 20.
     hf = 0.2 # roll centre height, front
     hr = 0.2
     hG = 0.5 # mass centre height
-    cfy = 40000 # cornering stiffness, front
-    cry = 40000
-    Ix = 818 # moments of inertia
-    Iy = 3267
-    Iz = 3508
-    kt = 180000 # tire vertical stiffness
+    cfy = 40000. # cornering stiffness, front
+    cry = 40000.
+    Ix = 818. # moments of inertia
+    Iy = 3267.
+    Iz = 3508.
+    kt = 180000. # tire vertical stiffness
     r = 0.3 # wheel radius
 end
 
-function input_full_car_rc(;params::params_list)
-
-    # unpack all the parameters
-    (; m, u, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur, hf, hr, hG, cfy, cry, Ix, Iy, Iz, kt, r) = params
+function input_full_car_rc(; kwargs...)
 
     the_system = mbd_system("Full Car Model with Swing Axles")
+    the_system.scratch = params_list(; kwargs...)
+    (; m, u, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur, hf, hr, hG, cfy, cry, Ix, Iy, Iz, kt, r) = the_system.scratch
 
     # add one body representing the chassis
     item = body("chassis")

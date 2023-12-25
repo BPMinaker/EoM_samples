@@ -4,16 +4,15 @@ plotly()
 include(joinpath("models", "input_ex_roll_centre.jl"))
 
 # see the input file for the list of parameters and their default values
-# build the list of parameters, and set those that are not using defaults
+# set the list of parameters that are not using defaults
 # here the value of m and u are set, but we can add many more if we like
 m = 1500
 u = 20
 cfy = 0
 cry = 0
-params = params_list(; m, u, cfy, cry) # make sure to include them all here!!!
 
 # build system description with approximate cornering stiffnesses
-system = input_full_car_rc(; params)
+system = input_full_car_rc(; m, u, cfy, cry) # make sure to include them all parameters here!!!
 
 # generate eom
 output = run_eom!(system, true)
@@ -41,14 +40,14 @@ yf(x) = tire(Z0[1], x)
 # differentiate by slip angle
 dyf(x) = ForwardDiff.derivative(yf, x)
 # evaluate a slip angle of zero
-params.cfy = -dyf(0)
+cfy = -dyf(0)
 # repeat for rear
 yr(x) = tire(Z0[2], x)
 dyr(x) = ForwardDiff.derivative(yr, x)
-params.cry = -dyr(0)
+cry = -dyr(0)
 
 # rebuild the equations of motion using the updated cornering stiffnesses
-system = input_full_car_rc(; params)
+system = input_full_car_rc(; m, u, cfy, cry)
 output = run_eom!(system, true)
 result = analyze(output, true)
 
@@ -67,7 +66,7 @@ function input(x, t)
     # get slip angles from lateral velocity, subtract steer on front
     slip = y[[3, 4, 7, 8]] .- steer(t) * [1, 0, 1, 0] * π / 180
     # compute tire force, cancel linear tire
-    tire(Z, slip) + [params.cfy, params.cry, params.cfy, params.cry] .* y[[3, 4, 7, 8]]
+    tire(Z, slip) + [cfy, cry, cfy, cry] .* y[[3, 4, 7, 8]]
 end
 
 println("Solving time history...")
@@ -83,7 +82,7 @@ ZZ = Z0' .- y[:, [1, 2, 5, 6]]
 slip = y[:, [3, 4, 7, 8]] - steer.(t) .* [1, 0, 1, 0]' * π / 180
 
 YY = tire.(ZZ, slip)
-acc = sum(YY, dims = 2) / (params.m + 2 * params.muf + 2 * params.mur)
+acc = sum(YY, dims = 2) / (m + 2 * system.scratch.muf + 2 * system.scratch.mur)
 slip *= 180 / π
 
 # set plot text, etc
@@ -108,14 +107,14 @@ push!(plots, plot(t, 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]; xlabel, yl
 
 label = ""
 ylabel = "Yaw moment N [Nm]"
-push!(plots, plot(t, sum(params.a * YY[:, [1, 3]] - params.b * YY[:, [2, 4]], dims = 2); xlabel, ylabel, label, lw, size))
+push!(plots, plot(t, sum(system.scratch.a * YY[:, [1, 3]] - system.scratch.b * YY[:, [2, 4]], dims = 2); xlabel, ylabel, label, lw, size))
 
 ylabel = "G Lift [mm]"
 push!(plots, plot(t, y[:, 10]; xlabel, ylabel, label, lw, size))
 
 label = ["Steer δ" "Roll ϕ" "Pitch θ" "Slip β" "Understeer"]
 ylabel = "Angles [°]"
-push!(plots, plot(t, [steer.(t) y[:, 11:13] -y[:, 9] * (params.a + params.b) / params.u + steer.(t)]; xlabel, ylabel, label, lw, size))
+push!(plots, plot(t, [steer.(t) y[:, 11:13] -y[:, 9] * (system.scratch.a + system.scratch.b) / u + steer.(t)]; xlabel, ylabel, label, lw, size))
 
 label = ["ru" "Σf/m" "vdot"]
 ylabel = "acc [m/s^2]"

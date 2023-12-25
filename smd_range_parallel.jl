@@ -13,28 +13,22 @@ f(x) = input_ex_smd(; k, m, c = x)
 # then we define the range of values for c
 vpts = 0:0.001:5
 
-@time begin
-    n = length(vpts)
-    system = Vector{EoM.mbd_system}(undef, n)
-    output = Vector{EoM.dss_data}(undef, n)
-    result = Vector{EoM.analysis}(undef, n)
+# timing experiment
+# looping vs vectorizing
 
-    Threads.@threads for i in 1:n
-        system[i] = f(vpts[i])
-        output[i] = run_eom!(system[i])
-        result[i] = analyze(output[i])
-    end
+@time begin
+for i in vpts
+    system = f(i)
+    output = run_eom!(system)
+    result = analyze(output)
+end
 end
 
 @time begin
-    system2 = f.(vpts)
-    output2 = run_eom!.(system2)
-    result2 = analyze.(output2)
+    system = f.(vpts)
+    output = run_eom!.(system)
+    result = analyze.(output)
 end
 
-
-@time begin
-    result3 = analyze.(run_eom!.(f.(vpts)))
-end
 
 println("Done.")

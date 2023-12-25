@@ -51,7 +51,7 @@ println(output)
 
 result = analyze(output, true)
 
-# the analysis converts the system to a standard state space form (A,B,C,D), where the E matrix is eliminated, the size of the A matrix is usually smaller after this happens, and almost certainly not the same as if we derived it by hand, even though it has the same properties
+# the analysis converts the system to a standard state space form (A,B,C,D), where the E matrix is eliminated, the size of the A matrix is usually smaller after this happens, and almost certainly not the same as if we derived it by hand, even though it has the same properties; it also does a lot of other things we will be interested in, like the eigenvalues and vectors, the natural frequencies, the impulse response, etc.
 
 # `result` is also a structured variable that holds a number of vectors, such as `ss_eqns`
 
@@ -100,9 +100,9 @@ y = splsim(result.ss_eqns, u, t)
 
 res = [hcat(y...)' u.(0, t)]
 
-# our result will have three columns: the displacement, the spring force, and the applied force; we get the applied force by attaching the result of the input function, so we can plot them together; we use the dot operator on the vector of time values; in this case the 0 in the input is ignored by the `u()` function, but the `sin()` function is evaluated for each entry in the `t` vector
+# our result will have three columns: the displacement, the spring force, and the applied force; we get the applied force by attaching the result of the input function, so we can plot them together; we use the dot operator on the vector of time values, i.e., the . before the ( tells Julia that we are taking a function that expects a scalar, and calling it on each element of a vector, and we're stacking the results together in a vector; in this case the 0 in the input is ignored by the `u()` function, but the `sin()` function is evaluated for each entry in the `t` vector
 
-# we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, velocity, and applied force, which are all packed back into a matrix
+# we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, spring force, and applied force, which are all packed back into the  matrix `res`
 
 println("Plotting...")
 
@@ -117,7 +117,7 @@ p1 = plot(t, res; xlabel, ylabel, label, lw, size)
 
 # the plot is created and stored but not shown
 # we could send it to the screen using: display(p1)
-# this plot would show up in a tab in VS Code or in  a browser tab
+# this plot would show up in a tab in VS Code or in a web browser tab
 
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `u()` is defined as a function of `w` so all we have to do is update `w`, and `u()` will update as well
 

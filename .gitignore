@@ -2,3 +2,5 @@ output/
 scratch/
 
 .vscode/settings.json
+Project.toml
+Manifest.toml

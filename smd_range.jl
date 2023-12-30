@@ -25,6 +25,7 @@ output = run_eom!.(system)
 # we take the vector of output equations, and analyze all of them, again using dot notation
 result = analyze.(output)
 
+# now, just for fun, let's plot ms^2 + cs + k over a range of s, to confirm how the roots align with our eigenvalues
 xlabel = "s [rad/s]"
 ylabel = "p(s) [N/m]"
 size = (800, 400)
@@ -32,11 +33,9 @@ lw = 2
 p1 = plot(; xlabel, ylabel, size)
 
 s = -20:25/150:5
-
-for i in eachrow([result vpts])[1:15:end]
-    label = "c = $(my_round(i[2]))"
-
-    p = fromroots(i[1].e_val)
+for i in vpts[1:15:end]
+    label = "c = $(my_round(i))"
+    p = Polynomial([k, i, m])
     plot!(p1, s, p.(s); label, lw)
 end
 plots = [p1]

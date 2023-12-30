@@ -33,7 +33,7 @@ p1 = plot(; xlabel, ylabel, size)
 
 s = -20:25/150:5
 
-for i in eachrow([result vpts])[1:10:end]
+for i in eachrow([result vpts])[1:15:end]
     label = "c = $(my_round(i[2]))"
 
     p = fromroots(i[1].e_val)

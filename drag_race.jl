@@ -60,9 +60,7 @@ println("Static Zr=", round(Zr0, digits = 2), " N")
 result = analyze(output)
 
 # save the state space matrices in a convenient notation
-A = result.ss_eqns.A
-B = result.ss_eqns.B
-C = result.ss_eqns.C
+(; A, B, C, D) = result.ss_eqns
 
 # build the function that is the input to the equation of motion (i.e., the external forces)
 # we will call this function through the ODE solver

@@ -82,6 +82,9 @@ label = ["Lateral acceleration" "Steer angle δ"]
 push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
 
 summarize(system, result; plots)
-# summarize(system, result; plots, format = :html)
+
+#summarize(system, result; plots, format = :html)
+#using EoM_X3D
+#animate_modes(system, result)
 
 println("Done.")

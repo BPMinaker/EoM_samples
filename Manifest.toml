@@ -240,7 +240,7 @@ version = "2.0.0"
 
 [[deps.EoM_X3D]]
 deps = ["Dates", "EoM", "LinearAlgebra"]
-git-tree-sha1 = "84c960e895820bac466bf78f8287ee0bbf720222"
+git-tree-sha1 = "6c71a0020481a20c7c759d7d210e6bea3491de05"
 repo-rev = "master"
 repo-url = "http://github.com/BPMinaker/EoM_X3D.jl"
 uuid = "29d18a9a-f19a-11e8-3142-81fd2672d0ac"

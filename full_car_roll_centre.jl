@@ -10,9 +10,11 @@ m = 1500
 u = 20
 cfy = 0
 cry = 0
+hf = 0.3
+hr = 0.3
 
 # build system description with approximate cornering stiffnesses
-system = input_full_car_rc(; m, u, cfy, cry) # make sure to include them all parameters here!!!
+system = input_full_car_rc(; m, u, cfy, cry, hf, hr) # make sure to include all parameters here, and again below!!!
 
 # generate eom
 output = run_eom!(system, true)
@@ -47,7 +49,7 @@ dyr(x) = ForwardDiff.derivative(yr, x)
 cry = -dyr(0)
 
 # rebuild the equations of motion using the updated cornering stiffnesses
-system = input_full_car_rc(; m, u, cfy, cry)
+system = input_full_car_rc(; m, u, cfy, cry, hf, hr)
 output = run_eom!(system, true)
 result = analyze(output, true)
 

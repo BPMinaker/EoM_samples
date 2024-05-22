@@ -1,5 +1,4 @@
 using EoM
-EoM.plotly()
 
 include(joinpath("models", "input_quarter_car_a_arm_pushrod.jl"))
 include(joinpath("models", "susp.jl"))

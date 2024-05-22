@@ -1,5 +1,4 @@
 using EoM
-EoM.plotly()
 
 include(joinpath("models", "input_n_dof.jl"))
 

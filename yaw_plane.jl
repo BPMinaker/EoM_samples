@@ -1,5 +1,4 @@
-using EoM, Plots
-plotly()
+using EoM
 
 include(joinpath("models", "input_ex_yaw_plane.jl"))
 
@@ -47,17 +46,16 @@ n = findfirst(vpts .== u)
 y = splsim(result[n].ss_eqns, input, t)
 
 # merge vector of vectors into matrix, so we can pull out individual outputs to plot, and re-evaluate the steer angle so we can include it in the plots 
-res = hcat(y...)
 
 # Julia identifies every individual row of a matrix as a vector, so if we pull out just one row, it becomes a column
 # another notation conflict, y is system output, but also lateral displacement, use `y_dist` for lateral displacement
-r = res[1, :]
-β = res[2, :]
-α_u = res[3, :]
-a_lat = res[4, :]
-y_dist = res[5, :]
-α_f = res[7, :]
-α_r = res[8, :]
+r = y[:, 1]
+β =y[:, 2]
+α_u = y[:, 3]
+a_lat = y[:, 4]
+y_dist = y[:, 5]
+α_f = y[:, 7]
+α_r = y[:, 8]
 δ = input.(0, t)
 
 xlabel = "Time [s]"

@@ -1,5 +1,4 @@
-using EoM, Plots, ForwardDiff
-plotly()
+using EoM, ForwardDiff
 
 include(joinpath("models", "input_ex_roll_centre.jl"))
 
@@ -75,10 +74,9 @@ println("Solving time history...")
 t = 0:0.002:8
 
 y = splsim(result.ss_eqns, input, t)
-y = hcat(y...)'
 
 t = t[1:4:end]
-y = y[1:4:end, :]
+y = Matrix(y[1:4:end])
 
 ZZ = Z0' .- y[:, [1, 2, 5, 6]]
 slip = y[:, [3, 4, 7, 8]] - steer.(t) .* [1, 0, 1, 0]' * π / 180

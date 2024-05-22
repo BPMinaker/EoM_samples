@@ -1,5 +1,4 @@
-using EoM, Plots
-plotly()
+using EoM
 
 include(joinpath("models", "input_ex_truck_trailer.jl"))
 # here you can enter your vehicle specs by name
@@ -20,37 +19,31 @@ result = analyze.(output, vpts .== 1)
 summarize(system, vpts, result)
 # summarize(system, vpts, result; format = :html)
 
-
 # let's isolate one speed and expand
 # choose the equations of motion for 18 m/s (note function notation)
 n = findfirst(vpts .== 18)
-
 system = system[n]
 result = result[n]
 system.name *= " 18 m per s"
 
 # equations are known, let's solve a time history
-
 steer(t) = EoM.pulse(t, 1, 3) * 2 * sin(pi * (t - 1))
 
-input(~, t) = steer(t) # define input function to be steer but to also accept x and then ignore it
+u_vec(~, t) = steer(t) # define input function to be steer but to also accept x and then ignore it
 
 # Define time interval
 t = 0:0.05:20
 # solve the equations of motion using the EoM sparse linear solver, with the input function we just defined
 # we didn't send an inital condition, so the solver assumes all zeros
 
-y = splsim(result.ss_eqns, input, t)
-# merge vector of vectors into matrix, so we can pull out individual outputs (rows) to plot
-res = hcat(y...)
-# evaluate the steer angle so we can include it in the plots 
+y = splsim(result.ss_eqns, u_vec, t)
 
-r = res[1, :]
-β = res[2, :]
-α_u = res[3, :]
-γ = res[4, :]
-a_lat = res[5, :]
-δ = steer.(t)
+r = y[:, 1]
+β = y[:, 2]
+α_u = y[:, 3]
+γ = y[:, 4]
+a_lat = y[:, 5]
+δ = steer.(t) # evaluate the steer angle so we can include it in the plots 
 
 xlabel = "Time [s]"
 lw = 2 # thicker line weight

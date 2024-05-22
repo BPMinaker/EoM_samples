@@ -1,5 +1,4 @@
-using EoM, Plots
-plotly()
+using EoM
 
 include(joinpath("models", "input_ex_smd.jl"))
 
@@ -20,7 +19,7 @@ y = splsim(result.ss_eqns, u, t)
 
 # time history done, now make plots
 
-res = [hcat(y...)' u.(0, t)]
+res = [Matrix(y) u.(0, t)]
 
 xlabel = "Time [s]"
 ylabel = "z [m], kz [N], f [N]"

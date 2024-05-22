@@ -1,5 +1,4 @@
-using EoM, Plots
-plotly()
+using EoM
 size = (800, 400)
 lw = 2
 xlabel = "Time [s]"
@@ -45,13 +44,6 @@ for i in vec
     rr, L, rc = system[1].scratch
     display(rr)
 
-#    h = []
-#    hh = impulse.(getfield.(result, :ss_eqns), [t])
-#    for j in hh[idx]
-#        push!(h, hcat(j...)[1, :])
-#    end
-
-#    plots = [plot(t, hcat(h...); xlabel, ylabel, label, size, lw)]
     summarize(system, vpt, result; vpt_name, ss)
 
 end

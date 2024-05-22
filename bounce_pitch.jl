@@ -1,5 +1,4 @@
 using EoM
-EoM.plotly()
 
 include(joinpath("models", "input_ex_bounce_pitch.jl"))
 m = 2000

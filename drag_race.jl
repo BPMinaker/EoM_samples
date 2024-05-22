@@ -1,5 +1,4 @@
-using EoM, Interpolations, Plots
-plotly() # choose plot engine
+using EoM, Interpolations
 
 # read in the function that will define our drag race vehicle model
 include(joinpath("models", "input_ex_drag_race.jl"))
@@ -151,7 +150,7 @@ t = 0:0.01:30
 # it will assume zeros as inital conditions
 y = splsim(result.ss_eqns, u, t)
 # convert the vector of vectors to a matrix, and transpose it so the outputs are in columns for plotting
-y = hcat(y...)'
+y = Matrix(y)
 
 y[:, 2] *= 3.6 # scale second column to convert to km/h
 y[:, 3] /= 9.81 # acc'n in g

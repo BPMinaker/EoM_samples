@@ -1,5 +1,4 @@
 using EoM, EoM_X3D
-EoM.plotly()
 
 include(joinpath("models", "input_ex_hanging_chain.jl"))
 

@@ -1,8 +1,7 @@
 # you might find it helpful to turn on 'word wrapping' in VSCode; go to File, Preferences, Settings, and search for 'wrap'; change the setting to 'on'
 
 # the first step is to load the `EoM` and other support libraries
-using EoM, Plots
-plotly() # choose plotting engine
+using EoM
 
 # now, we load the function `input_ex_smd()`, which contains the definition of the spring mass damper system; we make Julia aware of the function by `including` the file that contains it; the `joinpath()` function inserts the appropriate separator, i.e., a forward slash or backslash, depending on the platform (Windows/Mac); you can `include` input files for systems you write yourself in the same way
 
@@ -88,17 +87,19 @@ w = 0.95 * result.omega_n[1]
 
 # the input function we pass to `splsim()` has to be defined as a function of the state and time, i.e., it takes two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input
 
-u(~, t) = sin(2π * w * t)
+u_vec(~, t) = sin(2π * w * t)
 
 # we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time vector to EoM's own linear ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has entries z and kz; we could choose the initial state if we wanted ,but `splsim()` will just use zeroes if we don't specify anything else
 
-y = splsim(result.ss_eqns, u, t)
+y = splsim(result.ss_eqns, u_vec, t)
 
 # note that unlike Matlab, Julia makes a distinction between a vector of vectors and a matrix; we can acess a vector of vectors like so: a[2][3] to the get third entry in the second vector, where for a matrix a[2,3] gives the entry in the second row, third column
 
-# the return argument `y` is a vector of vectors, one output vector for each time point, i.e., y[1] = y(t=0), y[2] = y(t=0.02); to read `y`, we use the `hcat()` function for horizontal concatenation (i.e., sticking column vectors together to form a matrix), and the `splatting` operator `...` to read all the entries from `y`; you can think of it as a short form for [y[1] y[2] ... y[end]]; we stick all the columns together, because we want to plot rows of the resulting matrix, so we transpose `res` using the apostrophe operator
+# in this case, y is is a special type that allow us to isolate individual time entries, e.g., `y[10]` gives us a vector of all the states at the 10th time step, where `y[10,2]` gives the second entry in that vector 
 
-res = [hcat(y...)' u.(0, t)]
+z = y[:, 1]
+kz = y[:, 2]
+f = u_vec.(0, t)
 
 # our result will have three columns: the displacement, the spring force, and the applied force; we get the applied force by attaching the result of the input function, so we can plot them together; we use the dot operator on the vector of time values, i.e., the . before the ( tells Julia that we are taking a function that expects a scalar, and calling it on each element of a vector, and we're stacking the results together in a vector; in this case the 0 in the input is ignored by the `u()` function, but the `sin()` function is evaluated for each entry in the `t` vector
 
@@ -113,7 +114,7 @@ label = ["z" "kz" "f"]
 lw = 2
 size = (800, 400)
 
-p1 = plot(t, res; xlabel, ylabel, label, lw, size)
+p1 = plot(t, [z kz f]; xlabel, ylabel, label, lw, size)
 
 # the plot is created and stored but not shown
 # we could send it to the screen using: display(p1)
@@ -122,14 +123,18 @@ p1 = plot(t, res; xlabel, ylabel, label, lw, size)
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `u()` is defined as a function of `w` so all we have to do is update `w`, and `u()` will update as well
 
 w = 0.5 * result.omega_n[1]
-y = splsim(result.ss_eqns, u, t)
-res = [hcat(y...)' u.(0, t)]
-p2 = plot(t, res; xlabel, ylabel, label, lw, size)
+y = splsim(result.ss_eqns, u_vec, t)
+z = y[:, 1]
+kz = y[:, 2]
+f = u_vec.(0, t)
+p2 = plot(t, [z kz f]; xlabel, ylabel, label, lw, size)
 
 w = 2.0 * result.omega_n[1]
-y = splsim(result.ss_eqns, u, t)
-res = [hcat(y...)' u.(0, t)]
-p3 = plot(t, res; xlabel, ylabel, label, lw, size)
+y = splsim(result.ss_eqns, u_vec, t)
+z = y[:, 1]
+kz = y[:, 2]
+f = u_vec.(0, t)
+p3 = plot(t, [z kz f]; xlabel, ylabel, label, lw, size)
 
 # now let's display all out results, along with the extra plots
 

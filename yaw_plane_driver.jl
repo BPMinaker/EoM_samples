@@ -1,5 +1,4 @@
-using EoM, Plots, ForwardDiff
-plotly()
+using EoM, ForwardDiff
 
 include(joinpath("models", "input_ex_yaw_plane.jl"))
 
@@ -65,16 +64,15 @@ steer(x, t) = steer_driver(result.ss_eqns.C * x, t)
 y = splsim(result.ss_eqns, steer, t)
 
 # go back and figure out what steer angle the driver model used, so we can plot it
-δ = steer_driver.(y, t)
+δ = steer_driver.(vec(y), t)
 
-res = hcat(y...)
-r = res[1, :]
-β = res[2, :]
-α_u = res[3, :]
-a_lat = res[4, :]
-y_dist = res[5, :]
-α_f = res[7, :]
-α_r = res[8, :]
+r = y[:, 1]
+β = y[:, 2]
+α_u = y[:, 3]
+a_lat = y[:, 4]
+y_dist = y[:, 5]
+α_f = y[:, 7]
+α_r = y[:, 8]
 
 xlabel = "Time [s]"
 lw = 2 # thicker line weight

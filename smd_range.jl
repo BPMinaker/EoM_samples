@@ -9,14 +9,14 @@ m = 1.0
 c_cr = 2 * (k * m)^0.5
 
 # here we redefine the input function, so we can call it using any value of c
-f(x) = input_ex_smd(; k, m, c = x)
+input_fn(x) = input_ex_smd(; k, m, c = x)
 
 # then we define the range of values for c, from 0 to 1.5 times critical
 vpts = (0:1.5/150:1.5) * c_cr
 vpt_name = ["c" "Damping coefficient" "N/(m/s)"]
 
 # then we call the function using the dot notation
-system = f.(vpts)
+system = input_fn.(vpts)
 
 # we take the vector of input systems, and generate the equations for all of them, again using dot notation
 output = run_eom!.(system)
@@ -43,6 +43,6 @@ plots = [p1]
 summarize(system, vpts, result; ss = [], vpt_name, plots)
 
 # we could also write to html output instead of the screen
-# summarize(system, vpts, result; ss = [], vpt_name, format = :html)
+summarize(system, vpts, result; ss = [], vpt_name, format = :html)
 
 println("Done.")

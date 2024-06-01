@@ -11,7 +11,6 @@ r = 0.346
 u = 10
 
 system = quarter_car_a_arm_pushrod(; u, a, tw, r)
-
 output = run_eom!(system)
 result = analyze(output)
 
@@ -20,5 +19,6 @@ summarize(system, result, format = :html)
 
 using EoM_X3D
 animate_modes(system, result)
+eom_draw(system)
 
 println("Done.")

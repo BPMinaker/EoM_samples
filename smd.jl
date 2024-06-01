@@ -140,9 +140,14 @@ p3 = plot(t, [z kz f]; xlabel, ylabel, label, lw, size)
 
 plots = [p1, p2, p3]
 
-summarize(system, result; plots)
-#summarize(system, result; plots, format = :html)
+# summarize(system, result; plots)
+summarize(system, result; plots, format = :html)
 
-# alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; you can change the folder name and filename with keyword arguments `folder` and `filename` if you really want; the default filename is taken from the model name in the input file; the data is also written to individual files as `output/date/filename/time/plot_1.html`, etc., which won't get overwritten if you run the analysis again, but the main html output file does, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
+# alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; that gets overwritten if you run the analysis again, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
+
+write_output(system, result)
+
+using EoM_X3D
+animate_modes(system, result)
 
 println("Done.")

@@ -6,7 +6,7 @@ include(joinpath("models", "input_ex_roll_centre.jl"))
 # set the list of parameters that are not using defaults
 # here the value of m and u are set, but we can add many more if we like
 m = 1500
-u = 20
+u = 80.5 / 3.6
 cfy = 0
 cry = 0
 hf = 0.3
@@ -55,7 +55,10 @@ result = analyze(output, true)
 # a smooth step function, 3 degrees, with its midpoint (i.e. 1.5) at t = 2
 # the 0.5 terms change the range from -1...1 to 0...1
 # the 4 determines how quickly the step occurs
-steer(t) = 3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
+# steer(t) = 3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
+
+# a sin w dwell input ala FMVSS 126
+steer(t) = 2 * (EoM.pulse(t, 2, 2 + 1/0.7*0.75) * sin(2π * 0.7 * (t - 2)) - EoM.pulse(t, 2 + 1/0.7*0.75, 2.5 + 1/0.7*0.75) + EoM.pulse(t, 2.5 + 1/0.7*0.75, 2.5 + 1/0.7) * sin(2π * 0.7 * (t - 2.5)))
 
 # assume LF, LR, RF, RR sequence
 # compute applied tire force
@@ -82,9 +85,11 @@ ZZ = Z0' .- y[:, [1, 2, 5, 6]]
 slip = y[:, [3, 4, 7, 8]] - steer.(t) .* [1, 0, 1, 0]' * π / 180
 
 YY = tire.(ZZ, slip)
-acc = sum(YY, dims = 2) / (m + 2 * system.scratch.muf + 2 * system.scratch.mur)
+acc = sum(YY, dims = 2) * 9.81 / sum(Z0) 
 slip *= 180 / π
 
+
+delta = steer.(t)
 # set plot text, etc
 lw = 2 # thicker plot lineweight
 size = (800, 400)
@@ -112,21 +117,27 @@ push!(plots, plot(t, sum(system.scratch.a * YY[:, [1, 3]] - system.scratch.b * Y
 ylabel = "G Lift [mm]"
 push!(plots, plot(t, y[:, 10]; xlabel, ylabel, label, lw, size))
 
-label = ["Steer δ" "Roll ϕ" "Pitch θ" "Slip β" "Understeer"]
+label = ["Steer δ" "Roll ϕ" "Slip β" "Understeer α_u"]
 ylabel = "Angles [°]"
-push!(plots, plot(t, [steer.(t) y[:, 11:13] -y[:, 9] * (system.scratch.a + system.scratch.b) / u + steer.(t)]; xlabel, ylabel, label, lw, size))
+push!(plots, plot(t, [delta y[:, [11 ,13]] y[:, 14] .+ delta]; xlabel, ylabel, label, lw, size))
+
+label = ["Steer δ" "Pitch θ"]
+ylabel = "Angles [°]"
+push!(plots, plot(t, [delta y[:, 12]]; xlabel, ylabel, label, lw, size))
 
 label = ["ru" "Σf/m" "vdot"]
 ylabel = "acc [m/s^2]"
-push!(plots, plot(t, [y[:, 14] acc acc - y[:, 14]]; xlabel, ylabel, label, lw, size))
+push!(plots, plot(t, [y[:, 15] acc acc - y[:, 15]]; xlabel, ylabel, label, lw, size))
 
-# pick the outputs for the Bode plots
-bode = zeros(16, 4)
-bode[15, :] = [1, 1, 1, 1]
+label = ["Steer δ" "Yaw rate r"]
+ylabel = "Angular speed [°/s]"
+push!(plots, plot(t, [delta y[:, 9]]; xlabel, ylabel, label, lw, size))
+
+bode = 0 * result.ss_eqns.D
+impulse = bode
 ss = bode
 
-summarize(system, result; plots, bode, ss)
-# summarize(system, result; plots, format = :html)
+summarize(system, result; plots, bode, ss, impulse, format = :html)
 
 # generate animations of the mode shapes
 # using EoM_X3D

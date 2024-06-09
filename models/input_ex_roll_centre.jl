@@ -324,6 +324,7 @@ function input_full_car_rc(; kwargs...)
 
     mirror!(the_system) # note that the mirror can't go any further without adressing the change in the location in the sequence of items in the main file
 
+    # 9
     item = sensor("r")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -336,6 +337,7 @@ function input_full_car_rc(; kwargs...)
     add_item!(item, the_system)
 
     # measure the bounce, pitch, and roll
+    # 10
     item = sensor("z_G")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -345,6 +347,7 @@ function input_full_car_rc(; kwargs...)
     item.units = "mm"
     add_item!(item, the_system)
 
+    #11
     item = sensor("ϕ")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -355,6 +358,7 @@ function input_full_car_rc(; kwargs...)
     item.units = "°"
     add_item!(item, the_system)
 
+    #12
     item = sensor("θ")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -365,6 +369,7 @@ function input_full_car_rc(; kwargs...)
     item.units = "°"
     add_item!(item, the_system)
 
+    #13
     item = sensor("β")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -376,6 +381,18 @@ function input_full_car_rc(; kwargs...)
     item.units = "°"
     add_item!(item, the_system)
 
+    #14
+    item = sensor("α_u-δ")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, hG]
+    item.location[2] = [0, 0, -0.1]
+    item.twist = 1 # angular
+    item.order = 2 # velocity
+    item.gain = -180 * (a + b) / π / u # radian to degree
+    add_item!(item, the_system)
+
+    #15
     item = sensor("ru")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -385,25 +402,6 @@ function input_full_car_rc(; kwargs...)
     item.order = 2 # velocity
     item.twist = 1
     item.units = "m/s/s"
-    add_item!(item, the_system)
-
-    item = sensor("(kf+kr)zG")
-    item.body[1] = "chassis"
-    item.body[2] = "ground"
-    item.location[1] = [0, 0, 0.25]
-    item.location[2] = [0, 0, 0]
-    item.gain = kf + kr
-    item.units = "N"
-    add_item!(item, the_system)
-
-    item = sensor("(kf+kr)(t)phi")
-    item.body[1] = "chassis"
-    item.body[2] = "ground"
-    item.location[1] = [0, 0, 0.25]
-    item.location[2] = [-0.1, 0, 0.25]
-    item.gain = (kf + kr) * (tf + tr) / 2
-    item.twist = 1
-    item.units = "N"
     add_item!(item, the_system)
 
     the_system

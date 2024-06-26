@@ -55,10 +55,7 @@ result = analyze(output, true)
 # a smooth step function, 3 degrees, with its midpoint (i.e. 1.5) at t = 2
 # the 0.5 terms change the range from -1...1 to 0...1
 # the 4 determines how quickly the step occurs
-# steer(t) = 3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
-
-# a sin w dwell input ala FMVSS 126
-steer(t) = 2 * (EoM.pulse(t, 2, 2 + 1/0.7*0.75) * sin(2π * 0.7 * (t - 2)) - EoM.pulse(t, 2 + 1/0.7*0.75, 2.5 + 1/0.7*0.75) + EoM.pulse(t, 2.5 + 1/0.7*0.75, 2.5 + 1/0.7) * sin(2π * 0.7 * (t - 2.5)))
+steer(t) = 3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
 
 # assume LF, LR, RF, RR sequence
 # compute applied tire force

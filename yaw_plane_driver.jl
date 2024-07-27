@@ -27,7 +27,7 @@ function track(x)
 
     # define road y coordinate using the built-in function pulse to paste together a piecewise function of sines and constant
 
-    y(x) = EoM.pulse(x, 50, 100) * (2 - 2 * cos(2pi / 100 * (x - 50))) + EoM.pulse(x, 100, 150) * 4 + EoM.pulse(x, 150, 200) * (2 + 2 * cos(2pi / 100 * (x - 150)))
+    y(x) = EoM.pulse(x, 50, 100) * (2 - 2 * cos(2π / 100 * (x - 50))) + EoM.pulse(x, 100, 150) * 4 + EoM.pulse(x, 150, 200) * (2 + 2 * cos(2π / 100 * (x - 150)))
 
     # use automatic differentiation to find the heading angle and curvature; as long as the angles are small we can approximate slope with the derivative and the curvature as the second derivative; automatic differentiation is a powerful numerical (i.e. not symbolic!) technique to compute the derivative of any function, using the fact that every function must be computed using basic arithmetic operations
 
@@ -79,12 +79,12 @@ lw = 2 # thicker line weight
 size = (800, 400)
 
 # plot yaw rate vs time
-ylabel = "Yaw rate [deg/s], Steer angle [deg]"
+ylabel = "Yaw rate [°/s], Steer angle [°]"
 label = ["Yaw rate r" "Steer angle δ"]
 plots = [plot(t, [r δ]; xlabel, ylabel, label, lw, size)]
 
 # plot body slip angle vs time
-ylabel = "Body slip angle [deg], Steer angle [deg]"
+ylabel = "Body slip angle [°], Steer angle [°]"
 label = ["Body slip angle β" "Steer angle δ"]
 push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw, size))
 
@@ -94,12 +94,12 @@ push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw, size))
 # push!(plots, plot(t, [α_u δ]; xlabel, ylabel, label, lw, size))
 
 # plot slip angles vs time
-ylabel = "Understeer angle [deg], Steer angle [deg]"
+ylabel = "Understeer angle [°], Steer angle [°]"
 label = ["Slip angle α_f" "Slip angle α_r" "Understeer angle α_u" "Steer angle δ"]
 push!(plots, plot(t, [α_f α_r α_u δ]; xlabel, ylabel, label, lw, size))
 
 # plot lateral acceleration vs time
-ylabel = "Lateral acceleration [g], Steer angle [deg]"
+ylabel = "Lateral acceleration [ge], Steer angle [°]"
 label = ["Lateral acceleration" "Steer angle δ"]
 push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
 

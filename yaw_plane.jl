@@ -62,7 +62,7 @@ lw = 2 # thicker line weight
 size = (800, 400)
 
 # plot yaw rate vs time
-ylabel = "Yaw rate [° s^-1], Steer angle [°]"
+ylabel = "Yaw rate [°/s], Steer angle [°]"
 label = ["Yaw rate r" "Steer angle δ"]
 plots = [plot(t, [r δ]; xlabel, ylabel, label, lw, size)]
 

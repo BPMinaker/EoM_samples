@@ -6,7 +6,7 @@ include(joinpath("models", "input_ex_roll_centre.jl"))
 # set the list of parameters that are not using defaults
 # here the value of m and u are set, but we can add many more if we like
 m = 1500
-u = 80.5 / 3.6
+u = 80 / 3.6
 cfy = 0
 cry = 0
 hf = 0.3

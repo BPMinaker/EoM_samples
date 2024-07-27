@@ -47,6 +47,28 @@ function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, 
     add_item!(item,the_system)
     =#
 
+    item = actuator("u_LF")
+    item.body[1] = "LF Wheel+hub"
+    item.body[2] = "ground"
+    item.location[1] = [a, tw / 2, 0]
+    item.location[2] = [a, tw / 2, -0.1]
+    item.gain = kt
+    item.rate_gain = ct
+    item.units = "m"
+    add_item!(item, the_system)
+
+
+    item = actuator("u_LR")
+    item.body[1] = "LR Wheel+hub"
+    item.body[2] = "ground"
+    item.location[1] = [-b, tw / 2, 0]
+    item.location[2] = [-b, tw / 2, -0.1]
+    item.gain = kt
+    item.rate_gain = ct
+    item.units = "m"
+    add_item!(item, the_system)
+
+
     ####% Reflect all LF or LR items in y axis
     mirror!(the_system)
 
@@ -77,15 +99,6 @@ function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, 
     item.units = "m"
     add_item!(item, the_system)
 
-    item = actuator("u_LF")
-    item.body[1] = "LF Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [a, tw / 2, 0]
-    item.location[2] = [a, tw / 2, -0.1]
-    item.gain = kt
-    item.rate_gain = ct
-    item.units = "m"
-    add_item!(item, the_system)
 
     #=
     item = actuator("L")

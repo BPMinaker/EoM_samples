@@ -24,9 +24,9 @@ wlo = tw / 2 - 0.05
 r = 0.32
 u = 10
 
-ptr1(x) = input_quarter_car_planar_a_arm(; params = params_list(; a, tw, r, u, Y = x, wuo, wlo))
-ptr2(x) = input_quarter_car_planar_a_arm(; params = params_list(; a, tw, r, u, Y = x, wuo, wlo, wui = 0.53, wli = 0.53))
-ptr3(x) = input_quarter_car_planar_a_arm(; params = params_list(; a, tw, r, u, Y = x, wuo, wlo, wui = 0.53))
+ptr1(x) = input_quarter_car_planar_a_arm(;a, tw, r, u, Y = x, wuo, wlo)
+ptr2(x) = input_quarter_car_planar_a_arm(;a, tw, r, u, Y = x, wuo, wlo, wui = 0.53, wli = 0.53)
+ptr3(x) = input_quarter_car_planar_a_arm(;a, tw, r, u, Y = x, wuo, wlo, wui = 0.53)
 
 vec = [
     [ptr1, "Quarter Car A-arm - long arms"],

@@ -24,9 +24,9 @@
     g = 9.81
 end
 
-function input_quarter_car_planar_a_arm(; params::params_list=params_list())
+function input_quarter_car_planar_a_arm(; kwargs...)
 
-    (; u, a, cf, m, mu, r, tw, ks, cs, kt, ct, hui, huo, hli, hlo, wui, wuo, wli, wlo, Y, g) = params
+    (; u, a, cf, m, mu, r, tw, ks, cs, kt, ct, hui, huo, hli, hlo, wui, wuo, wli, wlo, Y, g) = params_list(; kwargs...)
 
     the_system = mbd_system("Quarter Car A-Arm")
     the_system.scratch = kinematics(; r_A=[wui, hui], r_B=[wuo, huo], r_C=[wli, hli], r_D=[wlo, hlo], r_E=[tw/2, 0])

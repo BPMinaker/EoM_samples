@@ -17,11 +17,12 @@ system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
 output = run_eom!(system)
 result = analyze(output)
 
-summarize(system, result)
+impulse = :skip
+summarize(system, result; impulse)
 
 input_delay!(system, result, (a + b) / 10, [1, 2])
 
-summarize(system, result)
+summarize(system, result; impulse)
 
 # using EoM_X3D
 # animate_modes(system, result)

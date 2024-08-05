@@ -14,7 +14,7 @@ system = quarter_car_a_arm_pushrod(; u, a, tw, r)
 output = run_eom!(system)
 result = analyze(output)
 
-impulse = [0,0,0]
+impulse = :skip
 #summarize(system, result; impulse)
 summarize(system, result; impulse, format = :html)
 

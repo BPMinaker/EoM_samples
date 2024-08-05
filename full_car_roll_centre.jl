@@ -130,10 +130,9 @@ label = ["Steer δ" "Yaw rate r"]
 ylabel = "Angular speed [°/s]"
 push!(plots, plot(t, [delta y[:, 9]]; xlabel, ylabel, label, lw, size))
 
-bode = 0 * result.ss_eqns.D
-impulse = bode
-ss = bode
-
+bode = :skip
+impulse = :skip
+ss = :skip
 summarize(system, result; plots, bode, ss, impulse, format = :html)
 
 # generate animations of the mode shapes

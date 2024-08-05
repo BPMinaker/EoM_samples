@@ -9,9 +9,10 @@ system = f.(vpts)
 output = run_eom!.(system, vpts .== 0.1)
 result = analyze.(output, vpts .== 0.1)
 
-ss = []
-summarize(system, vpts, result; ss)
-# summarize(system[10], result[10]; ss, format = :html)
+ss = :skip
+impulse = :skip
+summarize(system, vpts, result; ss, impulse)
+# summarize(system[10], result[10]; ss, impulse, format = :html)
 
 # using EoM_X3D
 # animate_modes(system[10], result[10])

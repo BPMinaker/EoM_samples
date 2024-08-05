@@ -12,7 +12,7 @@ vpt = 2500:-50:-5000
 idx = [1, 51, 101, 151]
 label = reshape(["Y=$x N" for x in vpt[idx]], 1, :)
 
-ss = []
+ss = :skip
 vpt_name = ["Y" "Lateral Force" "N"]
 t = 0:0.005:2
 

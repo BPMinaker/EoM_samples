@@ -9,6 +9,8 @@ system = f.(vpts)
 output = run_eom!.(system)
 result = analyze.(output)
 
-summarize(system, vpts, result; ss = [], vpt_name = ["r" "Angular speed" "rad/s"])
+ss = :skip
+impulse = :skip
+summarize(system, vpts, result; ss, impulse, vpt_name = ["r" "Angular speed" "rad/s"])
 
 println("Done.")

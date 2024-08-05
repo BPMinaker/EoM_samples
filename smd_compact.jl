@@ -33,7 +33,9 @@ my_plot = plot(t, res; xlabel, ylabel, label, lw, size)
 # or we can add it to a vector of plots, and send it to the `summarize()` function
 plots = [my_plot]
 
-summarize(system, result; plots)
+ss = :skip
+impulse = :skip
+summarize(system, vpts, result; ss, impulse, plots)
 
 # we could also write to html output instead of the screen
 # summarize(system, result; plots, format = :html)

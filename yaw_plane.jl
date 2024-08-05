@@ -89,19 +89,9 @@ push!(plots, plot(u * t, y_dist; xlabel, ylabel, label, lw, size))
 
 # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
 ss = [1, 1, 1, 1, 0, 0, 1, 1]
-impulse = 0 * ss
+impulse = :skip
 
 summarize(system, vpts, result; plots, ss, impulse)
 # summarize(system, vpts, result; plots, ss, impulse, format = :html)
 
 println("Done.")
-
-
-#=
-# cos ramp to constant two degrees, cos ramp back to zero
-steer(t) = EoM.pulse(t, 1, 1.5) * (1 - cos(2π * (t - 1))) + EoM.pulse(t, 1.5, 2) * 2 + EoM.pulse(t, 2, 2.5) * (1 + cos(2π * (t - 2)))
-
-# add an identical -ve steer five seconds later
-input(~, t) = steer(t) - steer(t - 3)
-
-=#

@@ -63,13 +63,13 @@ result = analyze(output)
 
 # build the function that is the input to the equation of motion (i.e., the external forces)
 # we will call this function through the ODE solver
-function u(x, t)
+function u_vec(x, t)
     # println("t ",t)
     # define the vector and set 0 values as placeholders
     # we will call this u_vec instead of u to keep it distinct from the function name, even though Julia doesn't care
-    u_vec = [0.0; 0.0]
-    # u_vec[1] aero resistance force
-    # u_vec[2] traction force
+    u = [0.0; 0.0]
+    # u[1] aero resistance force
+    # u[2] traction force
     # note that these are defined in the input definition file
     # we will compute them and store them in u_vec
 
@@ -78,7 +78,7 @@ function u(x, t)
     y = C * x
     # y[1] long position
     # y[2] long velocity
-    # y[3] long accl'n (note that we we can't use this to find u_vec because it depends directly on u_vec!)
+    # y[3] long accl'n (note that we we can't use this to find u because it depends directly on u!)
     # y[4] rear axle normal spring force
     # y[5] rear axle damper force
     # y[6] front axle normal spring force
@@ -89,7 +89,7 @@ function u(x, t)
     ρ = 1.23
     af = 2.85
     cd = 0.35
-    u_vec[1] = ρ / 2 * af * cd * y[2] * abs(y[2]) # use speed times abs(speed) instead of speed squared to switch force direction if we are moving backwards (which should never happen, but sometimes the rolling resistance model can cause weird things at very low speed)
+    u[1] = ρ / 2 * af * cd * y[2] * abs(y[2]) # use speed times abs(speed) instead of speed squared to switch force direction if we are moving backwards (which should never happen, but sometimes the rolling resistance model can cause weird things at very low speed)
 
     # find which gear we should use
     # note the .< returns a vector, i.e, (y[2] .< vmax) returns a vector of true or false where the current speed is below the shift point, we use findnext to find the index of the first true
@@ -136,10 +136,10 @@ function u(x, t)
     end
 
     # include rolling resistance loss, and note sign function to reverse force if needed, set traction force
-    u_vec[2] = Xr + Xf - (0.013 + 6.5e-6 * y[2]^2) * 9.81 * m * sign(y[2])
+    u[2] = Xr + Xf - (0.013 + 6.5e-6 * y[2]^2) * 9.81 * m * sign(y[2])
 
-    # return u_vec
-    u_vec
+    # return u
+    u
 end
 
 # solve the ODE
@@ -148,46 +148,43 @@ println("Solving time history...")
 t = 0:0.01:30
 # pass the state space matrices, the input function, and the time interval to the solver
 # it will assume zeros as inital conditions
-y = splsim(result.ss_eqns, u, t)
-# convert the vector of vectors to a matrix, and transpose it so the outputs are in columns for plotting
-y = Matrix(y)
+y = splsim(result.ss_eqns, u_vec, t)
+# convert the vector of vectors to a matrix
 
-y[:, 2] *= 3.6 # scale second column to convert to km/h
-y[:, 3] /= 9.81 # acc'n in g
-y[:, 4] .+= y[:, 5] # add damping load to spring load, note .+= increments each entry in column 3 by the corresponding entry in column 4
-y[:, 4] *= -1.0 # take compressive loads as positve (switch signs)
-y[:, 4] .+= Zr0 # add static load, note .+= increments each entry in the vector
-y[:, 4] /= 1000 # scale third column to get kN
-y[:, 6] .+= y[:, 7]
-y[:, 6] *= -1.0 # take compressive loads as positve (switch signs)
-y[:, 6] .+= Zf0 # add static load, note .+= increments each entry in the vector
-y[:, 6] /= 1000 # scale third column to get kN
+x = y[:, 1]
+u = y[:, 2] * 3.6 # scale second column to convert to km/h
+aG = y[:, 3] / 9.81 # acc'n in g
 
+Zr = y[:, 4] + y[:, 5]
+# add damping load to spring load
+Zr *= -1.0 # take compressive loads as positve (switch signs)
+Zr .+= Zr0 # add static load, note .+= increments each entry in the vector
+Zr /= 1000 # scale third column to get kN
+Zf = y[:, 6] + y[:, 7]
+Zf *= -1.0 # take compressive loads as positve (switch signs)
+Zf .+= Zf0 # add static load, note .+= increments each entry in the vector
+Zf /= 1000 # scale third column to get kN
 
 # linear interpolation to find 1/4 mile, 60 mph times
 # note 1/4 mile = 402.336 m, 60 mph = 96.5606 km/h
-interp_ts = LinearInterpolation(y[:, 1], t)
-interp_ut = LinearInterpolation(t, y[:, 2])
-interp_tu = LinearInterpolation(y[:, 2], t)
+interp_xt = LinearInterpolation(x, t)
+interp_tu = LinearInterpolation(t, u)
+interp_ut = LinearInterpolation(u, t)
 
 # find quarter mile time and speed, round it, and print
-if y[end, 1] > 402.336
-    tf = interp_ts(402.336)
-    println("Quarter mile time: ", round(tf, digits = 2), " s at ", round(interp_ut(tf), digits = 1), " km/h.")
+if x[end] > 402.336
+    tf = interp_xt(402.336)
+    println("Quarter mile time: ", round(tf, digits = 2), " s at ", round(interp_tu(tf), digits = 1), " km/h.")
 else
     println("Simulation ended before 1/4 mile!  Increase the time interval.")
 end
 
 # find 0-60 time, round it, and print
-if y[end, 2] > 96.5606
-    println("0-60 mph time: ", round(interp_tu(96.5606), digits = 2), " s.")
+if u[end] > 96.5606
+    println("0-60 mph time: ", round(interp_ut(96.5606), digits = 2), " s.")
 else
     println("Simulation ended below 60 mph!")
 end
-
-# reduce the number of points that are plotted
-t = t[1:5:end]
-y = y[1:5:end, :]
 
 # set plot text, etc
 xlabel = "Time [s]"
@@ -197,21 +194,23 @@ lw = 2 # thicker plot lineweight
 size = (800, 400)
 
 # make the first plot and save it in a vector
-plots = [plot(t, y[:, 1]; xlabel, ylabel, label, lw, size)]
+plots = [plot(t, x; xlabel, ylabel, label, lw, size)]
 
 # update label, make the next plot, and push it onto the plot vector
 ylabel = "Velocity [km/h]"
-push!(plots, plot(t, y[:, 2]; xlabel, ylabel, label, lw, size))
+push!(plots, plot(t, u; xlabel, ylabel, label, lw, size))
 
 ylabel = "Accl'n [g]"
-push!(plots, plot(t, y[:, 3]; ylims = (0, Inf), xlabel, ylabel, label, lw, size))
+push!(plots, plot(t, aG; ylims = (0, Inf), xlabel, ylabel, label, lw, size))
 
 label = ["Z_r [kN]" "Z_f [kN]"]
 ylabel = "Axle vertical load [N]"
-push!(plots, plot(t, y[:, [4, 6]]; ylims = (0, Inf), xlabel, ylabel, label, lw, size))
+push!(plots, plot(t, [Zr Zf]; ylims = (0, Inf), xlabel, ylabel, label, lw, size))
 
 # pass all the results and plots, skip the Bode plots for now
-summarize(system, result; plots, bode = [])
+bode = :skip
+impulse = :skip
+summarize(system, result; plots, bode, impulse)
 
 # using DelimitedFiles
 # writedlm(joinpath("output","data.txt"), [t y])

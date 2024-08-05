@@ -110,8 +110,8 @@ label = ["y" " target y"]
 push!(plots, plot(u * t, [y_dist first.(track.(u * t))]; xlabel, ylabel, label, lw, size))
 
 # write all the stuff to the output; skip steady state, Bode plots
-ss = []
-bode = []
+ss = :skip
+bode = :skip
 summarize(system, result; plots, ss, bode)
 
 println("Done.")

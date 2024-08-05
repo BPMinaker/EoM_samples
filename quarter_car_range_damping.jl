@@ -15,6 +15,9 @@ system = f.(vpts)
 output = run_eom!.(system, verbose)
 result = analyze.(output, verbose)
 
-summarize(system, vpts, result, vpt_name = ["c" "Damping" "Ns/m"], ss = [0, 0, 0])
+ss = :skip
+impulse = :skip
+vpt_name = ["c" "Damping" "Ns/m"]
+summarize(system, vpts, result; ss, impulse, vpt_name)
 
 println("Done.")

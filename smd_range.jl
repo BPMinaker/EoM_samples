@@ -40,9 +40,11 @@ end
 plots = [p1]
 
 # the `summarize()` function has been written using another feature of Julia, called `multiple dispatch`, which allows the same function to do different things, depending on the type of arguments, `summarize()` recognizes if system and result are vectors, and if so, it drops the tables, and gives series of plots instead
-summarize(system, vpts, result; ss = [], vpt_name, plots)
+ss = :skip
+impulse = :skip
+summarize(system, vpts, result; ss, impulse, vpt_name, plots)
 
 # we could also write to html output instead of the screen
-summarize(system, vpts, result; ss = [], vpt_name, format = :html)
+# summarize(system, vpts, result; ss, impulse, vpt_name, format = :html)
 
 println("Done.")

@@ -16,8 +16,9 @@ system = f.(vpts)
 output = run_eom!.(system, vpts .== 1)
 result = analyze.(output, vpts .== 1)
 
-summarize(system, vpts, result)
-# summarize(system, vpts, result; format = :html)
+impulse = :skip
+summarize(system, vpts, result; impulse)
+# summarize(system, vpts, result; impulse, format = :html)
 
 # let's isolate one speed and expand
 # choose the equations of motion for 18 m/s (note function notation)
@@ -74,7 +75,8 @@ ylabel = "Lateral acceleration [ge], Steer angle [°]"
 label = ["Lateral acceleration" "Steer angle δ"]
 push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
 
-summarize(system, result; plots)
+impulse = :skip
+summarize(system, result; plots, impulse)
 
 #summarize(system, result; plots, format = :html)
 #using EoM_X3D

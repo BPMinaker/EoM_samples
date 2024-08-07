@@ -12,8 +12,9 @@ system = input_ex_half_car(; m, a, b, cf, cr, Iy)
 output = run_eom!(system)
 result = analyze(output)
 
-summarize(system, result)
-# summarize(system, result, format = :html)
+impulse = :skip
+summarize(system, result; impulse)
+# summarize(system, result; impulse, format = :html)
 
 # using EoM_X3D
 # animate_modes(system, result)

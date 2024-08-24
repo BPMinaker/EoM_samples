@@ -8,6 +8,7 @@ function input_ex_smd(; m = 1.0, c = 0.1, k = 10.0)
     item.mass = m
     item.location = [0, 0, 1]
     add_item!(item, the_system)
+    add_item!(weight(item), the_system)
 
     # constrain the body to one translation in z, and no rotations
     item = rigid_point("slider 1")
@@ -19,16 +20,14 @@ function input_ex_smd(; m = 1.0, c = 0.1, k = 10.0)
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
-    # add a flex_point, with damping, to connect our body to ground, aligned with z-axis
-    item = flex_point("spring 1")
+    # add a spring, with damping, to connect our body to ground, aligned with z-axis
+    item = spring("spring 1")
     item.body[1] = "block"
     item.body[2] = "ground"
-    item.location = [0, 0, 0.5]
-    item.stiffness = [k, 0]
-    item.damping = [c, 0]
-    item.forces = 1
-    item.moments = 0
-    item.axis = [0, 0, 1]
+    item.location[1] = [0, 0, 1]
+    item.location[2] = [0, 0, 0]
+    item.stiffness = k
+    item.damping = c
     add_item!(item, the_system)
 
     # the actuator is a `line item` and defined by two locations, location[1] attaches to body[1]...

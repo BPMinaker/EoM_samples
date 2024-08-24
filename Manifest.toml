@@ -249,7 +249,7 @@ version = "1.6.0"
 
 [[deps.EoM]]
 deps = ["Dates", "DelimitedFiles", "LinearAlgebra", "Plots", "PrettyTables", "Reexport", "SparseArrays", "StateSpaceSets", "Test", "Unitful"]
-git-tree-sha1 = "b936d09d7085c0c23e33f9f32874c291819b1da0"
+git-tree-sha1 = "4c909718f4f71332d01fb641c1af617eb36ef328"
 repo-rev = "master"
 repo-url = "http://github.com/BPMinaker/EoM.jl"
 uuid = "25d7ee20-f19a-11e8-093a-7b526cbd2d90"
@@ -1338,10 +1338,10 @@ uuid = "2db6ffa8-e38f-5e21-84af-90c45d0032cc"
 version = "1.11.0+0"
 
 [[deps.libfdk_aac_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "daacc84a041563f965be61859a36e17c4e4fcd55"
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "8a22cf860a7d27e4f3498a0fe0811a7957badb38"
 uuid = "f638f0a6-7fb0-5443-88ba-1cc74229b280"
-version = "2.0.2+0"
+version = "2.0.3+0"
 
 [[deps.libinput_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "eudev_jll", "libevdev_jll", "mtdev_jll"]

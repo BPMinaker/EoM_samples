@@ -18,9 +18,6 @@ output = run_eom!(system, true)
 # do the eigenvalues, freq resp
 result = analyze(output, true)
 
-# define time interval
-t = 0:0.02:20
-
 # now lets try some closed loop feedback, where the driver input depends on the location; define the road geometry; note that we assume small heading angles in the linear equations, so can't do circuits yet
 
 function track(x)
@@ -60,11 +57,18 @@ end
 # define a dummy function to convert the driver model from a function of the output to a function of the state, because the solver requires the input to be a function of the state
 steer(x, t) = steer_driver(result.ss_eqns.C * x, t)
 
+
+# define time interval
+t1 = 0
+t2 = 20
 # solve the equation of motion with the closed loop driver model
-y = splsim(result.ss_eqns, steer, t)
+yy = ltisim(result.ss_eqns, steer, (t1, t2))
+
+t = t1:(t2-t1)/1000:t2
+y = hcat(yy.(t)...)'
 
 # go back and figure out what steer angle the driver model used, so we can plot it
-δ = steer_driver.(vec(y), t)
+δ = steer_driver.(yy.(t), t)
 
 r = y[:, 1]
 β = y[:, 2]

@@ -71,12 +71,13 @@ function input(x, t)
 end
 
 println("Solving time history...")
-t = 0:0.002:8
+t1 = 0
+t2 = 8
 
-y = splsim(result.ss_eqns, input, t)
+yy = ltisim(result.ss_eqns, input, (t1, t2))
 
-t = t[1:4:end]
-y = Matrix(y[1:4:end])
+t = t1:(t2-t1)/1000:t2
+y = hcat(yy.(t)...)'
 
 ZZ = Z0' .- y[:, [1, 2, 5, 6]]
 slip = y[:, [3, 4, 7, 8]] - steer.(t) .* [1, 0, 1, 0]' * π / 180

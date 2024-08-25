@@ -11,15 +11,18 @@ result = analyze(output)
 
 # equations of motion are found, now do time history solution
 
-t = 0:0.02:20
-w = 0.95 * result.omega_n[1]
+ω = 0.95 * result.omega_n[1]
+u(~, t) = sin(2π * ω * t)
 
-u(~, t) = sin(2π * w * t)
-y = splsim(result.ss_eqns, u, t)
+t1 = 0
+t2 = 20
+yy = ltisim(result.ss_eqns, u, (t1, t2))
+
+t = t1:(t2-t1)/1000:t2
+y = hcat(yy.(t)...)'
 
 # time history done, now make plots
-
-res = [Matrix(y) u.(0, t)]
+res = [y u.(0, t)]
 
 xlabel = "Time [s]"
 ylabel = "z [m], kz [N], f [N]"
@@ -35,7 +38,7 @@ plots = [my_plot]
 
 ss = :skip
 impulse = :skip
-summarize(system, vpts, result; ss, impulse, plots)
+summarize(system, result; ss, impulse, plots)
 
 # we could also write to html output instead of the screen
 # summarize(system, result; plots, format = :html)

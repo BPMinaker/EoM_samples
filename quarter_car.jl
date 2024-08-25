@@ -20,13 +20,13 @@ zofx = random_road(class = 5)
 # but we need to convert to time index, where x=ut; assuming a forward speed of u=10 m/s gives
 u_vec(~, t) = zofx(10 * t)
 
-# now define the time interval, and step size; at a forward speed of 10 m/s, this means the shortest wavelength is covered in 0.05/10 = 0.005 seconds per cycle, or occurs at 1/0.005 = 200 Hz (cycles / second); in order to capture this accurately, we need at least two time steps per wavelength, or a time step of 0.0025 s; ideally, we would have 10-20 steps per cycle, but in this case, that would be overdoing it, as 0.0025 s is already very short compared to the timescale of the vehicle response, which we would normally model up about to 50 Hz; a step of 0.0025 gives 8 samples in a 50 Hz cycle; this gives us lots of time steps per time constant and/or wavelength of the vehicle model; using that small time step means that we get 4001 solution points in a 10 s interval; a typical HD screen can only display 1920 pixels across, so there is no way we can display that much data in a graph without zooming in
-
 println("Solving time history...")
-t = 0:0.0025:10
+t1 = 0
+t2 = 10
 
-# because our model is linear, we can use the built-in linear ODE solver in EoM (splsim); it's much simpler and faster than using the ODE toolbox
-y = splsim(result.ss_eqns, u_vec, t)
+yy = ltisim(result.ss_eqns, u_vec, (t1, t2))
+t = t1:(t2-t1)/1000:t2
+y = hcat(yy.(t)...)'
 
 z1 = y[:, 1]
 z12 = y[:, 2]

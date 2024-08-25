@@ -66,7 +66,7 @@ result = analyze(output)
 function u_vec(x, t)
     # println("t ",t)
     # define the vector and set 0 values as placeholders
-    # we will call this u_vec instead of u to keep it distinct from the function name, even though Julia doesn't care
+    # we will call this u instead of u to keep it distinct from the function name, even though Julia doesn't care
     u = [0.0; 0.0]
     # u[1] aero resistance force
     # u[2] traction force
@@ -145,10 +145,14 @@ end
 # solve the ODE
 # choose the time interval and step size
 println("Solving time history...")
-t = 0:0.01:30
+t1 = 0
+t2 = 30
 # pass the state space matrices, the input function, and the time interval to the solver
 # it will assume zeros as inital conditions
-y = splsim(result.ss_eqns, u_vec, t)
+yy = ltisim(result.ss_eqns, u_vec, (t1, t2))
+
+t = t1:(t2-t1)/1000:t2
+y = hcat(yy.(t)...)'
 # convert the vector of vectors to a matrix
 
 x = y[:, 1]

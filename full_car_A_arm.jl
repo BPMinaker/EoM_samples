@@ -32,12 +32,12 @@ result = analyze(output)
 zofxl, zofxr = random_road(class = 5, dz = 0.2)
 u_vec(~, t) = [zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a - b)]
 
+t1 = 0
+t2 = 20
+yy = ltisim(result.ss_eqns, u_vec, (t1, t2))
+t = t1:(t2-t1)/1000:t2
+y = hcat(yy.(t)...)
 
-t = 0:0.005:20
-y = splsim(result.ss_eqns, u_vec, t)
-
-p = Matrix(y)'
-animate_history(system, t, p)
+animate_history(system, t, y)
 
 println("Done.")
-

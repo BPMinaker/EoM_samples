@@ -36,13 +36,15 @@ steer(t) = 2 * (EoM.pulse(t, 2, 2 + 1/0.7*0.75) * sin(2π * 0.7 * (t - 2)) - EoM
 input(~, t) = steer(t) 
 
 # define time interval
-t = 0:0.05:20
-
-# solve the equations of motion using the EoM sparse linear solver, with the input function we just defined; we didn't send an inital condition, so the solver assumes all zeros; note that `result` contains the equations of motion for every speed, but we pick out the set for 20 m/s)
+t1 = 0
+t2 = 20
 
 u = 20
 n = findfirst(vpts .== u)
-y = splsim(result[n].ss_eqns, input, t)
+yy = ltisim(result[n].ss_eqns, input, (t1, t2))
+
+t = t1:(t2-t1)/1000:t2
+y = hcat(yy.(t)...)'
 
 # merge vector of vectors into matrix, so we can pull out individual outputs to plot, and re-evaluate the steer angle so we can include it in the plots 
 

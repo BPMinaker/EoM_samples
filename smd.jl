@@ -1,7 +1,7 @@
 # you might find it helpful to turn on 'word wrapping' in VSCode; go to File, Preferences, Settings, and search for 'wrap'; change the setting to 'on'
 
 # the first step is to load the `EoM` and other support libraries
-using EoM
+using EoM, OrdinaryDiffEq
 
 # now, we load the function `input_ex_smd()`, which contains the definition of the spring mass damper system; we make Julia aware of the function by `including` the file that contains it; the `joinpath()` function inserts the appropriate separator, i.e., a forward slash or backslash, depending on the platform (Windows/Mac); you can `include` input files for systems you write yourself in the same way
 
@@ -71,37 +71,36 @@ display(result.e_val)
 
 # before we actually call the summary function, let's add in some time history solutions too
 
-# now, the ODE solver library in Julia is great, and has a number of very sophisticated algorithms, and can solve just about any type of ODE; however, in this case, our problem is quite a simple one, a linear ODE; for a linear ODE, it is often preferable to use a simpler ODE solver; there is one in the EoM library called `splsim()` (for sparse linear simulation); it uses something called `discrete time` to convert the differential equation to a difference equation, which it can solve very quickly
-
 println("Computing time history...")
 
-# when using `splsim()`, we have to choose a set of uniform time points in advance, and provide a function that can compute the input at those time points; more small steps provide a more accurate solution, but take longer to do; splsim() will warn us if our time step is too big for the properties of the system; we define the time as a range, 0 to 20 seconds with steps of 0.02 seconds
-
-t = 0:0.02:20
-
-# define input forcing function; here we chose to excite the system near its natural frequency, making sure that our step 0.02 seconds is fine enough to get a good sample of the input; a step of 0.02 is 50 times per second, and the rule of thumb is we'd like 10 samples in any sinewave (bare minimum is 2), so we can comfortably sample a 5 Hz signal with this stepsize
-
-# here, we choose an excitation frequency that's very close to the natural frequency, well below 5 Hz
+# we choose an excitation frequency that's very close to the natural frequency
 
 ω = 0.95 * result.omega_n[1]
 
-# the input function we pass to `splsim()` has to be defined as a function of the state and time, i.e., it takes two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input
+# the input function we pass to `ltisim()` has to be defined as a function of the state and time, i.e., it takes two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input
 
-u_vec(~, t) = sin(2π * ω * t)
+foft(~, t) = sin(2π * ω * t)
 
-# we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time vector to EoM's own linear ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has entries z and kz; we could choose the initial state if we wanted ,but `splsim()` will just use zeroes if we don't specify anything else
+# we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time span to EoM's ltisim, it will formulate the problem and call Julia's ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has entries z and kz; we could choose the initial state x0 if we wanted, but `ltisim()` will just use zeroes if we don't specify anything else
 
-y = splsim(result.ss_eqns, u_vec, t)
 
-# note that unlike Matlab, Julia makes a distinction between a vector of vectors and a matrix; we can acess a vector of vectors like so: a[2][3] to the get third entry in the second vector, where for a matrix a[2,3] gives the entry in the second row, third column
+# solve for 20 seconds
 
-# in this case, y is is a special type that offers the best of both syntaxes - it allows us to isolate individual time entries, e.g., `y[10]` gives us a vector of all the states at the 10th time step, where `y[:,2]` gives a vector of the time history of state 2 in that vector 
+t1 = 0
+t2 = 20
 
-z = y[:, 1]
-kz = y[:, 2]
-f = u_vec.(0, t)
+yy = ltisim(result.ss_eqns, foft, (t1, t2))
 
-# our result will have three columns: the displacement, the spring force, and the applied force; we get the applied force by attaching the result of the input function, so we can plot them together; we use the dot operator on the vector of time values, i.e., the . before the (tells Julia that we are taking a function that expects a scalar, and calling it on each element of a vector, and we're stacking the results together in a vector; in this case the 0 in the input is ignored by the `u_vec()` function, but the `sin()` function is evaluated for each entry in the `t` vector
+# note that ltisim returns y as a function handle, i.e., we can choose any time in the interval, so let's choose a range and evaluate; we use the dot operator on the vector of time values, i.e., the . before the ( tells Julia that we are taking a function that expects a scalar, and calling it on each element of a vector, and we're stacking the results together in a vector;
+
+t = t1:(t2-t1)/1000:t2
+y = hcat(yy.(t)...)'
+
+# note that unlike Matlab, Julia makes a distinction between a vector of vectors and a matrix; we can acess a vector of vectors like so: a[2][3] to the get third entry in the second vector, where for a matrix a[2,3] gives the entry in the second row, third column; yy.(t) is a vector of vectors, i.e., the output vector at 1001 points over the timespan, y is a matrix
+
+f = foft.(0, t)
+
+# our result is the displacement, the spring force, and the applied force; we get the applied force by attaching the result of the input function, so we can plot them together;  in this case the 0 in the input is ignored by the `u_vec()` function, but the `sin()` function is evaluated for each entry in the `t` vector
 
 println("Plotting...")
 
@@ -112,9 +111,8 @@ label = ["z" "kz" "f"]
 lw = 2
 size = (800, 400)
 
-
-# we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, spring force, and applied force, which are all packed back into the  matrix
-p1 = plot(t, [z kz f]; xlabel, ylabel, label, lw, size)
+# we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, spring force, and applied force, which are all packed back into a matrix
+p1 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
 
 # the plot is created and stored but not shown, we could send it to the screen using: display(p1)
 # this plot would show up in a tab in VS Code or in a web browser tab
@@ -122,18 +120,16 @@ p1 = plot(t, [z kz f]; xlabel, ylabel, label, lw, size)
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `u_vec()` is defined as a function of `ω` so all we have to do is update `ω`, and `u_vec()` will update as well
 
 ω = 0.5 * result.omega_n[1]
-y = splsim(result.ss_eqns, u_vec, t)
-z = y[:, 1]
-kz = y[:, 2]
-f = u_vec.(0, t)
-p2 = plot(t, [z kz f]; xlabel, ylabel, label, lw, size)
+yy = ltisim(result.ss_eqns, foft, tspan)
+y = hcat(yy.(t)...)'
+f = foft.(0, t)
+p2 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
 
 ω = 2.0 * result.omega_n[1]
-y = splsim(result.ss_eqns, u_vec, t)
-z = y[:, 1]
-kz = y[:, 2]
-f = u_vec.(0, t)
-p3 = plot(t, [z kz f]; xlabel, ylabel, label, lw, size)
+yy = ltisim(result.ss_eqns, foft, tspan)
+y = hcat(yy.(t)...)'
+f = foft.(0, t)
+p3 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
 
 # now let's display all out results, along with the extra plots
 plots = [p1, p2, p3]

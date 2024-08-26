@@ -21,7 +21,7 @@ summarize(system, result; impulse, format = :html)
 
 
 using EoM_X3D
-animate_modes(system, result)
+animate_modes(system, result, true)
 eom_draw(system)
 
 system = input_full_car_a_arm_pushrod(; u, a, tw, r)
@@ -32,6 +32,7 @@ result = analyze(output)
 zofxl, zofxr = random_road(class = 5, dz = 0.2)
 u_vec(~, t) = [zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a - b)]
 
+println("Solving time history...")
 t1 = 0
 t2 = 20
 yy = ltisim(result.ss_eqns, u_vec, (t1, t2))

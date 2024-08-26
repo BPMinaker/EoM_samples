@@ -20,7 +20,7 @@ include(joinpath("models", "input_ex_smd.jl"))
 
 # this is confusing and weird, but we can get around it by using a semicolon in the call to the function, if we want to send a local value to the same variable name in a function
 
-k = 5
+k = 50
 m = 1
 c = 0.2
 system = input_ex_smd(; k, m, c)
@@ -87,7 +87,7 @@ foft(~, t) = sin(2π * ω * t)
 # solve for 20 seconds
 
 t1 = 0
-t2 = 20
+t2 = 10
 
 yy = ltisim(result.ss_eqns, foft, (t1, t2))
 
@@ -120,13 +120,13 @@ p1 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `u_vec()` is defined as a function of `ω` so all we have to do is update `ω`, and `u_vec()` will update as well
 
 ω = 0.5 * result.omega_n[1]
-yy = ltisim(result.ss_eqns, foft, tspan)
+yy = ltisim(result.ss_eqns, foft, (t1, t2))
 y = hcat(yy.(t)...)'
 f = foft.(0, t)
 p2 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
 
 ω = 2.0 * result.omega_n[1]
-yy = ltisim(result.ss_eqns, foft, tspan)
+yy = ltisim(result.ss_eqns, foft, (t1, t2))
 y = hcat(yy.(t)...)'
 f = foft.(0, t)
 p3 = plot(t, [y f]; xlabel, ylabel, label, lw, size)

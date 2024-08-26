@@ -2,7 +2,7 @@ using EoM
 
 include(joinpath("models", "input_ex_smd.jl"))
 
-k = 5
+k = 50
 m = 1
 c = 0.2
 system = input_ex_smd(; k, m, c)
@@ -15,7 +15,7 @@ result = analyze(output)
 u(~, t) = sin(2π * ω * t)
 
 t1 = 0
-t2 = 20
+t2 = 10
 yy = ltisim(result.ss_eqns, u, (t1, t2))
 
 t = t1:(t2-t1)/1000:t2

@@ -12,7 +12,8 @@ result = analyze.(output, vpts .== 0)
 bode = [1 0; 1 0; 0 1]
 ss = :skip
 impulse = :skip
-summarize(system, vpts, result; bode, ss, impulse, vpt_name = ["r" "Angular speed" "rad/s"])
-# summarize(system, vpts, result; bode, ss, impulse, vpt_name = ["r" "Angular speed" "rad/s"], format = :html)
+vpt_name = ["r" "Angular speed" "rad/s"]
+summarize(system, vpts, result; bode, ss, impulse, vpt_name)
+# summarize(system, vpts, result; bode, ss, impulse, vpt_name, format = :html)
 
 println("Done.")

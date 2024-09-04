@@ -9,8 +9,8 @@ system = f.(vpts)
 output = run_eom!.(system)
 result = analyze.(output)
 
-summarize(system, vpts, result)
+ss = :skip
+impulse = :skip
+summarize(system, vpts, result; ss, impulse)
 
 println("Done.")
-
-

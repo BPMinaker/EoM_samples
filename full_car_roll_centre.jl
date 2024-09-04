@@ -134,7 +134,8 @@ push!(plots, plot(t, [delta y[:, 9]]; xlabel, ylabel, label, lw, size))
 bode = :skip
 impulse = :skip
 ss = :skip
-summarize(system, result; plots, bode, ss, impulse, format = :html)
+summarize(system, result; plots, bode, ss, impulse)
+# summarize(system, result; plots, bode, ss, impulse, format = :html)
 
 # generate animations of the mode shapes
 # using EoM_X3D

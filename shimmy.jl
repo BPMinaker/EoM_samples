@@ -16,7 +16,8 @@ output = run_eom!.(system)
 result = analyze.(output)
 
 impulse = :skip
-summarize(system, vpts, result; impulse, vpt_name = ["a/l" "Mass centre location" ""])
+vpt_name = ["a/l" "Mass centre location" ""]
+summarize(system, vpts, result; impulse, vpt_name)
 
 println("Done.")
 

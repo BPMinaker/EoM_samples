@@ -8,6 +8,9 @@ system = f.(vpts)
 output = run_eom!.(system)
 result = analyze.(output)
 
-summarize(system, vpts, result; vpt_name = ["k" "Angular stiffness" "Nm/rad"])
+ss = :skip
+impulse = :skip
+vpt_name = ["k" "Angular stiffness" "Nm/rad"]
+summarize(system, vpts, result; ss, impulse, vpt_name)
 
 println("Done.")

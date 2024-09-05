@@ -17,16 +17,15 @@ end
 # ╔═╡ 4e3bf4a1-c665-46b1-9bbf-247d494ba38a
 import Pkg
 
-# ╔═╡ e2f177fd-76e2-477c-b20c-6b8b8492bc49
-# ╠═╡ show_logs = false
-Pkg.develop(url="https://github.com/BPMinaker/EoM.jl")
+# ╔═╡ 315e931b-e2b0-4b32-9569-cd998fee1892
+Pkg.activate(".")
 
 # ╔═╡ f9d604c6-39c6-4328-97c7-83ac16f2baa9
 using PlutoUI
 
 # ╔═╡ b3ee9ee4-2e07-4acc-9a17-397e011e907d
 # ╠═╡ show_logs = false
-using EoM
+using EoM, Polynomials
 
 # ╔═╡ 1a22e2a5-5a13-45ae-b487-6979b13237f2
 include(joinpath("models", "input_ex_smd.jl"))
@@ -36,6 +35,15 @@ md"""
 ## Analyze the spring mass damper
 ### Load the libraries
 """
+
+# ╔═╡ 201c2d90-fb1e-4ecc-8e3e-b827b0ada00f
+Pkg.status()
+
+# ╔═╡ 4752c1b9-9ef6-4355-b239-c8fc52efc4a9
+pwd()
+
+# ╔═╡ 55b194ba-3622-4bc1-b4ff-538cb27900dc
+Pkg.status()
 
 # ╔═╡ 982e085e-487d-4391-82b1-51217dfee1e1
 md"""
@@ -117,6 +125,18 @@ plot(real(result.e_val), imag(result.e_val); seriestype = :scatter, aspect_ratio
 # ╔═╡ 0e6e017c-b309-46b4-9f2a-f97f01ee5871
 plot(result.w / 2pi, hcat(result.mag...)'[:,2]; xscale = :log10, xlim=(0.01,120), ylim=(-40,40), xticks=[0.01,0.1,1,10,100], xlabel = "Frequency [Hz]", ylabel = "Gain [dB]", label = "")
 
+# ╔═╡ 5cfb9bab-9d86-4f99-b895-776fedaa0bb9
+p = Polynomial([k, c, m])
+
+# ╔═╡ afe7a44e-4183-461f-ac6d-45211b505373
+s = -100:0.05:10
+
+# ╔═╡ ddc2c022-a8a9-4268-988b-3b7d91e97c25
+p.(s)
+
+# ╔═╡ 6dde2c3c-e59a-4ac5-8bef-cb9f3155af7b
+plot(s, p.(s); xlim=(-110,20), ylim=(-3000,1500), xlabel = "s [rad/s]", ylabel = "p(s) [N/m]", label="")
+
 # ╔═╡ fd1fc207-ff51-4872-a426-895445568917
 md"""
 ## Now compute the forced response
@@ -187,7 +207,10 @@ plot(t, [y f]; xlabel, ylabel, label, lw)
 # ╠═abed96dc-b6a8-41ba-a6a8-712e9f5479f7
 # ╠═f9d604c6-39c6-4328-97c7-83ac16f2baa9
 # ╠═4e3bf4a1-c665-46b1-9bbf-247d494ba38a
-# ╠═e2f177fd-76e2-477c-b20c-6b8b8492bc49
+# ╠═201c2d90-fb1e-4ecc-8e3e-b827b0ada00f
+# ╠═4752c1b9-9ef6-4355-b239-c8fc52efc4a9
+# ╠═315e931b-e2b0-4b32-9569-cd998fee1892
+# ╠═55b194ba-3622-4bc1-b4ff-538cb27900dc
 # ╠═b3ee9ee4-2e07-4acc-9a17-397e011e907d
 # ╠═982e085e-487d-4391-82b1-51217dfee1e1
 # ╠═1a22e2a5-5a13-45ae-b487-6979b13237f2
@@ -212,6 +235,10 @@ plot(t, [y f]; xlabel, ylabel, label, lw)
 # ╠═f52bc5a6-e247-4a55-827a-8e61ee9de7fb
 # ╠═e179ea4b-96d2-40fc-afef-52946e60228f
 # ╠═0e6e017c-b309-46b4-9f2a-f97f01ee5871
+# ╠═5cfb9bab-9d86-4f99-b895-776fedaa0bb9
+# ╠═afe7a44e-4183-461f-ac6d-45211b505373
+# ╠═ddc2c022-a8a9-4268-988b-3b7d91e97c25
+# ╠═6dde2c3c-e59a-4ac5-8bef-cb9f3155af7b
 # ╠═fd1fc207-ff51-4872-a426-895445568917
 # ╠═2d73d997-6883-4952-a9aa-2332f7a7c36e
 # ╠═c549d33a-3780-45a4-81a0-fec8c37a6ed3

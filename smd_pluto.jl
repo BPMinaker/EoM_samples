@@ -197,10 +197,10 @@ md"""
 
 # ╔═╡ 454fd4ad-b6b7-4fb1-967e-d02f9212818a
 begin 
-xlabel = "Time [s]"
-ylabel = "z [m], kz [N], f [N]"
-label = ["z" "kz" "f"]
-lw = 2
+    xlabel = "Time [s]"
+    ylabel = "z [m], kz [N], mzddot [N], f [N]"
+    label = ["z" "kz" "mzddot" "f"]
+    lw = 2    
 end
 
 # ╔═╡ 6f5b743f-b13a-4a03-b9e9-b8e149dd7b9d

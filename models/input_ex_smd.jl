@@ -57,6 +57,16 @@ function input_ex_smd(; m = 1.0, c = 0.1, k = 10.0)
     item.units = "N"
     add_item!(item, the_system)
 
+    item = sensor("mzddot")
+    item.body[1] = "block"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 1]
+    item.location[2] = [0, 0, 0]
+    item.gain = m
+    item.order = 3
+    item.units = "N"
+    add_item!(item, the_system)
+
     the_system
 
 end

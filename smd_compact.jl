@@ -25,10 +25,11 @@ y = hcat(yy.(t)...)'
 res = [y u.(0, t)]
 
 xlabel = "Time [s]"
-ylabel = "z [m], kz [N], f [N]"
-label = ["z" "kz" "f"]
+ylabel = "z [m], kz [N], mzddot [N], f [N]"
+label = ["z" "kz" "mzddot" "f"]
 lw = 2
 size = (800, 400)
+
 
 my_plot = plot(t, res; xlabel, ylabel, label, lw, size)
 # we can display the plot like:

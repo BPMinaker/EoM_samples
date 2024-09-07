@@ -102,8 +102,8 @@ println("Plotting...")
 # here there are some keyword arguments for the labels, etc.
 
 xlabel = "Time [s]"
-ylabel = "z [m], kz [N], f [N]"
-label = ["z" "kz" "f"]
+ylabel = "z [m], kz [N], mzddot [N], f [N]"
+label = ["z" "kz" "mzddot" "f"]
 lw = 2
 size = (800, 400)
 

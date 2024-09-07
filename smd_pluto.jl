@@ -125,6 +125,9 @@ plot(real(result.e_val), imag(result.e_val); seriestype = :scatter, aspect_ratio
 # ╔═╡ 0e6e017c-b309-46b4-9f2a-f97f01ee5871
 plot(result.w / 2pi, hcat(result.mag...)'[:,2]; xscale = :log10, xlim=(0.01,120), ylim=(-40,40), xticks=[0.01,0.1,1,10,100], xlabel = "Frequency [Hz]", ylabel = "Gain [dB]", label = "")
 
+# ╔═╡ cabcd154-bbfb-40b4-838b-d3949c4ef4cb
+plot(result.w / 2pi, hcat(result.phase...)'[:,2]; xscale = :log10, xlim=(0.01,120), ylim=(-360,0), xticks=[0.01,0.1,1,10,100], xlabel = "Frequency [Hz]", ylabel = "Phase [degree]", label = "")
+
 # ╔═╡ 5cfb9bab-9d86-4f99-b895-776fedaa0bb9
 p = Polynomial([k, c, m])
 
@@ -235,6 +238,7 @@ plot(t, [y f]; xlabel, ylabel, label, lw)
 # ╠═f52bc5a6-e247-4a55-827a-8e61ee9de7fb
 # ╠═e179ea4b-96d2-40fc-afef-52946e60228f
 # ╠═0e6e017c-b309-46b4-9f2a-f97f01ee5871
+# ╠═cabcd154-bbfb-40b4-838b-d3949c4ef4cb
 # ╠═5cfb9bab-9d86-4f99-b895-776fedaa0bb9
 # ╠═afe7a44e-4183-461f-ac6d-45211b505373
 # ╠═ddc2c022-a8a9-4268-988b-3b7d91e97c25

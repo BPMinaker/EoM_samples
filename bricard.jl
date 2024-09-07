@@ -2,7 +2,7 @@ using EoM
 
 include(joinpath("models", "input_ex_bricard.jl"))
 
-system = input_ex_bricard(m = 2, l = 0.4)
+system = input_ex_bricard(m=2, l=0.4)
 output = run_eom!(system)
 result = analyze(output)
 

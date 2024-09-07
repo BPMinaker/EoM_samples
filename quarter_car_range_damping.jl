@@ -9,7 +9,7 @@ kt = 150000
 ks = 18000
 vpts = 500:20:3000
 
-f(x) = input_ex_quarter_car(; ks, ms, mu, kt, cs = x)
+f(x) = input_ex_quarter_car(; ks, ms, mu, kt, cs=x)
 verbose = (vpts .== 500)
 system = f.(vpts)
 output = run_eom!.(system, verbose)

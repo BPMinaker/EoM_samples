@@ -7,7 +7,7 @@ vpts = 0:3/125:3
 
 system = f.(vpts)
 output = run_eom!.(system)
-result = analyze.(output)
+result = analyze.(output; freq=(-1, 1))
 
 ss = :skip
 impulse = :skip

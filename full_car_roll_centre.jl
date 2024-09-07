@@ -83,7 +83,7 @@ ZZ = Z0' .- y[:, [1, 2, 5, 6]]
 slip = y[:, [3, 4, 7, 8]] - steer.(t) .* [1, 0, 1, 0]' * π / 180
 
 YY = tire.(ZZ, slip)
-acc = sum(YY, dims = 2) * 9.81 / sum(Z0) 
+acc = sum(YY, dims=2) * 9.81 / sum(Z0)
 slip *= 180 / π
 
 
@@ -110,14 +110,14 @@ push!(plots, plot(t, 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]; xlabel, yl
 
 label = ""
 ylabel = "Yaw moment N [Nm]"
-push!(plots, plot(t, sum(system.scratch.a * YY[:, [1, 3]] - system.scratch.b * YY[:, [2, 4]], dims = 2); xlabel, ylabel, label, lw, size))
+push!(plots, plot(t, sum(system.scratch.a * YY[:, [1, 3]] - system.scratch.b * YY[:, [2, 4]], dims=2); xlabel, ylabel, label, lw, size))
 
 ylabel = "G Lift [mm]"
 push!(plots, plot(t, y[:, 10]; xlabel, ylabel, label, lw, size))
 
 label = ["Steer δ" "Roll ϕ" "Slip β" "Understeer α_u"]
 ylabel = "Angles [°]"
-push!(plots, plot(t, [delta y[:, [11 ,13]] y[:, 14] .+ delta]; xlabel, ylabel, label, lw, size))
+push!(plots, plot(t, [delta y[:, [11, 13]] y[:, 14] .+ delta]; xlabel, ylabel, label, lw, size))
 
 label = ["Steer δ" "Pitch θ"]
 ylabel = "Angles [°]"

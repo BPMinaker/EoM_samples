@@ -16,7 +16,7 @@ result = analyze(output)
 
 impulse = :skip
 #summarize(system, result; impulse)
-summarize(system, result; impulse, format = :html)
+summarize(system, result; impulse, format=:html)
 
 
 using EoM_X3D
@@ -28,7 +28,7 @@ sensors_animate!(system)
 output = run_eom!(system)
 result = analyze(output)
 
-zofx = random_road(class = 5)
+zofx = random_road(class=5)
 u_vec(~, t) = zofx(u * t)
 
 t1 = 0

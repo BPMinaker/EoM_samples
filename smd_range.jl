@@ -9,7 +9,7 @@ m = 1.0
 c_cr = 2 * (k * m)^0.5
 
 # here we redefine the input function, so we can call it using any value of c
-f(x) = input_ex_smd(; k, m, c = x)
+f(x) = input_ex_smd(; k, m, c=x)
 
 # then we define the range of values for c, from 0 to 1.5 times critical
 vpts = (0:1.5/150:1.5) * c_cr

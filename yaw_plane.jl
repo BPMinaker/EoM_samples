@@ -14,7 +14,7 @@ cf = 70000
 cr = 80000
 
 # define a dummy function that just calls our input function, but also adds the parameters we just set
-f(x) = input_ex_yaw_plane(; u = x, m, a, b, Iz, cf, cr)
+f(x) = input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr)
 
 # here we set the speed in `vpts`, which gets sent one at a time to the `f()` function, which finally sends them to the `input_ex_yaw_plane()` function, where they determine the value of `u`
 vpts = 0.4:0.4:40
@@ -26,14 +26,14 @@ system = f.(vpts)
 output = run_eom!.(system)
 
 # do the eigenvalues, freq resp, etc, for each forward speed
-result = analyze.(output)
+result = analyze.(output; freq=(-1, 1))
 
 # now, let's also do some time domain solutions; define the steer angle as a function of time
 # a sin w dwell input ala FMVSS 126
-steer(t) = 2 * (EoM.pulse(t, 2, 2 + 1/0.7*0.75) * sin(2π * 0.7 * (t - 2)) - EoM.pulse(t, 2 + 1/0.7*0.75, 2.5 + 1/0.7*0.75) + EoM.pulse(t, 2.5 + 1/0.7*0.75, 2.5 + 1/0.7) * sin(2π * 0.7 * (t - 2.5)))
+steer(t) = 2 * (EoM.pulse(t, 2, 2 + 1 / 0.7 * 0.75) * sin(2π * 0.7 * (t - 2)) - EoM.pulse(t, 2 + 1 / 0.7 * 0.75, 2.5 + 1 / 0.7 * 0.75) + EoM.pulse(t, 2.5 + 1 / 0.7 * 0.75, 2.5 + 1 / 0.7) * sin(2π * 0.7 * (t - 2.5)))
 
 # define input function to be steer but to also accept x and then ignore it
-input(~, t) = steer(t) 
+input(~, t) = steer(t)
 
 # define time interval
 t1 = 0
@@ -51,7 +51,7 @@ y = hcat(yy.(t)...)'
 # Julia identifies every individual row of a matrix as a vector, so if we pull out just one row, it becomes a column
 # another notation conflict, y is system output, but also lateral displacement, use `y_dist` for lateral displacement
 r = y[:, 1]
-β =y[:, 2]
+β = y[:, 2]
 α_u = y[:, 3]
 a_lat = y[:, 4]
 y_dist = y[:, 5]

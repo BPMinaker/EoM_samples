@@ -8,7 +8,7 @@ k = 1.0
 m = 1.0
 
 # here we redefine the input function, so we can call it using any value of c
-f(x) = input_ex_smd(; k, m, c = x)
+f(x) = input_ex_smd(; k, m, c=x)
 
 # then we define the range of values for c
 vpts = 0:0.001:5
@@ -17,11 +17,11 @@ vpts = 0:0.001:5
 # looping vs vectorizing
 
 @time begin
-for i in vpts
-    system = f(i)
-    output = run_eom!(system)
-    result = analyze(output)
-end
+    for i in vpts
+        system = f(i)
+        output = run_eom!(system)
+        result = analyze(output)
+    end
 end
 
 @time begin

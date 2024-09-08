@@ -4,8 +4,8 @@ include(joinpath("models", "input_ex_yaw_plane.jl"))
 
 # here you can enter your vehicle specs by name, including m, Iz, a, b, cf, cr; make sure you add the property you want to set to the argument list of `input_ex_yaw_plane()` below after you set it; properties you don't set will use defaults defined in `input_ex_yaw_plane()`
 m = 1600
-fwf = 0.58
-wb = 2.6
+fwf = 0.58 # b/(a+b)
+wb = 2.6 # a+b
 
 b = wb * fwf
 a = wb - b

@@ -78,7 +78,7 @@ function u_vec(x, t)
     y = C * x
     # y[1] long position
     # y[2] long velocity
-    # y[3] long accl'n (note that we we can't use this to find u because it depends directly on u!)
+    # y[3] long accl'n (note that we we can't use this to find u because it depends directly on u! - the third row of D has non-zero entries)
     # y[4] rear axle normal spring force
     # y[5] rear axle damper force
     # y[6] front axle normal spring force

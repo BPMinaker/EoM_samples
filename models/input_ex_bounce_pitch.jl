@@ -75,6 +75,14 @@ function input_ex_bounce_pitch(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000
     item.units = "m"
     add_item!(item, the_system)
 
+    item = sensor("z_P")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [a / 2, 0, 0.25]
+    item.location[2] = [a / 2, 0, 0]
+    item.units = "m"
+    add_item!(item, the_system)
+
     # Force the bounce and pitch
     item = actuator("u_f")
     item.body[1] = "chassis"

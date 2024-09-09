@@ -55,17 +55,17 @@ function steer_driver(y, t)
 end
 
 # define a dummy function to convert the driver model from a function of the output to a function of the state, because the solver requires the input to be a function of the state
-steer(x, t) = steer_driver(result.ss_eqns.C * x, t)
+steer(x, t) = [steer_driver(result.ss_eqns.C * x, t)]
 
 
 # define time interval
 t1 = 0
 t2 = 20
 # solve the equation of motion with the closed loop driver model
-yy = ltisim(result.ss_eqns, steer, (t1, t2))
+yoft = ltisim(result.ss_eqns, steer, (t1, t2))
 
 t = t1:(t2-t1)/1000:t2
-y = hcat(yy.(t)...)'
+y = hcat(yoft.(t)...)'
 
 # go back and figure out what steer angle the driver model used, so we can plot it
 δ = steer_driver.(yy.(t), t)

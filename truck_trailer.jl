@@ -30,16 +30,16 @@ system.name *= " 18 m per s"
 # equations are known, let's solve a time history
 steer(t) = EoM.pulse(t, 1, 3) * 2 * sin(π * (t - 1))
 
-u_vec(~, t) = steer(t) # define input function to be steer but to also accept x and then ignore it
+u_vec(~, t) = [steer(t)] # define input function to be steer but to also accept x and then ignore it
 
 # Define time interval
 t1 = 0
 t2 = 20
 
 # solve the equations of motion
-yy = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 t = t1:(t2-t1)/1000:t2
-y = hcat(yy.(t)...)'
+y = hcat(yoft.(t)...)'
 
 r = y[:, 1]
 β = y[:, 2]

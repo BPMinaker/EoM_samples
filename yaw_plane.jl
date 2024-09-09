@@ -33,7 +33,7 @@ result = analyze.(output; freq=(-1, 1))
 steer(t) = 2 * (EoM.pulse(t, 2, 2 + 1 / 0.7 * 0.75) * sin(2π * 0.7 * (t - 2)) - EoM.pulse(t, 2 + 1 / 0.7 * 0.75, 2.5 + 1 / 0.7 * 0.75) + EoM.pulse(t, 2.5 + 1 / 0.7 * 0.75, 2.5 + 1 / 0.7) * sin(2π * 0.7 * (t - 2.5)))
 
 # define input function to be steer but to also accept x and then ignore it
-input(~, t) = steer(t)
+u_vec(~, t) = [steer(t)]
 
 # define time interval
 t1 = 0
@@ -41,10 +41,10 @@ t2 = 20
 
 u = 20
 n = findfirst(vpts .== u)
-yy = ltisim(result[n].ss_eqns, input, (t1, t2))
+yoft = ltisim(result[n].ss_eqns, input, (t1, t2))
 
 t = t1:(t2-t1)/1000:t2
-y = hcat(yy.(t)...)'
+y = hcat(yoft.(t)...)'
 
 # merge vector of vectors into matrix, so we can pull out individual outputs to plot, and re-evaluate the steer angle so we can include it in the plots 
 
@@ -57,7 +57,7 @@ a_lat = y[:, 4]
 y_dist = y[:, 5]
 α_f = y[:, 7]
 α_r = y[:, 8]
-δ = input.(0, t)
+δ = steer.(t)
 
 xlabel = "Time [s]"
 lw = 2 # thicker line weight

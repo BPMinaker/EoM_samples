@@ -18,20 +18,20 @@ result = analyze(output, verbose)
 zofx = random_road(class=5)
 
 # but we need to convert to time index, where x=ut; assuming a forward speed of u=10 m/s gives
-u_vec(~, t) = zofx(10 * t)
+u_vec(~, t) = [zofx(10 * t)]
 
 println("Solving time history...")
 t1 = 0
 t2 = 10
 
-yy = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 t = t1:(t2-t1)/1000:t2
-y = hcat(yy.(t)...)'
+y = hcat(yoft.(t)...)'
 
 z1 = y[:, 1]
 z12 = y[:, 2]
 z20 = y[:, 3]
-z0 = u_vec.(0, t)
+z0 = hcat(u_vec.(0, t)...)'
 
 xlabel = "Time [s]"
 ylabel = "Displacement [m]"

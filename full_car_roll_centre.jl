@@ -59,7 +59,7 @@ steer(t) = 3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
 
 # assume LF, LR, RF, RR sequence
 # compute applied tire force
-function input(x, t)
+function u_vec(x, t)
     # get sensor outputs (D=0)
     y = result.ss_eqns.C * x
     # get total normal load
@@ -74,10 +74,10 @@ println("Solving time history...")
 t1 = 0
 t2 = 8
 
-yy = ltisim(result.ss_eqns, input, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
 t = t1:(t2-t1)/1000:t2
-y = hcat(yy.(t)...)'
+y = hcat(yoft.(t)...)'
 
 ZZ = Z0' .- y[:, [1, 2, 5, 6]]
 slip = y[:, [3, 4, 7, 8]] - steer.(t) .* [1, 0, 1, 0]' * π / 180

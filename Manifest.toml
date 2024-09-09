@@ -425,7 +425,7 @@ weakdeps = ["Adapt"]
 
 [[deps.EoM]]
 deps = ["Dates", "DelimitedFiles", "LinearAlgebra", "OrdinaryDiffEq", "Pkg", "Plots", "PrettyTables", "Reexport", "Test", "Unitful"]
-git-tree-sha1 = "5db065b2ec449b8ae8df777f224fa56e65456b56"
+git-tree-sha1 = "19ae7dcf665a598c233aa5f0e4419488f00f7856"
 repo-rev = "master"
 repo-url = "http://github.com/BPMinaker/EoM.jl"
 uuid = "25d7ee20-f19a-11e8-093a-7b526cbd2d90"

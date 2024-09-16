@@ -20,7 +20,7 @@ include(joinpath("models", "input_ex_smd.jl"))
 
 # this is confusing and weird, but we can get around it by using a semicolon in the call to the function, if we want to send a local value to the same variable name in a function
 
-k = 50
+k = 10
 m = 1
 c = 0.2
 system = input_ex_smd(; k, m, c)
@@ -73,22 +73,26 @@ display(result.e_val)
 
 println("Computing time history...")
 
-# the input function we pass to `ltisim()` has to be defined as a function of the state and time, i.e., it takes two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input so we record x and ~ and ignore it; note the square brackets, as the input must be a vector, even if it only has length of one
-
-foft(~, t) = [sin(ω * t)]
-
-#we choose an excitation frequency that's very close to the natural frequency, to excite resonance
+# we choose an excitation frequency that's very close to the natural frequency, to excite resonance
 
 ω = 0.95 * minimum(abs.(result.e_val))
+
+# and define a function that's a sinewave at that frequency
+
+foft(t) = sin(ω * t)
+
+# the input function we pass to `ltisim()` has to be defined as a function of the state and time, i.e., it has to accept two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input so we record x and ~ and ignore it; note the square brackets, as the input must be a vector, even if it only has length of one
+
+u_vec(~, t) = [foft(t)]
 
 # solve for 20 seconds
 
 t1 = 0
-t2 = 10
+t2 = 20
 
 # we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time span to EoM's ltisim, it will formulate the problem and call Julia's ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has entries z and kz; we could choose the initial state x0 if we wanted, but `ltisim()` will just use zeroes if we don't specify anything else
 
-yoft = ltisim(result.ss_eqns, foft, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
 # note that `ltisim()' returns yoft as a function handle, i.e., we can choose any time t in the interval and find yoft(t), so let's choose a range and evaluate; we use the dot operator on the vector of time values, i.e., the . before the ( tells Julia that we are taking a function that expects a scalar, and calling it on each element of a vector, and we're stacking the results together in a vector;
 
@@ -98,9 +102,9 @@ y = hcat(y_vec...)'
 
 # note that unlike Matlab, Julia makes a distinction between a vector of vectors and a matrix; we can acess a vector of vectors like so: a[2][3] to the get third entry in the second vector, where for a matrix a[2,3] gives the entry in the second row, third column; y_vec is a vector of vectors, i.e., the output vector at 1001 points over the timespan; the `hcat()' function converts a vector of vectors to a matrix, so y is a matrix; the ... is the syntax to ask for all the entries in a vector, and the apostrophe ' is the transpose operator, so our data ends up in columns instead of rows
 
-f = hcat(foft.(0, t)...)'
+f = foft.(t)
 
-# our result is the displacement, the spring force, and the inertial force; we get the applied force by recomputing the input function, so we can plot them together; in this case the 0 in the input is ignored by the `foft()` function, but the `sin()` function is evaluated for each entry in the `t` vector; note f is also a vector of vectors, so again we hcat
+# our result is the displacement, the spring force, and the inertial force; we get the applied force by recomputing the input function, so we can plot them together; in this case the 0 in the input is ignored by the `foft()` function, but the `sin()` function is evaluated for each entry in the `t` vector;
 
 println("Plotting...")
 
@@ -121,15 +125,15 @@ p1 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `foft()` is defined as a function of `ω` so all we have to do is update `ω`, and `foft()` will update as well
 
 ω = 0.5 * minimum(abs.(result.e_val))
-yoft = ltisim(result.ss_eqns, foft, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 y = hcat(yoft.(t)...)'
-f = hcat(foft.(0, t)...)'
+f = foft.(t)
 p2 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
 
 ω = 2 * minimum(abs.(result.e_val))
-yoft = ltisim(result.ss_eqns, foft, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 y = hcat(yoft.(t)...)'
-f = hcat(foft.(0, t)...)'
+f = foft.(t)
 p3 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
 
 # now let's display all out results, along with the extra plots

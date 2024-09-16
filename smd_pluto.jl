@@ -154,7 +154,10 @@ md"""
 ω = 0.95 * minimum(abs.(result.e_val))
 
 # ╔═╡ b271a8cc-50c7-45c2-b833-2be9187d7aea
-foft(~, t) = sin(ω * t)
+foft(t) = sin(ω * t)
+
+# ╔═╡ 964baf61-43ce-40a2-930c-b088097dc2a1
+u_vec(~, t) = [foft(t)]
 
 # ╔═╡ da55e077-1369-42c5-a780-105ca87a9e51
 md"""
@@ -174,7 +177,7 @@ md"""
 
 # ╔═╡ 520bc495-8596-4516-82a1-2ca35ec68da3
 # ╠═╡ show_logs = false
-yy = ltisim(result.ss_eqns, foft, (t1, t2)); nothing
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2)); nothing
 
 # ╔═╡ 6f167dc2-967d-493a-93e3-f47976663796
 md"""
@@ -185,10 +188,10 @@ md"""
 t = t1:(t2-t1)/1000:t2
 
 # ╔═╡ 7babe13b-b5b8-462c-8592-a1411fff3618
-y = hcat(yy.(t)...)'
+y = hcat(yoft.(t)...)'
 
 # ╔═╡ be639309-74b0-4100-862a-8e6b3ad7e406
-f = foft.(0, t);
+f = foft.(t);
 
 # ╔═╡ 11157422-fe89-4d54-b4ac-13c10ec6e2b0
 md"""
@@ -247,6 +250,7 @@ plot(t, [y f]; xlabel, ylabel, label, lw)
 # ╠═2d73d997-6883-4952-a9aa-2332f7a7c36e
 # ╠═c549d33a-3780-45a4-81a0-fec8c37a6ed3
 # ╠═b271a8cc-50c7-45c2-b833-2be9187d7aea
+# ╠═964baf61-43ce-40a2-930c-b088097dc2a1
 # ╠═da55e077-1369-42c5-a780-105ca87a9e51
 # ╠═4316a8b3-2830-4231-912d-ce5c5e5a2de1
 # ╠═89ca8332-df5f-4e50-83b8-57d0c171a5ed

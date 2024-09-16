@@ -11,10 +11,10 @@ u_vec(~, t) = 0.2 * [sin(2π * ω * t), sin(2π * ω * (t+0.5)), sin(2π * ω * 
 
 t1 = 0
 t2 = 20
-yy = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
 t = t1:(t2-t1)/1000:t2
-y = hcat(yy.(t)...)'
+y = hcat(yoft.(t)...)'
 f = hcat(u_vec.(0, t)...)'
 
 xlabel = "Time [s]"
@@ -35,7 +35,7 @@ sensors_animate!(system)
 output = run_eom!(system)
 result = analyze(output)
 
-yy = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 y = hcat(yy.(t)...)
 
 animate_history(system, t, y)

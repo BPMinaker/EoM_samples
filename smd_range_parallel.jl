@@ -1,6 +1,6 @@
 using EoM
 
-# this file repeats the spring mass damper example, but shows how we can analyze a series of systems, using Julia's dot notation
+# this file repeats the spring mass damper example, but shows how we can analyze a series of systems
 
 include(joinpath("models", "input_ex_smd.jl"))
 
@@ -11,10 +11,10 @@ m = 1.0
 f(x) = input_ex_smd(; k, m, c=x)
 
 # then we define the range of values for c
-vpts = 0:0.001:5
+vpts = 0:0.001:1
 
 # timing experiment
-# looping vs vectorizing
+# looping vs vectorizing vs piping vs chaining
 
 @time begin
     for i in vpts
@@ -24,11 +24,18 @@ vpts = 0:0.001:5
     end
 end
 
-@time begin
+@time begin    
     system = f.(vpts)
     output = run_eom!.(system)
-    result = analyze.(output)
+    result = analyze.(output)    
 end
 
+@time begin
+    result = vpts .|> f .|> run_eom! .|> analyze
+end
+
+@time begin
+    result = (analyze ∘ run_eom! ∘ f).(vpts)  
+end
 
 println("Done.")

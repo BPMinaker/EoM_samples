@@ -149,10 +149,10 @@ t1 = 0
 t2 = 30
 # pass the state space matrices, the input function, and the time interval to the solver
 # it will assume zeros as inital conditions
-yy = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
 t = t1:(t2-t1)/1000:t2
-y = hcat(yy.(t)...)'
+y = hcat(yoft.(t)...)'
 # convert the vector of vectors to a matrix
 
 x = y[:, 1]

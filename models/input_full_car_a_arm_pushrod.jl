@@ -1,4 +1,4 @@
-function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, cr = 40000, m = 1400, Ix = 800, Iy = 2000, Iz = 2200, r = 0.3, tw = 1.5, cs = 2000, ks = 60000, kt = 150000, ct = 100)
+function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, cr = 40000, m = 1400, Ix = 800, Iy = 2000, Iz = 2200, r = 0.3, tw = 1.5, cs = 2000, ks = 60000, kt = 150000, ct = 100, flex = false, kba = 1e6, kbr = 6e6, cba = 1e4, cbr = 6e4)
 
     the_system = mbd_system("Full Car A-Arm Pushrod")
 
@@ -11,11 +11,14 @@ function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, 
     add_item!(item, the_system)
     add_item!(weight(item), the_system)
 
-    susp!(the_system; str = "LF ", front = true, a, tw, r, u, cs, ks)
+    susp!(the_system; str = "LF ", front = true, a, tw, r, u, cs, ks, flex, kba, kbr, cba, cbr)
     tire!(the_system; str = "LF ", front = true, a, tw, cf, kt, ct, u)
+    drive!(the_system; str = "LF ", front = true, a, tw, r)
 
-    susp!(the_system; a = -b, str = "LR ", front = false, tw, r, u, cs, ks)
+    susp!(the_system; a = -b, str = "LR ", front = false, tw, r, u, cs, ks, flex, kba, kbr, cba, cbr)
     tire!(the_system; a = -b, cf = cr, str = "LR ", front = false, tw, kt, ct, u)
+    drive!(the_system; str = "LR ", front = false, a = -b, tw, r)
+
 
     item = spring("Anti-roll bar")
     item.body[1] = "LF Anti-roll arm"

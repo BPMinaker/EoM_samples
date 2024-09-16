@@ -1,6 +1,6 @@
 using LinearAlgebra
 
-function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u = 10.0, g = 9.81, str = "L ", front = true)
+function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u = 10.0, g = 9.81, str = "L ", front = true, flex = false, kba = 1e6, kbr = 6e6, cba = 1e4, cbr = 6e4)
 
     # Copyright (C) 2019, Bruce Minaker
 
@@ -135,48 +135,6 @@ function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u 
     item.moments = 0
     add_item!(item, the_system)
 
-    item = rigid_point(str * "Lower A-arm pivot, rear")
-    item.body[1] = str * "Lower A-arm"
-    item.body[2] = "Chassis"
-    item.location = [a - 0.2 * sgn, 0.1, r - 0.15]
-    item.forces = 3
-    item.moments = 0
-    add_item!(item, the_system)
-
-    item = rigid_point(str * "Lower A-arm pivot, front")
-    item.body[1] = str * "Lower A-arm"
-    item.body[2] = "Chassis"
-    item.location = [a + 0.2 * sgn, 0.1, r - 0.2]
-    item.forces = 2
-    item.moments = 0
-    item.axis = [1.0, 0.0, 0.0]
-    add_item!(item, the_system)
-
-    item = rigid_point(str * "Bell-crank pivot")
-    item.body[1] = str * "Bell-crank"
-    item.body[2] = "Chassis"
-    item.location = [a - 0.1 * sgn, 0.35, r + 0.1]
-    item.forces = 3
-    item.moments = 2
-    item.axis = [0, 1, 1] / norm([0, 1, 1])
-    add_item!(item, the_system)
-
-    item = rigid_point(str * "Upper A-arm pivot, front")
-    item.body[1] = str * "Upper A-arm"
-    item.body[2] = "Chassis"
-    item.location = [a + 0.2 * sgn, 0.3, r + 0.05]
-    item.forces = 2
-    item.moments = 0
-    item.axis = [1, 0, 0]
-    add_item!(item, the_system)
-
-    item = rigid_point(str * "Upper A-arm pivot, rear")
-    item.body[1] = str * "Upper A-arm"
-    item.body[2] = "Chassis"
-    item.location = [a - 0.2 * sgn, 0.3, r + 0.05]
-    item.forces = 3
-    item.moments = 0
-    add_item!(item, the_system)
 
     item = rigid_point(str * "Upper ball joint")
     item.body[1] = str * "Upper A-arm"
@@ -186,6 +144,95 @@ function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u 
     item.moments = 0
     add_item!(item, the_system)
 
+    if flex == false
+
+        item = rigid_point(str * "Lower A-arm pivot, front")
+        item.body[1] = str * "Lower A-arm"
+        item.body[2] = "Chassis"
+        item.location = [a + 0.2 * sgn, 0.1, r - 0.2]
+        item.forces = 2
+        item.moments = 0
+        item.axis = [1.0, 0.0, 0.0]
+        add_item!(item, the_system)
+
+        item = rigid_point(str * "Lower A-arm pivot, rear")
+        item.body[1] = str * "Lower A-arm"
+        item.body[2] = "Chassis"
+        item.location = [a - 0.2 * sgn, 0.1, r - 0.15]
+        item.forces = 3
+        item.moments = 0
+        add_item!(item, the_system)
+
+        item = rigid_point(str * "Upper A-arm pivot, front")
+        item.body[1] = str * "Upper A-arm"
+        item.body[2] = "Chassis"
+        item.location = [a + 0.2 * sgn, 0.3, r + 0.05]
+        item.forces = 2
+        item.moments = 0
+        item.axis = [1, 0, 0]
+        add_item!(item, the_system)
+
+        item = rigid_point(str * "Upper A-arm pivot, rear")
+        item.body[1] = str * "Upper A-arm"
+        item.body[2] = "Chassis"
+        item.location = [a - 0.2 * sgn, 0.3, r + 0.05]
+        item.forces = 3
+        item.moments = 0
+        add_item!(item, the_system)
+
+    else
+
+        item = flex_point(str * "Lower A-arm pivot, front")
+        item.body[1] = str * "Lower A-arm"
+        item.body[2] = "Chassis"
+        item.location = [a + 0.2 * sgn, 0.1, r - 0.2]
+        item.forces = 3
+        item.moments = 0
+        item.s_mtx = diagm([kba, kbr, kbr])
+        item.d_mtx = diagm([cba, cbr, cbr])
+        add_item!(item, the_system)
+
+        item = flex_point(str * "Lower A-arm pivot, rear")
+        item.body[1] = str * "Lower A-arm"
+        item.body[2] = "Chassis"
+        item.location = [a - 0.2 * sgn, 0.1, r - 0.15]
+        item.forces = 3
+        item.moments = 0
+        item.s_mtx = diagm([kba, kbr, kbr])
+        item.d_mtx = diagm([cba, cbr, cbr])
+        add_item!(item, the_system)
+
+        item = flex_point(str * "Upper A-arm pivot, front")
+        item.body[1] = str * "Upper A-arm"
+        item.body[2] = "Chassis"
+        item.location = [a + 0.2 * sgn, 0.3, r + 0.05]
+        item.forces = 3
+        item.moments = 0
+        item.s_mtx = diagm([kba, kbr, kbr])
+        item.d_mtx = diagm([cba, cbr, cbr])
+        add_item!(item, the_system)
+
+        item = flex_point(str * "Upper A-arm pivot, rear")
+        item.body[1] = str * "Upper A-arm"
+        item.body[2] = "Chassis"
+        item.location = [a - 0.2 * sgn, 0.3, r + 0.05]
+        item.forces = 3
+        item.moments = 0
+        item.s_mtx = diagm([kba, kbr, kbr])
+        item.d_mtx = diagm([cba, cbr, cbr])
+        add_item!(item, the_system)
+
+    end
+
+    item = rigid_point(str * "Bell-crank pivot")
+    item.body[1] = str * "Bell-crank"
+    item.body[2] = "Chassis"
+    item.location = [a - 0.1 * sgn, 0.35, r + 0.1]
+    item.forces = 3
+    item.moments = 2
+    item.axis = [0, 1, 1] / norm([0, 1, 1])
+    add_item!(item, the_system)
+ 
     item = rigid_point(str * "Lower push-rod end")
     item.body[1] = str * "Lower A-arm"
     item.body[2] = str * "Push-rod"

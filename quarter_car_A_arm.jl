@@ -29,14 +29,14 @@ output = run_eom!(system)
 result = analyze(output)
 
 zofx = random_road(class=5)
-u_vec(~, t) = zofx(u * t)
+u_vec(~, t) = [zofx(u * t)]
 
 t1 = 0
 t2 = 20
-y = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
 t = t1:(t2-t1)/1000:t2
-y = hcat(yy.(t)...)
+y = hcat(yoft.(t)...)
 animate_history(system, t, y)
 
 println("Done.")

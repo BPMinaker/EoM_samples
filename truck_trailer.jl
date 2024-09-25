@@ -30,7 +30,7 @@ system.name *= " 18 m per s"
 # equations are known, let's solve a time history
 steer(t) = EoM.pulse(t, 1, 3) * 2 * sin(π * (t - 1))
 
-u_vec(~, t) = [steer(t)] # define input function to be steer but to also accept x and then ignore it
+u_vec(_, t) = [steer(t)] # define input function to be steer but to also accept x and then ignore it
 
 # Define time interval
 t1 = 0

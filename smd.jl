@@ -81,9 +81,9 @@ println("Computing time history...")
 
 foft(t) = sin(ω * t)
 
-# the input function we pass to `ltisim()` has to be defined as a function of the state and time, i.e., it has to accept two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input so we record x and ~ and ignore it; note the square brackets, as the input must be a vector, even if it only has length of one
+# the input function we pass to `ltisim()` has to be defined as a function of the state and time, i.e., it has to accept two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input so we record x in _ and ignore it; note the square brackets, as the input must be a vector, even if it only has length of one
 
-u_vec(~, t) = [foft(t)]
+u_vec(_, t) = [foft(t)]
 
 # solve for 20 seconds
 

@@ -30,23 +30,31 @@ result = analyze.(output; freq=(-1, 1))
 
 # now, let's also do some time domain solutions; define the steer angle as a function of time
 # a sin w dwell input ala FMVSS 126
-steer(t) = 2 * (EoM.pulse(t, 2, 2 + 1 / 0.7 * 0.75) * sin(2π * 0.7 * (t - 2)) - EoM.pulse(t, 2 + 1 / 0.7 * 0.75, 2.5 + 1 / 0.7 * 0.75) + EoM.pulse(t, 2.5 + 1 / 0.7 * 0.75, 2.5 + 1 / 0.7) * sin(2π * 0.7 * (t - 2.5)))
+# a 0.7 Hz sinewave with origin at t=2 times zero everywhere except times one from t=2 for 3/4 of a wavelength
+# plus a constant negative one for 0.5 seconds,starting right after the 3/4 wavelength
+# plus a 0.7 Hz sinewave with origin at t=2.5 times zero everywhere except times one for the last 1/4 of a wavelength
+# all times 2
+steer(t) = 2 * (
+sin(2π * 0.7 * (t - 2)) * EoM.pulse(t, 2, 2 + 0.75 / 0.7)
+- EoM.pulse(t, 2 + 0.75 / 0.7, 2.5 + 0.75 / 0.7)
++ sin(2π * 0.7 * (t - 2.5)) * EoM.pulse(t, 2.5 + 0.75 / 0.7, 2.5 + 1 / 0.7))
 
-# define input function to be steer but to also accept x and then ignore it
-u_vec(~, t) = [steer(t)]
+# define input function to be steer but to also accept x and then ignore it, then put it in a vector
+u_vec(_, t) = [steer(t)]
 
 # define time interval
 t1 = 0
 t2 = 20
 
+# find which equations of motion are from when u=20, and use that to solve the time history
 u = 20
 n = findfirst(vpts .== u)
-yoft = ltisim(result[n].ss_eqns, input, (t1, t2))
+yoft = ltisim(result[n].ss_eqns, u_vec, (t1, t2))
 
+# find 1000 sub-intervals
 t = t1:(t2-t1)/1000:t2
 y = hcat(yoft.(t)...)'
-
-# merge vector of vectors into matrix, so we can pull out individual outputs to plot, and re-evaluate the steer angle so we can include it in the plots 
+# merge vector of vectors into matrix, so we can pull out individual outputs to plot
 
 # Julia identifies every individual row of a matrix as a vector, so if we pull out just one row, it becomes a column
 # another notation conflict, y is system output, but also lateral displacement, use `y_dist` for lateral displacement
@@ -58,6 +66,7 @@ y_dist = y[:, 5]
 α_f = y[:, 7]
 α_r = y[:, 8]
 δ = steer.(t)
+# re-evaluate the steer angle so we can include it in the plots
 
 xlabel = "Time [s]"
 lw = 2 # thicker line weight

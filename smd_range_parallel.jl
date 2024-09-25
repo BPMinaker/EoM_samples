@@ -38,4 +38,28 @@ end
     result = (analyze ∘ run_eom! ∘ f).(vpts)  
 end
 
+# looping and vectorizing with anonymous function inline
+
+@time begin
+    for i in vpts
+        system = (x -> input_ex_smd(; k, m, c=x))(i)
+        output = run_eom!(system)
+        result = analyze(output)
+    end
+end
+
+@time begin    
+    system = (x -> input_ex_smd(; k, m, c=x)).(vpts)
+    output = run_eom!.(system)
+    result = analyze.(output)    
+end
+
+@time begin    
+    system = map(x -> input_ex_smd(; k, m, c=x), vpts)
+    output = run_eom!.(system)
+    result = analyze.(output)    
+end
+
+
+
 println("Done.")

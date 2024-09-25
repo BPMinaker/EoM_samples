@@ -18,7 +18,7 @@ result = analyze(output, verbose)
 zofx = random_road(class=5)
 
 # but we need to convert to time index, where x=ut; assuming a forward speed of u=10 m/s gives
-u_vec(~, t) = [zofx(10 * t)]
+u_vec(_, t) = [zofx(10 * t)]
 
 println("Solving time history...")
 t1 = 0

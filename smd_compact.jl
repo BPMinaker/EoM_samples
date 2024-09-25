@@ -15,7 +15,7 @@ result = system |> run_eom! |> analyze
 
 ω = 0.95 * result.omega_n[1] * 2π
 foft(t) = sin(ω * t)
-u_vec(~, t) = [foft(t)]
+u_vec(_, t) = [foft(t)]
 
 t1 = 0
 t2 = 10

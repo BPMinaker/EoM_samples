@@ -157,7 +157,7 @@ md"""
 foft(t) = sin(ω * t)
 
 # ╔═╡ 964baf61-43ce-40a2-930c-b088097dc2a1
-u_vec(~, t) = [foft(t)]
+u_vec(_, t) = [foft(t)]
 
 # ╔═╡ da55e077-1369-42c5-a780-105ca87a9e51
 md"""

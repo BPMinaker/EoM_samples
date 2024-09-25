@@ -7,7 +7,7 @@ output = run_eom!(system)
 result = analyze(output)
 
 ω = minimum(result.omega_n)
-u_vec(~, t) = 0.2 * [sin(2π * ω * t), sin(2π * ω * (t+0.5)), sin(2π * ω * (t+1))]
+u_vec(_, t) = 0.2 * [sin(2π * ω * t), sin(2π * ω * (t+0.5)), sin(2π * ω * (t+1))]
 
 t1 = 0
 t2 = 20

@@ -81,7 +81,7 @@ output = run_eom!(system)
 result = analyze(output)
 
 zofxl, zofxr = random_road(class=5, dz=0.2)
-u_vec(~, t) = [zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a - b)]
+u_vec(_, t) = [zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a - b)]
 
 println("Solving time history...")
 t1 = 0

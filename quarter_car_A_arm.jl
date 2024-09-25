@@ -29,7 +29,7 @@ output = run_eom!(system)
 result = analyze(output)
 
 zofx = random_road(class=5)
-u_vec(~, t) = [zofx(u * t)]
+u_vec(_, t) = [zofx(u * t)]
 
 t1 = 0
 t2 = 20

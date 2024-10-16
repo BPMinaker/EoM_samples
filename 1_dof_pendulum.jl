@@ -1,3 +1,5 @@
+module one_dof
+
 using EoM
 
 include(joinpath("models", "input_ex_1_dof_pendulum.jl"))
@@ -7,6 +9,8 @@ output = run_eom!(system)
 result = analyze(output)
 
 impulse = :skip
-summarize(system, result; impulse)
+summarize(system, result; impulse, format=:html)
+
+end
 
 println("Done.")

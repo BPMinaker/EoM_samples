@@ -1,3 +1,5 @@
+module quarter_car
+
 using EoM
 
 include(joinpath("models", "input_ex_quarter_car.jl"))
@@ -19,5 +21,7 @@ ss = :skip
 impulse = :skip
 vpt_name = ["c" "Damping" "Ns/m"]
 summarize(system, vpts, result; ss, impulse, vpt_name)
+
+end
 
 println("Done.")

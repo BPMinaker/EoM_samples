@@ -1,3 +1,6 @@
+
+module disk
+
 using EoM
 
 include(joinpath("models", "input_ex_disk.jl"))
@@ -14,3 +17,6 @@ impulse = :skip
 summarize(system, vpts, result; ss, impulse)
 
 println("Done.")
+
+end
+

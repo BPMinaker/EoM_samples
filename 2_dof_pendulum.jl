@@ -1,3 +1,5 @@
+module two_dof
+
 using EoM
 
 include(joinpath("models", "input_ex_2_dof_pendulum.jl"))
@@ -6,9 +8,11 @@ system = input_ex_pendulum_2()
 output = run_eom!(system)
 result = analyze(output)
 
-summarize(system, result)
+summarize(system, result, format=:html)
 
 # using EoM_X3D
 # animate_modes(system, result)
+
+end
 
 println("Done.")

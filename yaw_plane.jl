@@ -1,3 +1,5 @@
+module yaw_plane
+
 using EoM
 
 include(joinpath("models", "input_ex_yaw_plane.jl"))
@@ -104,5 +106,7 @@ impulse = :skip
 
 summarize(system, vpts, result; plots, ss, impulse)
 # summarize(system, vpts, result; plots, ss, impulse, format = :html)
+
+end
 
 println("Done.")

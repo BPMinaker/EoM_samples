@@ -1,4 +1,4 @@
-function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000.0, cr = 80000.0, m = 16975 / 9.81, Iz = 3508.0, lf=0.02, lr=0.02, kf=1E8, kr=1E8)
+function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000.0, cr = 80000.0, ptf = 0, ptr = 0, m = 16975 / 9.81, Iz = 3508.0, lf=0.02, lr=0.02, kf=1E8, kr=1E8)
 
     # The classic yaw plane model
     # a = front axle to truck cg
@@ -82,7 +82,7 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
     item = flex_point("front tire")
     item.body[1] = "front wheel"
     item.body[2] = "ground"
-    item.location = [a, 0, 0]
+    item.location = [a-ptf, 0, 0]
     item.forces = 1
     item.moments = 0
     item.axis = [0, 1, 0]
@@ -93,7 +93,7 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
     item = flex_point("rear tire")
     item.body[1] = "rear wheel"
     item.body[2] = "ground"
-    item.location = [-b, 0, 0]
+    item.location = [-b-ptr, 0, 0]
     item.forces = 1
     item.moments = 0
     item.axis = [0, 1, 0]
@@ -104,8 +104,8 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
     item = actuator("δ_f")
     item.body[1] = "front wheel"
     item.body[2] = "ground"
-    item.location[1] = [a, 0, 0]
-    item.location[2] = [a, 0.1, 0]
+    item.location[1] = [a-ptf, 0, 0]
+    item.location[2] = [a-ptf, 0.1, 0]
     item.gain = cf * π / 180 # degree to radian
     item.units = "°"
     add_item!(item, the_system)
@@ -114,8 +114,8 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
     item = actuator("δ_r")
     item.body[1] = "rear wheel"
     item.body[2] = "ground"
-    item.location[1] = [-b, 0, 0]
-    item.location[2] = [-b, -0.1, 0]
+    item.location[1] = [-b-ptr, 0, 0]
+    item.location[2] = [-b-ptr, 0.1, 0]
     item.gain = cr * π / 180
     item.units = "°"
     #add_item!(item,the_system)
@@ -212,6 +212,30 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
     add_item!(item, the_system)
 
 
+    # measure the front flex angle
+    item = sensor("γ_f")
+    item.body[1] = "front wheel"
+    item.body[2] = "chassis"
+    item.location[1] = [a, 0, 0]
+    item.location[2] = [a, 0, 0.1]
+    item.twist = true
+    item.gain = 180 / π # radian to degree
+    item.units = "°"
+    add_item!(item, the_system)
+
+
+    # measure the rear flex angle
+    item = sensor("γ_r")
+    item.body[1] = "rear wheel"
+    item.body[2] = "chassis"
+    item.location[1] = [-b, 0, 0]
+    item.location[2] = [-b, 0, 0.1]
+    item.twist = true
+    item.gain = 180 / π # radian to degree
+    item.units = "°"
+    add_item!(item, the_system)
+
+
     # measure the front slip angle
     item = sensor("α_f")
     item.body[1] = "chassis"
@@ -240,6 +264,7 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
 #    item.actuator_gain = -1 # input is already in degrees
     item.units = "°"
     add_item!(item, the_system)
+
 
     the_system
 

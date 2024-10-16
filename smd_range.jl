@@ -1,3 +1,5 @@
+module smd
+
 using EoM, Polynomials
 
 # this file repeats the spring mass damper example, but shows how we can analyze a series of systems, using Julia's dot notation
@@ -46,5 +48,7 @@ summarize(system, vpts, result; ss, impulse, vpt_name, plots)
 
 # we could also write to html output instead of the screen
 # summarize(system, vpts, result; ss, impulse, vpt_name, format = :html)
+
+end
 
 println("Done.")

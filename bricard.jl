@@ -1,3 +1,5 @@
+module bricard
+
 using EoM
 
 include(joinpath("models", "input_ex_bricard.jl"))
@@ -10,5 +12,7 @@ summarize(system, result)
 
 # using EoM_X3D
 # animate_modes(system, result)
+
+end
 
 println("Done.")

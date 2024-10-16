@@ -1,3 +1,5 @@
+module quarter_car
+
 using EoM
 
 include(joinpath("models", "input_quarter_car_a_arm_pushrod.jl"))
@@ -38,5 +40,7 @@ yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 t = t1:(t2-t1)/1000:t2
 y = hcat(yoft.(t)...)
 animate_history(system, t, y)
+
+end
 
 println("Done.")

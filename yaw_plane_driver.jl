@@ -1,3 +1,5 @@
+module yaw_plane
+
 using EoM, ForwardDiff
 
 include(joinpath("models", "input_ex_yaw_plane.jl"))
@@ -117,5 +119,7 @@ push!(plots, plot(u * t, [y_dist first.(track.(u * t))]; xlabel, ylabel, label, 
 ss = :skip
 bode = :skip
 summarize(system, result; plots, ss, bode)
+
+end
 
 println("Done.")

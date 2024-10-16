@@ -1,3 +1,5 @@
+module full_car
+
 using EoM, EoM_X3D
 
 include(joinpath("models", "input_full_car_a_arm_pushrod.jl"))
@@ -64,7 +66,7 @@ DD = D
 
 display(eigen(AA).values)
 
-
+end
 
 
 

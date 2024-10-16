@@ -1,3 +1,5 @@
+module top
+
 using EoM
 
 include(joinpath("models", "input_ex_top.jl"))
@@ -13,5 +15,7 @@ ss = :skip
 impulse = :skip
 vpt_name = ["r" "Angular speed" "rad/s"]
 summarize(system, vpts, result; ss, impulse, vpt_name)
+
+end
 
 println("Done.")

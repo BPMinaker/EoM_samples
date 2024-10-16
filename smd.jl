@@ -1,6 +1,11 @@
 # you might find it helpful to turn on 'word wrapping' in VSCode; go to File, Preferences, Settings, and search for 'wrap'; change the setting to 'on'
 
+# create a unique variable space
+
+module smd
+
 # the first step is to load the `EoM` and other support libraries
+
 using EoM
 
 # now, we load the function `input_ex_smd()`, which contains the definition of the spring mass damper system; we make Julia aware of the function by `including` the file that contains it; the `joinpath()` function inserts the appropriate separator, i.e., a forward slash or backslash, depending on the platform (Windows/Mac); you can `include` input files for systems you write yourself in the same way
@@ -111,8 +116,8 @@ println("Plotting...")
 # here there are some keyword arguments for the labels, etc.
 
 xlabel = "Time [s]"
-ylabel = "z [m], kz [N], mzddot [N], f [N]"
-label = ["z" "kz" "mzddot" "f"]
+ylabel = "z [m], kz [N], czdot [N], mzddot [N], f [N]"
+label = ["z" "kz" "czdot" "mzddot" "f"]
 lw = 2
 size = (800, 400)
 
@@ -139,8 +144,8 @@ p3 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
 # now let's display all out results, along with the extra plots
 
 plots = [p1, p2, p3]
-summarize(system, result; plots)
-# summarize(system, result; plots, format = :html)
+# summarize(system, result; plots)
+summarize(system, result; plots, format = :html)
 
 # alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; that gets overwritten if you run the analysis again, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
 
@@ -148,5 +153,7 @@ summarize(system, result; plots)
 
 # using EoM_X3D
 # animate_modes(system, result)
+
+end
 
 println("Done.")

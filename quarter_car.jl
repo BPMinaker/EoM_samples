@@ -1,3 +1,5 @@
+module quarter_car
+
 using EoM
 
 include(joinpath("models", "input_ex_quarter_car.jl"))
@@ -55,5 +57,7 @@ summarize(system, result; plots, impulse)
 # generate animations of the mode shapes
 # using EoM_X3D
 # animate_modes(system, result, scale=0.2)
+
+end
 
 println("Done.")

@@ -1,3 +1,5 @@
+module bicycle
+
 using EoM
 
 include(joinpath("models", "input_ex_bicycle_rider.jl"))
@@ -16,5 +18,7 @@ summarize(system, vpts, result; ss, impulse)
 
 # using EoM_X3D
 # animate_modes(system[10], result[10])
+
+end
 
 println("Done.")

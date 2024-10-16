@@ -1,3 +1,5 @@
+module half_car
+
 using EoM
 
 include(joinpath("models", "input_ex_half_car.jl"))
@@ -18,5 +20,7 @@ summarize(system, result; impulse)
 
 # using EoM_X3D
 # animate_modes(system, result)
+
+end
 
 println("Done.")

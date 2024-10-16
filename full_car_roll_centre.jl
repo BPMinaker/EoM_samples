@@ -1,3 +1,5 @@
+module roll_centre
+
 using EoM, ForwardDiff
 
 include(joinpath("models", "input_ex_roll_centre.jl"))
@@ -140,5 +142,7 @@ summarize(system, result; plots, bode, ss, impulse)
 # generate animations of the mode shapes
 # using EoM_X3D
 # animate_modes(system, result, true)
+
+end
 
 println("Done.")

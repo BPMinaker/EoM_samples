@@ -1,3 +1,5 @@
+module smd
+
 using EoM
 
 include(joinpath("models", "input_ex_smd.jl"))
@@ -28,8 +30,8 @@ y = hcat(yoft.(t)...)'
 res = [y foft.(t)]
 
 xlabel = "Time [s]"
-ylabel = "z [m], kz [N], mzddot [N], f [N]"
-label = ["z" "kz" "mzddot" "f"]
+ylabel = "z [m], kz [N], czdot [N], mzddot [N], f [N]"
+label = ["z" "kz" "czdot" "mzddot" "f"]
 lw = 2
 size = (800, 400)
 
@@ -45,5 +47,7 @@ summarize(system, result; ss, impulse, plots)
 
 # we could also write to html output instead of the screen
 # summarize(system, result; plots, format = :html)
+
+end
 
 println("Done.")

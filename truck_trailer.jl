@@ -1,3 +1,5 @@
+module truck_trailer
+
 using EoM
 
 include(joinpath("models", "input_ex_truck_trailer.jl"))
@@ -83,5 +85,7 @@ summarize(system, result; plots, impulse)
 #summarize(system, result; plots, format = :html)
 #using EoM_X3D
 #animate_modes(system, result)
+
+end
 
 println("Done.")

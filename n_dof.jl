@@ -1,3 +1,5 @@
+module n_dof
+
 using EoM
 
 include(joinpath("models", "input_n_dof.jl"))
@@ -10,3 +12,5 @@ summarize(system, result)
 
 # using EoM_X3D
 # animate_modes(system, result, scale = 0.5)
+
+end

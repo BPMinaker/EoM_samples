@@ -1,3 +1,5 @@
+module shimmy
+
 using EoM
 
 include(joinpath("models", "input_ex_shimmy.jl"))
@@ -18,6 +20,8 @@ result = analyze.(output)
 impulse = :skip
 vpt_name = ["a/l" "Mass centre location" ""]
 summarize(system, vpts, result; impulse, vpt_name)
+
+end
 
 println("Done.")
 

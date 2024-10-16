@@ -1,3 +1,5 @@
+module full_car
+
 using EoM
 
 include(joinpath("models", "input_full_car_a_arm_pushrod.jl"))
@@ -40,5 +42,7 @@ t = t1:(t2-t1)/1000:t2
 y = hcat(yy.(t)...)
 
 animate_history(system, t, y)
+
+end
 
 println("Done.")

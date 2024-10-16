@@ -1,3 +1,5 @@
+module drag_race
+
 using EoM, Interpolations
 
 # read in the function that will define our drag race vehicle model
@@ -218,5 +220,7 @@ summarize(system, result; plots, bode, impulse)
 
 # using DelimitedFiles
 # writedlm(joinpath("output","data.txt"), [t y])
+
+end
 
 println("Done.")

@@ -1,10 +1,10 @@
 # you might find it helpful to turn on 'word wrapping' in VSCode; go to File, Preferences, Settings, and search for 'wrap'; change the setting to 'on'
 
-# create a unique variable space
+# this isn't strictly necessary, but let's first create a unique variable space, so we can run different samples back to back without conflict; as a consequence, any variable defined in the module will need the module name attached if we want to read it in the REPL, e.g., our mass `m` will be `smd.m` in the REPL
 
 module smd
 
-# the first step is to load the `EoM` and other support libraries
+# next, load the EoM support library, that defines the `run_eom!()`, `analyze()`, and `summarize()` functions
 
 using EoM
 
@@ -78,15 +78,15 @@ display(result.e_val)
 
 println("Computing time history...")
 
-# we choose an excitation frequency that's very close to the natural frequency, to excite resonance
+# we choose an excitation frequency that's very close to the natural frequency, to excite resonance (note that we can use Greek characters in Julia; e.g., you can get an ω using \omega)
 
 ω = 0.95 * minimum(abs.(result.e_val))
 
-# and define a function that's a sinewave at that frequency
+# and define a force function that's a sinewave at that frequency
 
 foft(t) = sin(ω * t)
 
-# the input function we pass to `ltisim()` has to be defined as a function of the state and time, i.e., it has to accept two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input so we record x in _ and ignore it; note the square brackets, as the input must be a vector, even if it only has length of one
+# the input function we pass to our time history solver `ltisim()` has to be defined as a function of the state and time, i.e., it has to accept two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input so we record x in _ and ignore it; note the square brackets, as the input must be a vector, even if it only has length of one
 
 u_vec(_, t) = [foft(t)]
 
@@ -95,7 +95,7 @@ u_vec(_, t) = [foft(t)]
 t1 = 0
 t2 = 20
 
-# we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time span to EoM's ltisim, it will formulate the problem and call Julia's ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has entries z and kz; we could choose the initial state x0 if we wanted, but `ltisim()` will just use zeroes if we don't specify anything else
+# we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time span to EoM's ltisim, it will formulate the problem and call Julia's ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has entries z, kz, czdot, and mzddot; we could choose the initial state x0 if we wanted, but `ltisim()` will just use zeroes if we don't specify anything else
 
 yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
@@ -103,14 +103,14 @@ yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
 t = t1:(t2-t1)/1000:t2
 y_vec = yoft.(t)
-y = hcat(y_vec...)'
 
 # note that unlike Matlab, Julia makes a distinction between a vector of vectors and a matrix; we can acess a vector of vectors like so: a[2][3] to the get third entry in the second vector, where for a matrix a[2,3] gives the entry in the second row, third column; y_vec is a vector of vectors, i.e., the output vector at 1001 points over the timespan; the `hcat()' function converts a vector of vectors to a matrix, so y is a matrix; the ... is the syntax to ask for all the entries in a vector, and the apostrophe ' is the transpose operator, so our data ends up in columns instead of rows
 
+y = hcat(y_vec...)'
+
+# our result is the displacement, the spring force, the damping force, and the inertial force; we get the applied force by recomputing the input function, so we can plot them together; the `sin(ω * t)` function is evaluated for each entry in the `t` vector;
+
 f = foft.(t)
-
-# our result is the displacement, the spring force, and the inertial force; we get the applied force by recomputing the input function, so we can plot them together; in this case the 0 in the input is ignored by the `foft()` function, but the `sin()` function is evaluated for each entry in the `t` vector;
-
 println("Plotting...")
 
 # here there are some keyword arguments for the labels, etc.
@@ -144,8 +144,8 @@ p3 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
 # now let's display all out results, along with the extra plots
 
 plots = [p1, p2, p3]
-# summarize(system, result; plots)
-summarize(system, result; plots, format = :html)
+summarize(system, result; plots)
+# summarize(system, result; plots, format = :html)
 
 # alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; that gets overwritten if you run the analysis again, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
 

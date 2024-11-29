@@ -1,10 +1,11 @@
 module yaw_plane
 
-using EoM
+using EoM, Interpolations
 
 include(joinpath("models", "input_ex_yaw_plane.jl"))
 
 # here you can enter your vehicle specs by name, including m, Iz, a, b, cf, cr; make sure you add the property you want to set to the argument list of `input_ex_yaw_plane()` below after you set it; properties you don't set will use defaults defined in `input_ex_yaw_plane()`
+
 m = 1600
 fwf = 0.58 # b/(a+b)
 wb = 2.6 # a+b
@@ -14,6 +15,8 @@ a = wb - b
 Iz = 2600
 cf = 70000
 cr = 80000
+
+dpr = 180 / π
 
 # define a dummy function that just calls our input function, but also adds the parameters we just set
 f(x) = input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr)
@@ -29,6 +32,15 @@ output = run_eom!.(system)
 
 # do the eigenvalues, freq resp, etc, for each forward speed
 result = analyze.(output; freq=(-1, 1))
+
+ss_resp = hcat(getproperty.(result,:ss_resp)...)
+if maximum(yaw_plane.ss_resp[3,:]) > 0.5
+    yy = LinearInterpolation(ss_resp[3,:],vpts)
+    uchar = yy(0.5)
+    println("Characteristic speed $(my_round(uchar)) m/s.")
+    K = dpr * (a+b) * 9.81 / uchar^2
+    println("Understeer gradient $(my_round(K)) degrees/g.")
+end
 
 # now, let's also do some time domain solutions; define the steer angle as a function of time
 # a sin w dwell input ala FMVSS 126

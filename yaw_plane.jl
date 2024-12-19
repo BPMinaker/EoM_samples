@@ -1,28 +1,31 @@
 module yaw_plane
 
-using EoM, Interpolations
+using EoM
 
 include(joinpath("models", "input_ex_yaw_plane.jl"))
 
 # here you can enter your vehicle specs by name, including m, Iz, a, b, cf, cr; make sure you add the property you want to set to the argument list of `input_ex_yaw_plane()` below after you set it; properties you don't set will use defaults defined in `input_ex_yaw_plane()`
 
-m = 1600
-fwf = 0.58 # b/(a+b)
-wb = 2.6 # a+b
-
-b = wb * fwf
-a = wb - b
-Iz = 2600
-cf = 70000
-cr = 80000
-
 dpr = 180 / π
-
-# define a dummy function that just calls our input function, but also adds the parameters we just set
-f(x) = input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr)
 
 # here we set the speed in `vpts`, which gets sent one at a time to the `f()` function, which finally sends them to the `input_ex_yaw_plane()` function, where they determine the value of `u`
 vpts = 0.4:0.4:40
+
+m = 1914
+a = 1.473
+b = 1.403
+Iz = 2600
+cf = 2 * 1437 * dpr
+cr = 2 * 1507 * dpr
+
+df = 2 * 34 * dpr
+dr = 2 * 38 * dpr
+
+ptf = df / cf
+ptr = dr / cr
+
+# define a dummy function that just calls our input function, but also adds the parameters we just set
+f(x) = input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr)
 
 # generate our system
 system = f.(vpts)
@@ -33,16 +36,9 @@ output = run_eom!.(system)
 # do the eigenvalues, freq resp, etc, for each forward speed
 result = analyze.(output; freq=(-1, 1))
 
-ss_resp = hcat(getproperty.(result,:ss_resp)...)
-if maximum(yaw_plane.ss_resp[3,:]) > 0.5
-    yy = LinearInterpolation(ss_resp[3,:],vpts)
-    uchar = yy(0.5)
-    println("Characteristic speed $(my_round(uchar)) m/s.")
-    K = dpr * (a+b) * 9.81 / uchar^2
-    println("Understeer gradient $(my_round(K)) degrees/g.")
-end
 
 # now, let's also do some time domain solutions; define the steer angle as a function of time
+
 # a sin w dwell input ala FMVSS 126
 # a 0.7 Hz sinewave with origin at t=2 times zero everywhere except times one from t=2 for 3/4 of a wavelength
 # plus a constant negative one for 0.5 seconds,starting right after the 3/4 wavelength
@@ -118,6 +114,25 @@ impulse = :skip
 
 summarize(system, vpts, result; plots, ss, impulse)
 # summarize(system, vpts, result; plots, ss, impulse, format = :html)
+
+
+# generate over a huge range of speeds to find characteristic speed
+vpts = 0.4:0.4:140
+
+using Interpolations
+
+system = f.(vpts)
+output = run_eom!.(system)
+result = analyze.(output; freq=(-1, 1))
+
+ss_resp = hcat(getproperty.(result,:ss_resp)...)
+if maximum(yaw_plane.ss_resp[3,:]) > 0.5
+    yy = LinearInterpolation(ss_resp[3,:],vpts)
+    uchar = yy(0.5)
+    println("Characteristic speed $(my_round(uchar)) m/s.")
+    K = dpr * (a+b) * 9.81 / uchar^2
+    println("Understeer gradient $(my_round(K)) degrees/g.")
+end
 
 end
 

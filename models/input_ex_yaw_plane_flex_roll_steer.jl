@@ -1,4 +1,4 @@
-function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000.0, cr = 80000.0, ptf = 0, ptr = 0, m = 16975 / 9.81, Iz = 3508.0, lf=0.02, lr=0.02, kf=1E8, kr=1E8)
+function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189, c = 0, cf = 80000.0, cr = 80000.0, ptf = 0, ptr = 0, ms = 16975 / 9.81, muf = 0, mur = 0, Iz = 3508.0, lf=0.02, lr=0.02, kf=1E8, kr=1E8, ef=0, er=0, k_phi=0.005)
 
     # The classic yaw plane model
     # a = front axle to truck cg
@@ -8,7 +8,7 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
     # cf = front cornering stiffness (total)
     # cr = rear cornering stiffness (total)
 
-    the_system = mbd_system("Yaw Plane Flex Vehicle")
+    the_system = mbd_system("Yaw Plane Vehicle w Flex and Roll Steer")
 
     if (u == 0)
         error("Speed must be non-zero!")
@@ -16,14 +16,22 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
 
     # add one rigid body
     item = body("chassis")
-    item.mass = m
+    item.mass = ms
     item.moments_of_inertia = [0, 0, Iz]
     item.products_of_inertia = [0, 0, 0]
-    item.location = [0, 0, 0]
+    item.location = [c, 0, 0]
     item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = body("front wheel")
+    item.mass = muf
+    item.moments_of_inertia = [0, 0, 0]
+    item.products_of_inertia = [0, 0, 0]
+    item.location = [a, 0, 0]
+    item.velocity = [u, 0, 0]
+    add_item!(item, the_system)
+
+    item = body("front axle")
     item.mass = 0
     item.moments_of_inertia = [0, 0, 0]
     item.products_of_inertia = [0, 0, 0]
@@ -32,6 +40,14 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
     add_item!(item, the_system)
 
     item = body("rear wheel")
+    item.mass = mur
+    item.moments_of_inertia = [0, 0, 0]
+    item.products_of_inertia = [0, 0, 0]
+    item.location = [-b, 0, 0]
+    item.velocity = [u, 0, 0]
+    add_item!(item, the_system)
+
+    item = body("rear axle")
     item.mass = 0
     item.moments_of_inertia = [0, 0, 0]
     item.products_of_inertia = [0, 0, 0]
@@ -39,18 +55,67 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
     item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
-    item = rigid_point("front hinge")
-    item.body[1] = "front wheel"
+
+    item = rigid_point("front steer hinge")
+    item.body[1] = "front axle"
     item.body[2] = "chassis"
+    item.location = [a, 0, 0]
+    item.forces = 3
+    item.moments = 2
+    item.axis = [cos(ef), 0, sin(ef)]
+    add_item!(item, the_system)
+
+    item = rigid_point("rear steer hinge")
+    item.body[1] = "rear axle"
+    item.body[2] = "chassis"
+    item.location = [-b, 0, 0]
+    item.forces = 3
+    item.moments = 2
+    item.axis = [cos(er), 0, sin(er)]
+    add_item!(item, the_system)
+
+
+    item = rigid_point("front axle")
+    item.body[1] = "front axle"
+    item.body[2] = "ground"
+    item.location = [a, 0, 0]
+    item.forces = 0
+    item.moments = 1
+    item.axis = [1, 0, 0]
+    add_item!(item, the_system)
+
+    item = rigid_point("rear axle")
+    item.body[1] = "rear axle"
+    item.body[2] = "ground"
+    item.location = [-b, 0, 0]
+    item.forces = 0
+    item.moments = 1
+    item.axis = [1, 0, 0]
+    add_item!(item, the_system)
+
+    item = flex_point("roll stiffness")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location = [0, 0, 0]
+    item.forces = 0
+    item.moments = 1
+    item.axis = [1, 0, 0]
+    item.stiffness = [0, 1/k_phi]
+    add_item!(item, the_system)
+
+
+    item = rigid_point("front flex hinge")
+    item.body[1] = "front wheel"
+    item.body[2] = "front axle"
     item.location = [a-lf, 0, 0]
     item.forces = 3
     item.moments = 2
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
-    item = rigid_point("rear hinge")
+    item = rigid_point("rear flex hinge")
     item.body[1] = "rear wheel"
-    item.body[2] = "chassis"
+    item.body[2] = "rear axle"
     item.location = [-b-lr, 0, 0]
     item.forces = 3
     item.moments = 2
@@ -58,7 +123,7 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
     add_item!(item, the_system)
 
     item = flex_point("front flex")
-    item.body[1] = "chassis"
+    item.body[1] = "front axle"
     item.body[2] = "front wheel"
     item.location = [a, 0, 0]
     item.forces = 1
@@ -68,7 +133,7 @@ function input_ex_yaw_plane_flex(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 
     add_item!(item, the_system)
 
     item = flex_point("rear flex")
-    item.body[1] = "chassis"
+    item.body[1] = "front axle"
     item.body[2] = "rear wheel"
     item.location = [-b, 0, 0]
     item.forces = 1

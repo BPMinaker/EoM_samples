@@ -1,16 +1,14 @@
-function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000.0, cr = 80000.0, m = 16975 / 9.81, Iz = 3508.0, ptf = 0, ptr = 0)
+function input_ex_yaw_plane_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000.0, cr = 80000.0, m = 16975 / 9.81, Iz = 3508.0, ef=0, er=0, k_phi=0.005)
 
-    # The classic yaw plane model
+    # The classic yaw plane model modified forr roll steer
     # a = front axle to truck cg
     # b = rear axle to truck cg
     # m = mass
     # I = yaw inertia
     # cf = front cornering stiffness (total)
     # cr = rear cornering stiffness (total)
-    # ptf = front pneumatic trail
-    # ptr = rear pneumatic trail
 
-    the_system = mbd_system("Yaw Plane Vehicle")
+    the_system = mbd_system("Yaw Plane Caster Vehicle")
 
     if (u == 0)
         error("Speed must be non-zero!")
@@ -21,15 +19,84 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.mass = m
     item.moments_of_inertia = [0, 0, Iz]
     item.products_of_inertia = [0, 0, 0]
-    item.location = [0, 0, 0]
+    item.location = [0, 0, 1/m]
     item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
-    # add a damping, to connect our body to ground, aligned with y-axis (front tire)
-    item = flex_point("front tire")
+    item = body("front wheel")
+    item.mass = 0
+    item.moments_of_inertia = [0, 0, 0]
+    item.products_of_inertia = [0, 0, 0]
+    item.location = [a, 0, 0]
+    item.velocity = [u, 0, 0]
+    add_item!(item, the_system)
+
+    item = body("rear wheel")
+    item.mass = 0
+    item.moments_of_inertia = [0, 0, 0]
+    item.products_of_inertia = [0, 0, 0]
+    item.location = [-b, 0, 0]
+    item.velocity = [u, 0, 0]
+    add_item!(item, the_system)
+
+    item = rigid_point("front hinge")
+    item.body[1] = "front wheel"
+    item.body[2] = "chassis"
+    item.location = [a, 0, 0]
+    item.forces = 3
+    item.moments = 2
+    item.axis = [cos(ef), 0, sin(ef)]
+    add_item!(item, the_system)
+
+    item = rigid_point("rear hinge")
+    item.body[1] = "rear wheel"
+    item.body[2] = "chassis"
+    item.location = [-b, 0, 0]
+    item.forces = 3
+    item.moments = 2
+    item.axis = [cos(er), 0, sin(er)]
+    add_item!(item, the_system)
+
+
+    item = rigid_point("front wheel")
+    item.body[1] = "front wheel"
+    item.body[2] = "ground"
+    item.location = [a, 0, 0]
+    item.forces = 0
+    item.moments = 1
+    item.axis = [1, 0, 0]
+    add_item!(item, the_system)
+
+    item = rigid_point("rear wheel")
+    item.body[1] = "rear wheel"
+    item.body[2] = "ground"
+    item.location = [-b, 0, 0]
+    item.forces = 0
+    item.moments = 1
+    item.axis = [1, 0, 0]
+    add_item!(item, the_system)
+
+
+
+    item = flex_point("roll stiffness")
     item.body[1] = "chassis"
     item.body[2] = "ground"
-    item.location = [a - ptf, 0, 0]
+    item.location = [0, 0, 0]
+    item.forces = 0
+    item.moments = 1
+    item.axis = [1, 0, 0]
+    item.stiffness = [0, 1/k_phi]
+    add_item!(item, the_system)
+
+
+
+
+
+    # add a damping, to connect our body to ground, aligned with y-axis (front tire)
+    item = flex_point("front tire")
+    item.body[1] = "front wheel"
+    item.body[2] = "ground"
+    item.location = [a, 0, 0]
     item.forces = 1
     item.moments = 0
     item.axis = [0, 1, 0]
@@ -38,9 +105,9 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
 
     # rear tire
     item = flex_point("rear tire")
-    item.body[1] = "chassis"
+    item.body[1] = "rear wheel"
     item.body[2] = "ground"
-    item.location = [-b - ptr, 0, 0]
+    item.location = [-b, 0, 0]
     item.forces = 1
     item.moments = 0
     item.axis = [0, 1, 0]
@@ -49,33 +116,44 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
 
     # add an actuator to apply the steering force
     item = actuator("δ_f")
-    item.body[1] = "chassis"
+    item.body[1] = "front wheel"
     item.body[2] = "ground"
-    item.location[1] = [a - ptf, 0, 0]
-    item.location[2] = [a - ptf, 0.1, 0]
+    item.location[1] = [a, 0, 0]
+    item.location[2] = [a, 0.1, 0]
     item.gain = cf * π / 180 # degree to radian
     item.units = "°"
     add_item!(item, the_system)
 
     # rear wheel steer, off by default
     item = actuator("δ_r")
-    item.body[1] = "chassis"
+    item.body[1] = "rear wheel"
     item.body[2] = "ground"
-    item.location[1] = [-b - ptr, 0, 0]
-    item.location[2] = [-b - ptr, -0.1, 0]
+    item.location[1] = [-b, 0, 0]
+    item.location[2] = [-b, 0.1, 0]
     item.gain = cr * π / 180
     item.units = "°"
     #add_item!(item,the_system)
 
-    # constrain to planar motion
-    item = rigid_point("road")
+    # constrain bounce
+    item = rigid_point("bounce")
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location = [0, 0, 0]
     item.forces = 1
-    item.moments = 2
+    item.moments = 0
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
+
+    # constrain pitch
+    item = rigid_point("pitch")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location = [0, 0, 0]
+    item.forces = 0
+    item.moments = 1
+    item.axis = [0, 1, 0]
+    add_item!(item, the_system)
+
 
     # constrain chassis in the forward direction
     # the left/right symmetry of the chassis tells us that the lateral and longitudinal motions are decoupled anyway
@@ -121,7 +199,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[2] = [0, 0, 0.1]
     item.twist = 1 # angular
     item.order = 2 # velocity
-    item.gain = -(a + b) * 180 / π / u # radian to degree
+    item.gain = -180 * (a + b) / π / u # radian to degree
     item.actuator = "δ_f"
     item.actuator_gain = 1 # input is already in degrees
     item.units = "°"
@@ -136,7 +214,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.order = 3 # acceleration
     item.gain = 1 / 9.81 # g
     item.units = "ge"
-    add_item!(item, the_system)
+ #   add_item!(item, the_system)
 
     # note that the y location will not reach steady state with constant delta input, so adding the sensor will give an error if the steady state gain is computed, but is included so that a time history can be computed
     item = sensor("y")
@@ -155,6 +233,30 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[2] = [0, 0, 0.1]
     item.twist = 1 # angular
     item.gain = 180 / π
+    item.units = "°"
+    add_item!(item, the_system)
+
+
+    # measure the front flex angle
+    item = sensor("γ_f")
+    item.body[1] = "front wheel"
+    item.body[2] = "chassis"
+    item.location[1] = [a, 0, 0]
+    item.location[2] = [a, 0, 0.1]
+    item.twist = true
+    item.gain = 180 / π # radian to degree
+    item.units = "°"
+    add_item!(item, the_system)
+
+
+    # measure the rear flex angle
+    item = sensor("γ_r")
+    item.body[1] = "rear wheel"
+    item.body[2] = "chassis"
+    item.location[1] = [-b, 0, 0]
+    item.location[2] = [-b, 0, 0.1]
+    item.twist = true
+    item.gain = 180 / π # radian to degree
     item.units = "°"
     add_item!(item, the_system)
 
@@ -186,6 +288,29 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
 #    item.actuator = "δ_r"
 #    item.actuator_gain = -1 # input is already in degrees
     item.units = "°"
+    add_item!(item, the_system)
+
+    item = sensor("ϕ")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0.1, 0, 0]
+    item.location[2] = [0, 0, 0]
+    item.twist = true
+    item.gain = 180 / π # radian to degree
+    item.units = "°"
+    add_item!(item, the_system)
+
+
+    # measure the steady state lat acc
+    item = sensor("ru")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 0]
+    item.location[2] = [0, 0, 0.1]
+    item.twist = 1 # angular
+    item.order = 2 # velocity
+    item.gain =  u / 9.81 # radian to degree
+    item.units = "ge"
     add_item!(item, the_system)
 
     the_system

@@ -1,4 +1,4 @@
-function input_ex_yaw_plane_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000.0, cr = 80000.0, m = 16975 / 9.81, Iz = 3508.0, ef=0, er=0, k_phi=0.005)
+function input_ex_yaw_plane_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000.0, cr = 80000.0, m = 16975 / 9.81, Iz = 3508.0, ef=0, er=0, k_phi=0.005, ptf = 0, ptr = 0)
 
     # The classic yaw plane model modified forr roll steer
     # a = front axle to truck cg
@@ -42,7 +42,7 @@ function input_ex_yaw_plane_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189,
     item = rigid_point("front hinge")
     item.body[1] = "front wheel"
     item.body[2] = "chassis"
-    item.location = [a, 0, 0]
+    item.location = [a - ptf, 0, 0]
     item.forces = 3
     item.moments = 2
     item.axis = [cos(ef), 0, sin(ef)]
@@ -51,10 +51,10 @@ function input_ex_yaw_plane_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189,
     item = rigid_point("rear hinge")
     item.body[1] = "rear wheel"
     item.body[2] = "chassis"
-    item.location = [-b, 0, 0]
+    item.location = [-b - ptr, 0, 0]
     item.forces = 3
     item.moments = 2
-    item.axis = [cos(er), 0, sin(er)]
+    item.axis = [cos(er), 0, -sin(er)]
     add_item!(item, the_system)
 
 
@@ -90,13 +90,11 @@ function input_ex_yaw_plane_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189,
 
 
 
-
-
     # add a damping, to connect our body to ground, aligned with y-axis (front tire)
     item = flex_point("front tire")
     item.body[1] = "front wheel"
     item.body[2] = "ground"
-    item.location = [a, 0, 0]
+    item.location = [a - ptf, 0, 0]
     item.forces = 1
     item.moments = 0
     item.axis = [0, 1, 0]
@@ -107,7 +105,7 @@ function input_ex_yaw_plane_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189,
     item = flex_point("rear tire")
     item.body[1] = "rear wheel"
     item.body[2] = "ground"
-    item.location = [-b, 0, 0]
+    item.location = [-b - ptr, 0, 0]
     item.forces = 1
     item.moments = 0
     item.axis = [0, 1, 0]
@@ -118,18 +116,20 @@ function input_ex_yaw_plane_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189,
     item = actuator("δ_f")
     item.body[1] = "front wheel"
     item.body[2] = "ground"
-    item.location[1] = [a, 0, 0]
-    item.location[2] = [a, 0.1, 0]
+    item.location[1] = [a - ptf, 0, 0]
+    item.location[2] = [a - ptf, 0.1, 0]
     item.gain = cf * π / 180 # degree to radian
     item.units = "°"
     add_item!(item, the_system)
+
+
 
     # rear wheel steer, off by default
     item = actuator("δ_r")
     item.body[1] = "rear wheel"
     item.body[2] = "ground"
-    item.location[1] = [-b, 0, 0]
-    item.location[2] = [-b, 0.1, 0]
+    item.location[1] = [-b - ptr, 0, 0]
+    item.location[2] = [-b - ptr, 0.1, 0]
     item.gain = cr * π / 180
     item.units = "°"
     #add_item!(item,the_system)
@@ -214,29 +214,9 @@ function input_ex_yaw_plane_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189,
     item.order = 3 # acceleration
     item.gain = 1 / 9.81 # g
     item.units = "ge"
- #   add_item!(item, the_system)
-
-    # note that the y location will not reach steady state with constant delta input, so adding the sensor will give an error if the steady state gain is computed, but is included so that a time history can be computed
-    item = sensor("y")
-    item.body[1] = "chassis"
-    item.body[2] = "ground"
-    item.location[1] = [0, 0, 0]
-    item.location[2] = [0, 0.1, 0]
-    item.units = "m"
     add_item!(item, the_system)
 
-    # also won't reach steady state with constant delta input
-    item = sensor("θ")
-    item.body[1] = "chassis"
-    item.body[2] = "ground"
-    item.location[1] = [0, 0, 0]
-    item.location[2] = [0, 0, 0.1]
-    item.twist = 1 # angular
-    item.gain = 180 / π
-    item.units = "°"
-    add_item!(item, the_system)
-
-
+    
     # measure the front flex angle
     item = sensor("γ_f")
     item.body[1] = "front wheel"

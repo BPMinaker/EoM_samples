@@ -1,4 +1,4 @@
-function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189, c = 0, cf = 80000.0, cr = 80000.0, ptf = 0, ptr = 0, ms = 16975 / 9.81, muf = 0, mur = 0, Iz = 3508.0, lf=0.02, lr=0.02, kf=1E8, kr=1E8, ef=0, er=0, k_phi=0.005)
+function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000.0, cr = 80000.0, ptf = 0, ptr = 0, ms = 16975 / 9.81, muf = 0, mur = 0, Izs = 3508.0, lf=0.02, lr=0.02, kf=1E8, kr=1E8, ef=0, er=0, k_phi=0.005)
 
     # The classic yaw plane model
     # a = front axle to truck cg
@@ -17,9 +17,9 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     # add one rigid body
     item = body("chassis")
     item.mass = ms
-    item.moments_of_inertia = [0, 0, Iz]
+    item.moments_of_inertia = [0, 0, Izs]
     item.products_of_inertia = [0, 0, 0]
-    item.location = [c, 0, 0]
+    item.location = [0, 0, 1/ms]
     item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
@@ -59,7 +59,7 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     item = rigid_point("front steer hinge")
     item.body[1] = "front axle"
     item.body[2] = "chassis"
-    item.location = [a, 0, 0]
+    item.location = [a - ptf, 0, 0]
     item.forces = 3
     item.moments = 2
     item.axis = [cos(ef), 0, sin(ef)]
@@ -68,10 +68,10 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     item = rigid_point("rear steer hinge")
     item.body[1] = "rear axle"
     item.body[2] = "chassis"
-    item.location = [-b, 0, 0]
+    item.location = [-b - ptr, 0, 0]
     item.forces = 3
     item.moments = 2
-    item.axis = [cos(er), 0, sin(er)]
+    item.axis = [cos(er), 0, -sin(er)]
     add_item!(item, the_system)
 
 
@@ -107,7 +107,7 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     item = rigid_point("front flex hinge")
     item.body[1] = "front wheel"
     item.body[2] = "front axle"
-    item.location = [a-lf, 0, 0]
+    item.location = [a + lf, 0, 0]
     item.forces = 3
     item.moments = 2
     item.axis = [0, 0, 1]
@@ -116,7 +116,7 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     item = rigid_point("rear flex hinge")
     item.body[1] = "rear wheel"
     item.body[2] = "rear axle"
-    item.location = [-b-lr, 0, 0]
+    item.location = [-b + lr, 0, 0]
     item.forces = 3
     item.moments = 2
     item.axis = [0, 0, 1]
@@ -133,7 +133,7 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     add_item!(item, the_system)
 
     item = flex_point("rear flex")
-    item.body[1] = "front axle"
+    item.body[1] = "rear axle"
     item.body[2] = "rear wheel"
     item.location = [-b, 0, 0]
     item.forces = 1
@@ -147,7 +147,7 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     item = flex_point("front tire")
     item.body[1] = "front wheel"
     item.body[2] = "ground"
-    item.location = [a-ptf, 0, 0]
+    item.location = [a - ptf, 0, 0]
     item.forces = 1
     item.moments = 0
     item.axis = [0, 1, 0]
@@ -158,7 +158,7 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     item = flex_point("rear tire")
     item.body[1] = "rear wheel"
     item.body[2] = "ground"
-    item.location = [-b-ptr, 0, 0]
+    item.location = [-b - ptr, 0, 0]
     item.forces = 1
     item.moments = 0
     item.axis = [0, 1, 0]
@@ -169,8 +169,8 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     item = actuator("δ_f")
     item.body[1] = "front wheel"
     item.body[2] = "ground"
-    item.location[1] = [a-ptf, 0, 0]
-    item.location[2] = [a-ptf, 0.1, 0]
+    item.location[1] = [a - ptf, 0, 0]
+    item.location[2] = [a - ptf, 0.1, 0]
     item.gain = cf * π / 180 # degree to radian
     item.units = "°"
     add_item!(item, the_system)
@@ -179,21 +179,33 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     item = actuator("δ_r")
     item.body[1] = "rear wheel"
     item.body[2] = "ground"
-    item.location[1] = [-b-ptr, 0, 0]
-    item.location[2] = [-b-ptr, 0.1, 0]
+    item.location[1] = [-b - ptr, 0, 0]
+    item.location[2] = [-b - ptr, 0.1, 0]
     item.gain = cr * π / 180
     item.units = "°"
     #add_item!(item,the_system)
 
-    # constrain to planar motion
-    item = rigid_point("road")
-    item.body[1] = "chassis"
-    item.body[2] = "ground"
-    item.location = [0, 0, 0]
-    item.forces = 1
-    item.moments = 2
-    item.axis = [0, 0, 1]
-    add_item!(item, the_system)
+
+   # constrain bounce
+   item = rigid_point("bounce")
+   item.body[1] = "chassis"
+   item.body[2] = "ground"
+   item.location = [0, 0, 0]
+   item.forces = 1
+   item.moments = 0
+   item.axis = [0, 0, 1]
+   add_item!(item, the_system)
+
+   # constrain pitch
+   item = rigid_point("pitch")
+   item.body[1] = "chassis"
+   item.body[2] = "ground"
+   item.location = [0, 0, 0]
+   item.forces = 0
+   item.moments = 1
+   item.axis = [0, 1, 0]
+   add_item!(item, the_system)
+
 
     # constrain chassis in the forward direction
     # the left/right symmetry of the chassis tells us that the lateral and longitudinal motions are decoupled anyway
@@ -245,42 +257,11 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     item.units = "°"
     add_item!(item, the_system)
 
-    # measure the lateral acceleration in g
-    item = sensor("a_y")
-    item.body[1] = "chassis"
-    item.body[2] = "ground"
-    item.location[1] = [0, 0, 0]
-    item.location[2] = [0, 0.1, 0]
-    item.order = 3 # acceleration
-    item.gain = 1 / 9.81 # g
-    item.units = "ge"
-    add_item!(item, the_system)
-
-    # note that the y location will not reach steady state with constant delta input, so adding the sensor will give an error if the steady state gain is computed, but is included so that a time history can be computed
-    item = sensor("y")
-    item.body[1] = "chassis"
-    item.body[2] = "ground"
-    item.location[1] = [0, 0, 0]
-    item.location[2] = [0, 0.1, 0]
-    item.units = "m"
-    add_item!(item, the_system)
-
-    # also won't reach steady state with constant delta input
-    item = sensor("θ")
-    item.body[1] = "chassis"
-    item.body[2] = "ground"
-    item.location[1] = [0, 0, 0]
-    item.location[2] = [0, 0, 0.1]
-    item.twist = 1 # angular
-    item.gain = 180 / π
-    item.units = "°"
-    add_item!(item, the_system)
-
 
     # measure the front flex angle
     item = sensor("γ_f")
     item.body[1] = "front wheel"
-    item.body[2] = "chassis"
+    item.body[2] = "front axle"
     item.location[1] = [a, 0, 0]
     item.location[2] = [a, 0, 0.1]
     item.twist = true
@@ -292,7 +273,7 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     # measure the rear flex angle
     item = sensor("γ_r")
     item.body[1] = "rear wheel"
-    item.body[2] = "chassis"
+    item.body[2] = "rear axle"
     item.location[1] = [-b, 0, 0]
     item.location[2] = [-b, 0, 0.1]
     item.twist = true
@@ -330,6 +311,29 @@ function input_ex_yaw_plane_flex_roll_steer(; u = 10.0, a = 1.189, b = 2.885 - 1
     item.units = "°"
     add_item!(item, the_system)
 
+
+    item = sensor("ϕ")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0.1, 0, 0]
+    item.location[2] = [0, 0, 0]
+    item.twist = true
+    item.gain = 180 / π # radian to degree
+    item.units = "°"
+    add_item!(item, the_system)
+
+
+    # measure the steady state lat acc
+    item = sensor("ru")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 0]
+    item.location[2] = [0, 0, 0.1]
+    item.twist = 1 # angular
+    item.order = 2 # velocity
+    item.gain =  u / 9.81 # radian to degree
+    item.units = "ge"
+    add_item!(item, the_system)
 
     the_system
 

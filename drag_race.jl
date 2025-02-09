@@ -216,7 +216,7 @@ push!(plots, plot(t, [Zr Zf]; ylims=(0, Inf), xlabel, ylabel, label, lw, size))
 # pass all the results and plots, skip the Bode plots for now
 bode = :skip
 impulse = :skip
-summarize(system, result; plots, bode, impulse)
+summarize(system, result; plots, bode, impulse, format=:html)
 
 # using DelimitedFiles
 # writedlm(joinpath("output","data.txt"), [t y])

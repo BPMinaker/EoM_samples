@@ -36,10 +36,22 @@ output = run_eom!.(system)
 # do the eigenvalues, freq resp, etc, for each forward speed
 result = analyze.(output; freq=(-1, 1))
 
+# sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
+# write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
+ss = [1, 1, 1, 1, 0, 0, 1, 1]
+impulse = :skip
+bode = :skip
+#summarize(system, vpts, result; ss, impulse, bode)
+summarize(system, vpts, result; ss, impulse, bode, format=:html)
 
-# now, let's also do some time domain solutions; define the steer angle as a function of time
+# now, let's also do some time domain solutions; let's pick a speed of 50 mph, or 22.4 m/s, and get the equations of motion and the results for that speed
+u = 22.4
+n = findfirst(vpts .== u)
+system = system[n]
+system.name *= " $u m per s"
+result = result[n]
 
-# a sin w dwell input ala FMVSS 126
+#define the steer angle as a function of time, a sin w dwell input ala FMVSS 126
 # a 0.7 Hz sinewave with origin at t=2 times zero everywhere except times one from t=2 for 3/4 of a wavelength
 # plus a constant negative one for 0.5 seconds,starting right after the 3/4 wavelength
 # plus a 0.7 Hz sinewave with origin at t=2.5 times zero everywhere except times one for the last 1/4 of a wavelength
@@ -56,64 +68,50 @@ u_vec(_, t) = [steer(t)]
 t1 = 0
 t2 = 20
 
-# find which equations of motion are from when u=20, and use that to solve the time history
-u = 20
-n = findfirst(vpts .== u)
-yoft = ltisim(result[n].ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
-# find 1000 sub-intervals
-t = t1:(t2-t1)/1000:t2
-y = hcat(yoft.(t)...)'
-# merge vector of vectors into matrix, so we can pull out individual outputs to plot
-
-# Julia identifies every individual row of a matrix as a vector, so if we pull out just one row, it becomes a column
-# another notation conflict, y is system output, but also lateral displacement, use `y_dist` for lateral displacement
-r = y[:, 1]
-β = y[:, 2]
-α_u = y[:, 3]
-a_lat = y[:, 4]
-y_dist = y[:, 5]
-α_f = y[:, 7]
-α_r = y[:, 8]
-δ = steer.(t)
-# re-evaluate the steer angle so we can include it in the plots
-
-xlabel = "Time [s]"
-lw = 2 # thicker line weight
-size = (800, 400)
+# notation conflict, y is system output vector, but also lateral displacement
+# sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
 
 # plot yaw rate vs time
-ylabel = "Yaw rate [°/s], Steer angle [°]"
-label = ["Yaw rate r" "Steer angle δ"]
-plots = [plot(t, [r δ]; xlabel, ylabel, label, lw, size)]
+yidx = [1]
+label, ylabel = ltilabels(system; yidx)
+p1 = ltiplot(yoft; ylabel, label, yidx)
 
 # plot body slip angle vs time
-ylabel = "Body slip angle [°], Steer angle [°]"
-label = ["Body slip angle β" "Steer angle δ"]
-push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw, size))
+yidx = [2]
+label, ylabel = ltilabels(system; yidx)
+p2 = ltiplot(yoft; ylabel, label, yidx)
 
-# plot slip angles vs time
-ylabel = "Understeer angle [°], Steer angle [°]"
-label = ["Slip angle α_f" "Slip angle α_r" "Understeer angle α_u" "Steer angle δ"]
-push!(plots, plot(t, [α_f α_r α_u δ]; xlabel, ylabel, label, lw, size))
+# plot slip angles, understeer angle vs time
+yidx = [7, 8, 3]
+label, ylabel = ltilabels(system; yidx)
+p3 = ltiplot(yoft; ylabel, label, yidx)
 
 # plot lateral acceleration vs time
-ylabel = "Lateral acceleration [ge], Steer angle [°]"
-label = ["Lateral acceleration" "Steer angle δ"]
-push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
+yidx = [4]
+label, ylabel = ltilabels(system; yidx)
+p4 = ltiplot(yoft; ylabel, label, yidx)
 
 # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
 xlabel = "x [m]"
 ylabel = "y [m]"
 label = ""
-push!(plots, plot(u * t, y_dist; xlabel, ylabel, label, lw, size))
+lw = 2 # thicker line weight
+size = (800, 400)
+p5 = EoM.plot(u * yoft.t, yoft[5,:]; xlabel, ylabel, label, lw, size)
+
+plots = [p1, p2, p3, p4, p5]
 
 # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
-ss = [1, 1, 1, 1, 0, 0, 1, 1]
+ss = :skip
 impulse = :skip
 
-summarize(system, vpts, result; plots, ss, impulse)
-# summarize(system, vpts, result; plots, ss, impulse, format = :html)
+# summarize(system, result; plots, ss, impulse)
+summarize(system, result; plots, ss, impulse, format = :html)
+
+using EoM_X3D
+animate_modes(system, result)
 
 
 # generate over a huge range of speeds to find characteristic speed

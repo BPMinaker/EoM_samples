@@ -66,59 +66,43 @@ t2 = 20
 # solve the equation of motion with the closed loop driver model
 yoft = ltisim(result.ss_eqns, steer, (t1, t2))
 
-t = t1:(t2-t1)/1000:t2
-y = hcat(yoft.(t)...)'
-
-# go back and figure out what steer angle the driver model used, so we can plot it
-δ = steer_driver.(yy.(t), t)
-
-r = y[:, 1]
-β = y[:, 2]
-α_u = y[:, 3]
-a_lat = y[:, 4]
-y_dist = y[:, 5]
-α_f = y[:, 7]
-α_r = y[:, 8]
-
-xlabel = "Time [s]"
-lw = 2 # thicker line weight
-size = (800, 400)
+# notation conflict, y is system output vector, but also lateral displacement
+# sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
 
 # plot yaw rate vs time
-ylabel = "Yaw rate [°/s], Steer angle [°]"
-label = ["Yaw rate r" "Steer angle δ"]
-plots = [plot(t, [r δ]; xlabel, ylabel, label, lw, size)]
+yidx = [1]
+label, ylabel = ltilabels(system[1]; yidx)
+plots = [ltiplot(yoft; ylabel, label, yidx)]
 
 # plot body slip angle vs time
-ylabel = "Body slip angle [°], Steer angle [°]"
-label = ["Body slip angle β" "Steer angle δ"]
-push!(plots, plot(t, [β δ]; xlabel, ylabel, label, lw, size))
+yidx = [2]
+label, ylabel = ltilabels(system[1]; yidx)
+push!(plots, ltiplot(yoft; ylabel, label, yidx))
 
-# # plot understeer angle vs time
-# ylabel = "Understeer angle [deg], Steer angle [deg]"
-# label = ["Understeer angle α_u" "Steer angle δ"]
-# push!(plots, plot(t, [α_u δ]; xlabel, ylabel, label, lw, size))
-
-# plot slip angles vs time
-ylabel = "Understeer angle [°], Steer angle [°]"
-label = ["Slip angle α_f" "Slip angle α_r" "Understeer angle α_u" "Steer angle δ"]
-push!(plots, plot(t, [α_f α_r α_u δ]; xlabel, ylabel, label, lw, size))
+# plot slip angles, understeer angle vs time
+yidx = [7, 8, 3]
+label, ylabel = ltilabels(system[1]; yidx)
+push!(plots, ltiplot(yoft; ylabel, label, yidx))
 
 # plot lateral acceleration vs time
-ylabel = "Lateral acceleration [ge], Steer angle [°]"
-label = ["Lateral acceleration" "Steer angle δ"]
-push!(plots, plot(t, [a_lat δ]; xlabel, ylabel, label, lw, size))
+yidx = [4]
+label, ylabel = ltilabels(system[1]; yidx)
+push!(plots, ltiplot(yoft; ylabel, label, yidx))
 
 # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
 xlabel = "x [m]"
 ylabel = "y [m]"
-label = ["y" " target y"]
-push!(plots, plot(u * t, [y_dist first.(track.(u * t))]; xlabel, ylabel, label, lw, size))
+label = ""
+lw = 2 # thicker line weight
+size = (800, 400)
+push!(plots, ltiplot(u * yoft.t, yoft[5,:]; xlabel, ylabel, label, lw, size))
 
-# write all the stuff to the output; skip steady state, Bode plots
-ss = :skip
-bode = :skip
-summarize(system, result; plots, ss, bode)
+# write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
+ss = [1, 1, 1, 1, 0, 0, 1, 1]
+impulse = :skip
+
+summarize(system, vpts, result; plots, ss, impulse)
+# summarize(system, vpts, result; plots, ss, impulse, format = :html)
 
 end
 

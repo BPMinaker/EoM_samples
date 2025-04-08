@@ -16,7 +16,6 @@ ss = :skip
 impulse = :skip
 summarize(system, vpts, result; ss, impulse)
 
-println("Done.")
-
 end
 
+println("Done.")

@@ -63,6 +63,7 @@ function input_ex_bounce_pitch(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000
     item.location[1] = [0, 0, 0.25]
     item.location[2] = [0, 0, 0]
     item.units = "m"
+    item.desc = "Bounce of mass center"
     add_item!(item, the_system)
 
     item = sensor("θ(a+b)")
@@ -73,6 +74,7 @@ function input_ex_bounce_pitch(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000
     item.twist = 1
     item.gain = a + b
     item.units = "m"
+    item.desc = "Pitch angle"
     add_item!(item, the_system)
 
     item = sensor("z_P")
@@ -81,6 +83,27 @@ function input_ex_bounce_pitch(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000
     item.location[1] = [a / 2, 0, 0.25]
     item.location[2] = [a / 2, 0, 0]
     item.units = "m"
+    item.desc = "Bounce of passenger"
+    add_item!(item, the_system)
+
+    item = sensor("z_f")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [a, 0, 0.25]
+    item.location[2] = [a, 0, 0]
+    item.actuator = "u_f"
+    item.units = "m"
+    item.desc = "Front suspension travel"
+    add_item!(item, the_system)
+
+    item = sensor("z_r")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [-b, 0, 0.25]
+    item.location[2] = [-b, 0, 0]
+    item.actuator = "u_r"
+    item.units = "m"
+    item.desc = "Rear suspension travel"
     add_item!(item, the_system)
 
     # Force the bounce and pitch
@@ -92,6 +115,7 @@ function input_ex_bounce_pitch(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000
     item.gain = kf
     item.rate_gain = cf
     item.units = "m"
+    item.desc = "Front ground displacement"
     add_item!(item, the_system)
 
     item = actuator("u_r")
@@ -102,6 +126,7 @@ function input_ex_bounce_pitch(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000
     item.gain = kr
     item.rate_gain = cr
     item.units = "m"
+    item.desc = "Rear ground displacement"
     add_item!(item, the_system)
 
     the_system

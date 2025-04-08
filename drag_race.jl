@@ -193,25 +193,29 @@ else
 end
 
 # set plot text, etc
-xlabel = "Time [s]"
-ylabel = "Distance [m]"
 label = ""
-lw = 2 # thicker plot lineweight
-size = (800, 400)
+
+# don't include any of the inputs in the plots
+uidx = [0]
 
 # make the first plot and save it in a vector
-plots = [plot(t, x; xlabel, ylabel, label, lw, size)]
+# we can just choose output number one, which is the distance
+yidx = [1]
+ylabel = "Distance [m]"
+plots = [ltiplot(yoft; ylabel, label, yidx, uidx)]
 
 # update label, make the next plot, and push it onto the plot vector
+# we can't just choose output number two, which is the velocity, because we want new units
+yidx = [0]
 ylabel = "Velocity [km/h]"
-push!(plots, plot(t, u; xlabel, ylabel, label, lw, size))
+push!(plots, ltiplot(yoft, u; ylabel, label, yidx, uidx))
 
 ylabel = "Accl'n [g]"
-push!(plots, plot(t, aG; ylims=(0, Inf), xlabel, ylabel, label, lw, size))
+push!(plots, ltiplot(yoft, aG; ylims=(0, Inf), ylabel, label, yidx, uidx))
 
 label = ["Z_r [kN]" "Z_f [kN]"]
 ylabel = "Axle vertical load [N]"
-push!(plots, plot(t, [Zr Zf]; ylims=(0, Inf), xlabel, ylabel, label, lw, size))
+push!(plots, ltiplot(yoft, [Zr Zf]; ylims=(0, Inf), ylabel, label, yidx, uidx))
 
 # pass all the results and plots, skip the Bode plots for now
 bode = :skip

@@ -270,6 +270,7 @@ function input_full_car_rc(; kwargs...)
     item.location[1] = [a, tf / 2, 0]
     item.location[2] = [a, tf / 2 - 0.1, 0]
     item.units = "N"
+    item.desc = "Tire lateral force"
     add_item!(item, the_system)
 
     item = actuator("Y_lr")
@@ -278,6 +279,7 @@ function input_full_car_rc(; kwargs...)
     item.location[1] = [-b, tr / 2, 0]
     item.location[2] = [-b, tr / 2 - 0.1, 0]
     item.units = "N"
+    item.desc = "Tire lateral force"
     add_item!(item, the_system)
 
     # tire measure vertical force
@@ -288,6 +290,7 @@ function input_full_car_rc(; kwargs...)
     item.location[1] = [a, tf / 2, 0.1]
     item.location[2] = [a, tf / 2, 0]
     item.units = "N"
+    item.desc = "Tire vertical force"
     add_item!(item, the_system)
 
     item = sensor("Z_lr")
@@ -297,6 +300,7 @@ function input_full_car_rc(; kwargs...)
     item.location[1] = [-b, tr / 2, 0.1]
     item.location[2] = [-b, tr / 2, 0]
     item.units = "N"
+    item.desc = "Tire vertical force"
     add_item!(item, the_system)
 
     # tire, measure slip angle
@@ -309,6 +313,7 @@ function input_full_car_rc(; kwargs...)
     item.frame = 0
     item.gain = 1 / u
     item.units = "rad"
+    item.desc = "Tire slip angle"
     add_item!(item, the_system)
 
     item = sensor("α_lr")
@@ -320,6 +325,7 @@ function input_full_car_rc(; kwargs...)
     item.frame = 0
     item.gain = 1 / u
     item.units = "rad"
+    item.desc = "Tire slip angle"
     add_item!(item, the_system)
 
     mirror!(the_system) # note that the mirror can't go any further without adressing the change in the location in the sequence of items in the main file
@@ -334,6 +340,7 @@ function input_full_car_rc(; kwargs...)
     item.order = 2
     item.gain = 180 / pi
     item.units = "°/s"
+    item.desc = "Yaw rate"
     add_item!(item, the_system)
 
     # measure the bounce, pitch, and roll
@@ -345,6 +352,7 @@ function input_full_car_rc(; kwargs...)
     item.location[2] = [0, 0, 0]
     item.gain = 1000
     item.units = "mm"
+    item.desc = "Vertical displacement"
     add_item!(item, the_system)
 
     #11
@@ -356,6 +364,7 @@ function input_full_car_rc(; kwargs...)
     item.gain = 180 / pi
     item.twist = 1
     item.units = "°"
+    item.desc = "Roll angle"
     add_item!(item, the_system)
 
     #12
@@ -367,6 +376,7 @@ function input_full_car_rc(; kwargs...)
     item.gain = 180 / pi
     item.twist = 1
     item.units = "°"
+    item.desc = "Pitch angle"
     add_item!(item, the_system)
 
     #13
@@ -379,6 +389,7 @@ function input_full_car_rc(; kwargs...)
     item.frame = 0 # local frame
     item.gain = 180 / pi / u # radian to degree
     item.units = "°"
+    item.desc = "Slip angle"
     add_item!(item, the_system)
 
     #14
@@ -390,6 +401,8 @@ function input_full_car_rc(; kwargs...)
     item.twist = 1 # angular
     item.order = 2 # velocity
     item.gain = -180 * (a + b) / π / u # radian to degree
+    item.units = "°"
+    item.desc = "Understeer term"
     add_item!(item, the_system)
 
     #15
@@ -402,6 +415,7 @@ function input_full_car_rc(; kwargs...)
     item.order = 2 # velocity
     item.twist = 1
     item.units = "m/s/s"
+    item.desc = "Lateral acceleration (steady state)"
     add_item!(item, the_system)
 
     the_system

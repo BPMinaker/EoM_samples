@@ -80,7 +80,11 @@ println("Computing time history...")
 
 # we choose an excitation frequency that's very close to the natural frequency, to excite resonance (note that we can use Greek characters in Julia; e.g., you can get an ω using \omega)
 
-ω = 0.95 * minimum(abs.(result.e_val))
+ω_n = result.omega_n[1]
+if ω_n == 0
+    ω_n = minimum(abs.(result.e_val))
+end
+ω = 0.95 * ω_n * 2π
 
 # and define a force function that's a sinewave at that frequency
 
@@ -99,47 +103,28 @@ t2 = 20
 
 yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
-# note that `ltisim()' returns yoft as a function handle, i.e., we can choose any time t in the interval and find yoft(t), so let's choose a range and evaluate; we use the dot operator on the vector of time values, i.e., the . before the ( tells Julia that we are taking a function that expects a scalar, and calling it on each element of a vector, and we're stacking the results together in a vector;
+# note that `ltisim()' returns yoft as a function handle, i.e., we can choose any time t in the interval and find yoft(t)
 
-t = t1:(t2-t1)/1000:t2
-y_vec = yoft.(t)
+# our result is the displacement, the spring force, the damping force, and the inertial force; 
 
-# note that unlike Matlab, Julia makes a distinction between a vector of vectors and a matrix; we can acess a vector of vectors like so: a[2][3] to the get third entry in the second vector, where for a matrix a[2,3] gives the entry in the second row, third column; y_vec is a vector of vectors, i.e., the output vector at 1001 points over the timespan; the `hcat()' function converts a vector of vectors to a matrix, so y is a matrix; the ... is the syntax to ask for all the entries in a vector, and the apostrophe ' is the transpose operator, so our data ends up in columns instead of rows
-
-y = hcat(y_vec...)'
-
-# our result is the displacement, the spring force, the damping force, and the inertial force; we get the applied force by recomputing the input function, so we can plot them together; the `sin(ω * t)` function is evaluated for each entry in the `t` vector;
-
-f = foft.(t)
 println("Plotting...")
 
-# here there are some keyword arguments for the labels, etc.
+# we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, spring force, the damping force, the inertial force, and applied force, here there are some keyword arguments for the labels, etc.
 
-xlabel = "Time [s]"
-ylabel = "z [m], kz [N], czdot [N], mzddot [N], f [N]"
-label = ["z" "kz" "czdot" "mzddot" "f"]
-lw = 2
-size = (800, 400)
-
-# we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, spring force, and applied force, which are all packed back into a matrix
-
-p1 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
+label, ylabel = ltilabels(system)
+p1 = ltiplot(yoft; ylabel, label)
 
 # the plot is created and stored but not shown, we could send it to the screen using: display(p1); this plot would show up in a tab in VS Code or in a web browser tab
 
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `foft()` is defined as a function of `ω` so all we have to do is update `ω`, and `foft()` will update as well
 
-ω = 0.5 * minimum(abs.(result.e_val))
+ω = 0.5 * ω_n
 yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
-y = hcat(yoft.(t)...)'
-f = foft.(t)
-p2 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
+p2 = ltiplot(yoft; ylabel, label)
 
-ω = 2 * minimum(abs.(result.e_val))
+ω = 2 * ω_n
 yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
-y = hcat(yoft.(t)...)'
-f = foft.(t)
-p3 = plot(t, [y f]; xlabel, ylabel, label, lw, size)
+p3 = ltiplot(yoft; ylabel, label)
 
 # now let's display all out results, along with the extra plots
 

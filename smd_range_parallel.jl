@@ -60,6 +60,8 @@ end
     result = analyze.(output)    
 end
 
-
+@time begin
+    result = vpts .|> (x -> input_ex_smd(; k, m, c=x)) .|> run_eom! .|> analyze
+end
 
 println("Done.")

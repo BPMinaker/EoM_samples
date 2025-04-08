@@ -5,6 +5,7 @@ using EoM
 include(joinpath("models", "input_full_car_a_arm_pushrod.jl"))
 include(joinpath("models", "susp.jl"))
 include(joinpath("models", "tire.jl"))
+include(joinpath("models", "drive.jl"))
 
 # here you can enter your vehicle specs by name, and set the speed
 a = 2.65 * 0.58
@@ -32,16 +33,14 @@ output = run_eom!(system)
 result = analyze(output)
 
 zofxl, zofxr = random_road(class=5, dz=0.2)
-u_vec(_, t) = [zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a - b)]
+u_vec(_, t) = [0, 0, zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a - b)]
 
 println("Solving time history...")
 t1 = 0
 t2 = 20
-yy = ltisim(result.ss_eqns, u_vec, (t1, t2))
-t = t1:(t2-t1)/1000:t2
-y = hcat(yy.(t)...)
+y = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
-animate_history(system, t, y)
+animate_history(system, y.t, y)
 
 end
 

@@ -13,18 +13,14 @@ t1 = 0
 t2 = 20
 yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
-t = t1:(t2-t1)/1000:t2
-y = hcat(yoft.(t)...)'
-f = hcat(u_vec.(0, t)...)'
-
-xlabel = "Time [s]"
-ylabel = "x [m], y [m], ψ [rad]"
-label = ["x" "y" "ψ" "X" "Y" "N"]
-lw = 2
-size = (800, 400)
-
-plots = [plot(t, [y f]; xlabel, ylabel, label, lw, size)]
+label, ylabel = ltilabels(system)
+plots = [ltiplot(yoft; ylabel, label)]
 summarize(system, result; plots)
+
+
+
+gfjgjh()
+
 
 # summarize(system, result; plots, format = :html)
 # animate_modes(system, result)
@@ -35,10 +31,9 @@ sensors_animate!(system)
 output = run_eom!(system)
 result = analyze(output)
 
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
-y = hcat(yy.(t)...)
+y = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
-animate_history(system, t, y)
+animate_history(system, y.t, y)
 =#
 
 

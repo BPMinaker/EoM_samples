@@ -37,9 +37,7 @@ t1 = 0
 t2 = 20
 yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
-t = t1:(t2-t1)/1000:t2
-y = hcat(yoft.(t)...)
-animate_history(system, t, y)
+animate_history(system, yoft.t, yoft[:,:])
 
 end
 

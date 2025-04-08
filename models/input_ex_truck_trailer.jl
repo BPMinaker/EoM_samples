@@ -110,6 +110,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.location[2] = [a, 0.1, 0]
     item.gain = cf * π / 180
     item.units = "°"
+    item.desc = "Steer angle"
     add_item!(item, the_system)
 
     # measure the yaw rate
@@ -122,6 +123,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.order = 2 # velocity
     item.gain = 180 / π # radian to degree
     item.units = "°/s"
+    item.desc = "Yaw rate"
     add_item!(item, the_system)
 
     item = sensor("β")
@@ -133,6 +135,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.frame = 0 # local frame
     item.gain = 180 / π / u # radian to degree
     item.units = "°"
+    item.desc = "Body slip angle"
     add_item!(item, the_system)
 
     # measure the understeer angle
@@ -147,6 +150,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.actuator = "δ_f"
     item.actuator_gain = 1 # input is already in degrees
     item.units = "°"
+    item.desc = "Understeer angle"
     add_item!(item, the_system)
 
     item = sensor("γ")
@@ -157,6 +161,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.twist = 1 # angular
     item.gain = 180 / π # radian to degree
     item.units = "°"
+    item.desc = "Trailer sway angle"
     add_item!(item, the_system)
 
     # measure the lateral acceleration in g
@@ -168,6 +173,7 @@ function input_ex_truck_trailer(; u = 10, a = 1.289, b = 2.885 - 1.289, cf = 800
     item.order = 3 # acceleration
     item.gain = 1 / 9.81 # g
     item.units = "ge"
+    item.desc = "Lateral accel'n"
     add_item!(item, the_system)
 
     the_system

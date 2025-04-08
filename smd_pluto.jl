@@ -1,24 +1,26 @@
 ### A Pluto.jl notebook ###
-# v0.19.46
+# v0.20.4
 
 using Markdown
 using InteractiveUtils
 
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
+    #! format: off
     quote
         local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
+    #! format: on
 end
 
 # ╔═╡ 4e3bf4a1-c665-46b1-9bbf-247d494ba38a
 import Pkg
 
 # ╔═╡ 315e931b-e2b0-4b32-9569-cd998fee1892
-Pkg.activate(".")
+Pkg.activate()
 
 # ╔═╡ f9d604c6-39c6-4328-97c7-83ac16f2baa9
 using PlutoUI
@@ -120,13 +122,13 @@ md"""
 """
 
 # ╔═╡ e179ea4b-96d2-40fc-afef-52946e60228f
-plot(real(result.e_val), imag(result.e_val); seriestype = :scatter, aspect_ratio = :equal, xlim = (-100, 10), xlabel = "Real part [rad/s]", ylabel = "Imaginary part [rad/s]", label ="")
+EoM.plot(real(result.e_val), imag(result.e_val); seriestype = :scatter, aspect_ratio = :equal, xlim = (-100, 10), xlabel = "Real part [rad/s]", ylabel = "Imaginary part [rad/s]", label ="")
 
 # ╔═╡ 0e6e017c-b309-46b4-9f2a-f97f01ee5871
-plot(result.w / 2pi, hcat(result.mag...)'[:,2]; xscale = :log10, xlim=(0.01,120), ylim=(-40,40), xticks=[0.01,0.1,1,10,100], xlabel = "Frequency [Hz]", ylabel = "Gain [dB]", label = "")
+EoM.plot(result.w / 2pi, hcat(result.mag...)'[:,2]; xscale = :log10, xlim=(0.01,120), ylim=(-40,40), xticks=[0.01,0.1,1,10,100], xlabel="Frequency [Hz]", ylabel="Gain [dB]", label="", lw=2)
 
 # ╔═╡ cabcd154-bbfb-40b4-838b-d3949c4ef4cb
-plot(result.w / 2pi, hcat(result.phase...)'[:,2]; xscale = :log10, xlim=(0.01,120), ylim=(-360,0), xticks=[0.01,0.1,1,10,100], xlabel = "Frequency [Hz]", ylabel = "Phase [degree]", label = "")
+EoM.plot(result.w / 2pi, hcat(result.phase...)'[:,2]; xscale = :log10, xlim=(0.01,120), ylim=(-360,180), xticks=[0.01,0.1,1,10,100], xlabel="Frequency [Hz]", ylabel="Phase [degree]", label="", lw=2)
 
 # ╔═╡ 5cfb9bab-9d86-4f99-b895-776fedaa0bb9
 p = Polynomial([k, c, m])
@@ -138,7 +140,7 @@ s = -100:0.05:10
 p.(s)
 
 # ╔═╡ 6dde2c3c-e59a-4ac5-8bef-cb9f3155af7b
-plot(s, p.(s); xlim=(-110,20), ylim=(-3000,1500), xlabel = "s [rad/s]", ylabel = "p(s) [N/m]", label="")
+EoM.plot(s, p.(s); xlim=(-110,20), ylim=(-3000,1500), xlabel = "s [rad/s]", ylabel = "p(s) [N/m]", label="", lw=2)
 
 # ╔═╡ fd1fc207-ff51-4872-a426-895445568917
 md"""
@@ -179,20 +181,6 @@ md"""
 # ╠═╡ show_logs = false
 yoft = ltisim(result.ss_eqns, u_vec, (t1, t2)); nothing
 
-# ╔═╡ 6f167dc2-967d-493a-93e3-f47976663796
-md"""
-### Evaluate the solution at 1001 points in the interval
-"""
-
-# ╔═╡ 5b43e131-2123-492e-bd38-348add5ae3ab
-t = t1:(t2-t1)/1000:t2
-
-# ╔═╡ 7babe13b-b5b8-462c-8592-a1411fff3618
-y = hcat(yoft.(t)...)'
-
-# ╔═╡ be639309-74b0-4100-862a-8e6b3ad7e406
-f = foft.(t);
-
 # ╔═╡ 11157422-fe89-4d54-b4ac-13c10ec6e2b0
 md"""
 ### Set some properties of the graph, and plot the time history
@@ -200,14 +188,11 @@ md"""
 
 # ╔═╡ 454fd4ad-b6b7-4fb1-967e-d02f9212818a
 begin 
-    xlabel = "Time [s]"
-    ylabel = "z [m], kz [N], mzddot [N], f [N]"
-    label = ["z" "kz" "mzddot" "f"]
-    lw = 2    
+	label, ylabel = ltilabels(system) 
 end
 
 # ╔═╡ 6f5b743f-b13a-4a03-b9e9-b8e149dd7b9d
-plot(t, [y f]; xlabel, ylabel, label, lw)
+ltiplot(yoft; ylabel, label, size=(600,400))
 
 # ╔═╡ Cell order:
 # ╠═abed96dc-b6a8-41ba-a6a8-712e9f5479f7
@@ -255,10 +240,6 @@ plot(t, [y f]; xlabel, ylabel, label, lw)
 # ╠═4316a8b3-2830-4231-912d-ce5c5e5a2de1
 # ╠═89ca8332-df5f-4e50-83b8-57d0c171a5ed
 # ╠═520bc495-8596-4516-82a1-2ca35ec68da3
-# ╠═6f167dc2-967d-493a-93e3-f47976663796
-# ╠═5b43e131-2123-492e-bd38-348add5ae3ab
-# ╠═7babe13b-b5b8-462c-8592-a1411fff3618
-# ╠═be639309-74b0-4100-862a-8e6b3ad7e406
 # ╠═11157422-fe89-4d54-b4ac-13c10ec6e2b0
 # ╠═454fd4ad-b6b7-4fb1-967e-d02f9212818a
 # ╠═6f5b743f-b13a-4a03-b9e9-b8e149dd7b9d

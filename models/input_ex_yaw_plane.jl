@@ -47,26 +47,6 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.damping = [cr / u, 0]
     add_item!(item, the_system)
 
-    # add an actuator to apply the steering force
-    item = actuator("δ_f")
-    item.body[1] = "chassis"
-    item.body[2] = "ground"
-    item.location[1] = [a - ptf, 0, 0]
-    item.location[2] = [a - ptf, 0.1, 0]
-    item.gain = cf * π / 180 # degree to radian
-    item.units = "°"
-    add_item!(item, the_system)
-
-    # rear wheel steer, off by default
-    item = actuator("δ_r")
-    item.body[1] = "chassis"
-    item.body[2] = "ground"
-    item.location[1] = [-b - ptr, 0, 0]
-    item.location[2] = [-b - ptr, -0.1, 0]
-    item.gain = cr * π / 180
-    item.units = "°"
-    #add_item!(item,the_system)
-
     # constrain to planar motion
     item = rigid_point("road")
     item.body[1] = "chassis"
@@ -89,6 +69,28 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.axis = [1, 0, 0]
     add_item!(item, the_system)
 
+    # add an actuator to apply the steering force
+    item = actuator("δ_f")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [a - ptf, 0, 0]
+    item.location[2] = [a - ptf, 0.1, 0]
+    item.gain = cf * π / 180 # degree to radian
+    item.units = "°"
+    item.desc = "Steer angle"
+    add_item!(item, the_system)
+
+    # rear wheel steer, off by default
+    item = actuator("δ_r")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [-b - ptr, 0, 0]
+    item.location[2] = [-b - ptr, -0.1, 0]
+    item.gain = cr * π / 180
+    item.units = "°"
+    item.desc = "Rear steer angle"
+    #add_item!(item,the_system)
+
     # measure the yaw rate
     item = sensor("r")
     item.body[1] = "chassis"
@@ -99,6 +101,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.order = 2 # velocity
     item.gain = 180 / π # radian to degree
     item.units = "°/s"
+    item.desc = "Yaw rate"
     add_item!(item, the_system)
 
     # measure the body slip angle
@@ -111,6 +114,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.frame = 0 # local frame
     item.gain = 180 / π / u # radian to degree
     item.units = "°"
+    item.desc = "Body slip angle"
     add_item!(item, the_system)
 
     # measure the understeer angle
@@ -125,6 +129,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.actuator = "δ_f"
     item.actuator_gain = 1 # input is already in degrees
     item.units = "°"
+    item.desc = "Understeer angle"
     add_item!(item, the_system)
 
     # measure the lateral acceleration in g
@@ -136,6 +141,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.order = 3 # acceleration
     item.gain = 1 / 9.81 # g
     item.units = "ge"
+    item.desc = "Lateral acceleration"
     add_item!(item, the_system)
 
     # note that the y location will not reach steady state with constant delta input, so adding the sensor will give an error if the steady state gain is computed, but is included so that a time history can be computed
@@ -145,6 +151,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.location[1] = [0, 0, 0]
     item.location[2] = [0, 0.1, 0]
     item.units = "m"
+    item.desc = "Lateral position"
     add_item!(item, the_system)
 
     # also won't reach steady state with constant delta input
@@ -156,8 +163,8 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.twist = 1 # angular
     item.gain = 180 / π
     item.units = "°"
+    item.desc = "Yaw angle"
     add_item!(item, the_system)
-
 
     # measure the front slip angle
     item = sensor("α_f")
@@ -171,8 +178,8 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.actuator = "δ_f"
     item.actuator_gain = -1 # input is already in degrees
     item.units = "°"
+    item.desc = "Front slip angle"
     add_item!(item, the_system)
-
 
     # measure the rear slip angle
     item = sensor("α_r")
@@ -186,6 +193,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
 #    item.actuator = "δ_r"
 #    item.actuator_gain = -1 # input is already in degrees
     item.units = "°"
+    item.desc = "Rear slip angle"
     add_item!(item, the_system)
 
     the_system

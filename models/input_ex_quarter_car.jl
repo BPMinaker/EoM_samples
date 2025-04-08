@@ -63,41 +63,45 @@ function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs =
     add_item!(item, the_system)
 
     # Add external force between unsprung mass and ground (represents ground motion)
-    item = actuator("z_0")
+    item = actuator("z_g")
     item.body[1] = "unsprung"
     item.body[2] = "ground"
     item.gain = kt
     item.location[1] = [0.05, 0, 0.3]
     item.location[2] = [0.05, 0, 0]
     item.units = "m"
+    item.desc = "Ground profile"
     add_item!(item, the_system)
 
     # Add measure between ground and sprung mass
-    item = sensor("z_1")
+    item = sensor("z_s")
     item.body[1] = "sprung"
     item.body[2] = "ground"
     item.location[1] = [0, 0.05, 0.6]
     item.location[2] = [0, 0.05, 0]
     item.units = "m"
+    item.desc = "Sprung mass motion"
     add_item!(item, the_system)
 
     # Add measure between sprung mass and unsprung mass
-    item = sensor("z_1-z_2")
+    item = sensor("z_s-z_u")
     item.body[1] = "unsprung"
     item.body[2] = "sprung"
     item.location[1] = [0.1, 0, 0.3]
     item.location[2] = [0.1, 0, 0.6]
     item.units = "m"
+    item.desc = "Suspension travel"
     add_item!(item, the_system)
 
     # Add measure between ground and unsprung mass
-    item = sensor("z_2-z_0")
+    item = sensor("z_u-z_g")
     item.body[1] = "unsprung"
     item.body[2] = "ground"
-    item.actuator = "z_0"
+    item.actuator = "z_g"
     item.location[1] = [0.1, 0, 0.3]
     item.location[2] = [0.1, 0, 0]
     item.units = "m"
+    item.desc = "Tire compression"
     add_item!(item, the_system)
 
     the_system

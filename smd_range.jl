@@ -31,13 +31,13 @@ xlabel = "s [rad/s]"
 ylabel = "p(s) [N/m]"
 size = (800, 400)
 lw = 2
-p1 = plot(; xlabel, ylabel, size)
+p1 = EoM.plot(; xlabel, ylabel, size)
 
 s = -20:25/150:5
 for i in vpts[1:15:end]
     label = "c = $(my_round(i))"
     p = Polynomial([k, i, m])
-    plot!(p1, s, p.(s); label, lw)
+    EoM.plot!(p1, s, p.(s); label, lw)
 end
 plots = [p1]
 

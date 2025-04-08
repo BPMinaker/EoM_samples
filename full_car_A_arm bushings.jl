@@ -88,11 +88,9 @@ u_vec(_, t) = [zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a
 println("Solving time history...")
 t1 = 0
 t2 = 20
-yy = ltisim(result.ss_eqns, u_vec, (t1, t2))
-t = t1:(t2-t1)/1000:t2
-y = hcat(yy.(t)...)
+y = ltisim(result.ss_eqns, u_vec, (t1, t2))
 
-animate_history(system, t, y)
+animate_history(system, y.t, y)
 
 =#
 

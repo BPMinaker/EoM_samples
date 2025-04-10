@@ -115,6 +115,7 @@ label, ylabel = ltilabels(system)
 p1 = ltiplot(yoft; ylabel, label)
 
 # the plot is created and stored but not shown, we could send it to the screen using: display(p1); this plot would show up in a tab in VS Code or in a web browser tab
+# or we can add it to a vector of plots, and send it to the `summarize()` function
 
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `foft()` is defined as a function of `ω` so all we have to do is update `ω`, and `foft()` will update as well
 

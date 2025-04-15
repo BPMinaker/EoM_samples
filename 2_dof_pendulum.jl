@@ -8,7 +8,7 @@ system = input_ex_pendulum_2()
 output = run_eom!(system)
 result = analyze(output)
 
-summarize(system, result, format=:html)
+summarize(system, result)
 
 # using EoM_X3D
 # animate_modes(system, result)

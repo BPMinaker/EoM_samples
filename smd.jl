@@ -119,11 +119,11 @@ p1 = ltiplot(yoft; ylabel, label)
 
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `foft()` is defined as a function of `ω` so all we have to do is update `ω`, and `foft()` will update as well
 
-ω = 0.5 * ω_n
+ω = 0.5 * ω_n * 2π
 yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 p2 = ltiplot(yoft; ylabel, label)
 
-ω = 2 * ω_n
+ω = 2 * ω_n * 2π
 yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
 p3 = ltiplot(yoft; ylabel, label)
 

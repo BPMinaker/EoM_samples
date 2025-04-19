@@ -19,7 +19,7 @@ format = :screen
 
 system = input_full_car_a_arm_pushrod(; u, a, b, tw, r)
 output = run_eom!(system)
-result = analyze(output)
+result = analyze(output, freq=(-1, 2))
 
 impulse = :skip
 summarize(system, result; impulse, format)

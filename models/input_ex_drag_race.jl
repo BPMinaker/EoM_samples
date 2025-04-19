@@ -50,6 +50,7 @@ function input_ex_drag_race(; re = 0.3, a = 1.2, b = 1.4, h_G = 0.5, kf = 35000,
     item.location[1] = [0, 0, h_G]
     item.location[2] = [-0.1, 0, h_G]
     item.units = "m"
+    item.desc = "Distance"
     add_item!(item, the_system)
 
     item = sensor("u_G")
@@ -59,6 +60,7 @@ function input_ex_drag_race(; re = 0.3, a = 1.2, b = 1.4, h_G = 0.5, kf = 35000,
     item.location[2] = [-0.1, 0, h_G]
     item.order = 2
     item.units = "m/s"
+    item.desc = "Velocity"
     add_item!(item, the_system)
 
     item = sensor("udot_G")
@@ -68,6 +70,7 @@ function input_ex_drag_race(; re = 0.3, a = 1.2, b = 1.4, h_G = 0.5, kf = 35000,
     item.location[2] = [-0.1, 0, h_G]
     item.order = 3
     item.units = "m/s/s"
+    item.desc = "Acceleration"
     add_item!(item, the_system)
 
     item = sensor("Zs_r")
@@ -77,6 +80,7 @@ function input_ex_drag_race(; re = 0.3, a = 1.2, b = 1.4, h_G = 0.5, kf = 35000,
     item.location[2] = [-b, 0, 0]
     item.gain = kr
     item.units = "N"
+    item.desc = "Rear spring force"
     add_item!(item, the_system)
 
     item = sensor("Zd_r")
@@ -87,6 +91,7 @@ function input_ex_drag_race(; re = 0.3, a = 1.2, b = 1.4, h_G = 0.5, kf = 35000,
     item.gain = cr
     item.order = 2
     item.units = "N"
+    item.desc = "Rear damper force"
     add_item!(item, the_system)
 
     item = sensor("Zs_f")
@@ -96,6 +101,7 @@ function input_ex_drag_race(; re = 0.3, a = 1.2, b = 1.4, h_G = 0.5, kf = 35000,
     item.location[2] = [a, 0, 0]
     item.gain = kf
     item.units = "N"
+    item.desc = "Front spring force"
     add_item!(item, the_system)
 
     item = sensor("Zd_f")
@@ -106,8 +112,8 @@ function input_ex_drag_race(; re = 0.3, a = 1.2, b = 1.4, h_G = 0.5, kf = 35000,
     item.gain = cf
     item.order = 2
     item.units = "N"
+    item.desc = "Front damper force"
     add_item!(item, the_system)
-
 
     # inputs
     item = actuator("X_a")
@@ -116,6 +122,7 @@ function input_ex_drag_race(; re = 0.3, a = 1.2, b = 1.4, h_G = 0.5, kf = 35000,
     item.location[1] = [0, 0, h_G]
     item.location[2] = [0.1, 0, h_G]
     item.units = "N"
+    item.desc = "Aero drag force"
     add_item!(item, the_system)
 
     item = actuator("X_t")
@@ -124,6 +131,7 @@ function input_ex_drag_race(; re = 0.3, a = 1.2, b = 1.4, h_G = 0.5, kf = 35000,
     item.location[1] = [0, 0, 0]
     item.location[2] = [-0.1, 0, 0]
     item.units = "N"
+    item.desc = "Traction force"
     add_item!(item, the_system)
 
     the_system

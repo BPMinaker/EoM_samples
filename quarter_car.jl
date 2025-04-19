@@ -11,6 +11,9 @@ kt = 150000
 ks = 18000
 cs = 500
 
+format = :screen
+# format = :html
+
 verbose = true
 system = input_ex_quarter_car(; ms, mu, kt, ks, cs)
 output = run_eom!(system, verbose)
@@ -46,13 +49,11 @@ p3 = ltiplot(yoft; ylabel, label, yidx)
 plots = [p1, p2, p3]
 
 impulse = :skip
-#summarize(system, result; plots, impulse)
-summarize(system, result; plots, impulse, format = :html)
-
+summarize(system, result; plots, impulse, format)
 
 # generate animations of the mode shapes
-using EoM_X3D
-animate_modes(system, result, scale=0.2)
+# using EoM_X3D
+# animate_modes(system, result, scale=0.2)
 
 end
 

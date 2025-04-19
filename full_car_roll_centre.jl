@@ -14,6 +14,9 @@ cry = 0
 hf = 0.3
 hr = 0.3
 
+format = :screen
+# format = :html
+
 # build system description with no cornering stiffnesses
 system = input_full_car_rc(; m, u, cfy, cry, hf, hr) # make sure to include all parameters here, and again below!!!
 output = run_eom!(system, true)
@@ -151,8 +154,7 @@ result = analyze(output, true)
 bode = :skip
 impulse = :skip
 ss = :skip
-summarize(system, result; plots, bode, ss, impulse)
-# summarize(system, result; plots, bode, ss, impulse, format = :html)
+summarize(system, result; plots, bode, ss, impulse, format)
 
 # generate animations of the mode shapes
 # using EoM_X3D

@@ -7,6 +7,7 @@ include(joinpath("models", "input_ex_smd.jl"))
 k = 50
 m = 1
 c = 0.2
+
 system = input_ex_smd(; k, m, c)
 output = run_eom!(system)
 result = analyze(output)
@@ -23,7 +24,6 @@ plots = [ltiplot(yoft; ylabel, label)]
 ss = :skip
 
 summarize(system, result; ss, plots)
-# summarize(system, result; ss, plots, format = :html)
 
 end
 

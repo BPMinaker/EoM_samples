@@ -24,6 +24,9 @@ dr = 2 * 38 * dpr
 ptf = df / cf
 ptr = dr / cr
 
+format = :screen
+# format = :html
+
 # define a dummy function that just calls our input function, but also adds the parameters we just set
 f(x) = input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr)
 
@@ -41,8 +44,8 @@ result = analyze.(output; freq=(-1, 1))
 ss = [1, 1, 1, 1, 0, 0, 1, 1]
 impulse = :skip
 bode = :skip
-#summarize(system, vpts, result; ss, impulse, bode)
-summarize(system, vpts, result; ss, impulse, bode, format=:html)
+summarize(system, vpts, result; ss, impulse, bode)
+#summarize(system, vpts, result; ss, impulse, bode, format=:html)
 
 # now, let's also do some time domain solutions; let's pick a speed of 50 mph, or 22.4 m/s, and get the equations of motion and the results for that speed
 u = 22.4
@@ -106,13 +109,10 @@ plots = [p1, p2, p3, p4, p5]
 # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
 ss = :skip
 impulse = :skip
+summarize(system, result; plots, ss, impulse, format)
 
-# summarize(system, result; plots, ss, impulse)
-summarize(system, result; plots, ss, impulse, format = :html)
-
-using EoM_X3D
-animate_modes(system, result)
-
+#using EoM_X3D
+#animate_modes(system, result)
 
 # generate over a huge range of speeds to find characteristic speed
 vpts = 0.4:0.4:140

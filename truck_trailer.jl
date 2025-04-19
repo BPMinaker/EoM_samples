@@ -13,6 +13,9 @@ mt = 2000
 It = 3000
 vpts = 0.4:0.4:40
 
+format = :screen
+# format = :html
+
 f(x) = input_ex_truck_trailer(; u=x, m, Iz, d, e, h, mt, It)
 system = f.(vpts)
 output = run_eom!.(system, vpts .== 1)
@@ -21,7 +24,7 @@ result = analyze.(output, vpts .== 1; freq=(-1, 1))
 impulse = :skip
 bode = :skip
 #summarize(system, vpts, result; impulse)
-summarize(system, vpts, result; impulse, bode, format = :html)
+summarize(system, vpts, result; impulse, bode, format)
 
 # choose the equations of motion for 18 m/s (note function notation)
 n = findfirst(vpts .== 18)
@@ -69,10 +72,10 @@ push!(plots, ltiplot(yoft; ylabel, label, yidx))
 
 impulse = :skip
 ss = :skip
-summarize(system, result; plots, impulse, ss, format = :html)
+summarize(system, result; plots, impulse, ss, format)
 
-using EoM_X3D
-animate_modes(system, result)
+# using EoM_X3D
+# animate_modes(system, result)
 
 end
 

@@ -5,6 +5,9 @@ using EoM, Interpolations
 # read in the function that will define our drag race vehicle model
 include(joinpath("models", "input_ex_drag_race.jl"))
 
+format = :screen
+# format = :html
+
 # set the values of the parameters here
 # tire radius in meters, for example, for 195/50-R16
 re = (8 * 25.4 + 0.5 * 195) / 1000
@@ -192,35 +195,36 @@ else
     println("Simulation ended below 60 mph!")
 end
 
-# set plot text, etc
-label = ""
-
 # don't include any of the inputs in the plots
 uidx = [0]
 
 # make the first plot and save it in a vector
 # we can just choose output number one, which is the distance
 yidx = [1]
-ylabel = "Distance [m]"
+label, ylabel = ltilabels(system; yidx, uidx)
 plots = [ltiplot(yoft; ylabel, label, yidx, uidx)]
 
 # update label, make the next plot, and push it onto the plot vector
 # we can't just choose output number two, which is the velocity, because we want new units
 yidx = [0]
+label = ["Velocity u"]
 ylabel = "Velocity [km/h]"
+display(label)
+display(ylabel)
 push!(plots, ltiplot(yoft, u; ylabel, label, yidx, uidx))
 
+label = ["Accl'n u_dot"]
 ylabel = "Accl'n [g]"
-push!(plots, ltiplot(yoft, aG; ylims=(0, Inf), ylabel, label, yidx, uidx))
+push!(plots, ltiplot(yoft, aG; ylabel, label, yidx, uidx, ylims=(0,Inf)))
 
-label = ["Z_r [kN]" "Z_f [kN]"]
-ylabel = "Axle vertical load [N]"
-push!(plots, ltiplot(yoft, [Zr Zf]; ylims=(0, Inf), ylabel, label, yidx, uidx))
+label = ["Z_r" "Z_f"]
+ylabel = "Axle vertical load [kN]"
+push!(plots, ltiplot(yoft, [Zr Zf]; ylabel, label, yidx, uidx, ylims=(0,Inf)))
 
 # pass all the results and plots, skip the Bode plots for now
 bode = :skip
 impulse = :skip
-summarize(system, result; plots, bode, impulse, format=:html)
+summarize(system, result; plots, bode, impulse, format)
 
 # using DelimitedFiles
 # writedlm(joinpath("output","data.txt"), [t y])

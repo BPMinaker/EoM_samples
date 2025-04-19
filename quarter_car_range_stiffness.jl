@@ -11,6 +11,9 @@ kt = 150000
 vpts = 15000:100:30000
 cs = 500
 
+format = :screen
+# format = :html
+
 f(x) = input_ex_quarter_car(; ks=x, ms, mu, kt, cs)
 verbose = (vpts .== 15000)
 system = f.(vpts)
@@ -20,8 +23,7 @@ result = analyze.(output, verbose)
 ss = :skip
 impulse = :skip
 vpt_name = ["k" "Stiffness" "N/m"]
-summarize(system, vpts, result; ss, impulse, vpt_name)
-#summarize(system, vpts, result; ss, impulse, vpt_name, format = :html)
+summarize(system, vpts, result; ss, impulse, vpt_name, format)
 
 end
 

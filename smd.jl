@@ -12,6 +12,9 @@ using EoM
 
 include(joinpath("models", "input_ex_smd.jl"))
 
+format = :screen
+# format = :html
+
 # one of the cool features of Julia is that it allows `keyword arguments`, i.e., you can pass many arguments to a function, but you can include the name of the argument, so it doesn't matter if you mix up the order; the example input file `input_ex_smd.jl` allows you to redefine the values of the mass (m), the stiffness (k), and the damping (c) by defining the function like this:
 # function input_ex_smd(; m = 1.0, c = 0.1, k = 10.0) 
 # notice the semicolon in the definition; any values we don't supply just use defaults defined in the file; so, for example, we could call:
@@ -130,8 +133,7 @@ p3 = ltiplot(yoft; ylabel, label)
 # now let's display all out results, along with the extra plots
 
 plots = [p1, p2, p3]
-summarize(system, result; plots)
-# summarize(system, result; plots, format = :html)
+summarize(system, result; plots, format)
 
 # alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; that gets overwritten if you run the analysis again, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
 

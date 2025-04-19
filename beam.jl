@@ -1,4 +1,4 @@
-module beam
+module rect_beam
 
 using EoM
 

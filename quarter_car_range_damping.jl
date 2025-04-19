@@ -11,6 +11,9 @@ kt = 150000
 ks = 18000
 vpts = 500:20:3000
 
+format = :screen
+# format = :html
+
 f(x) = input_ex_quarter_car(; ks, ms, mu, kt, cs=x)
 verbose = (vpts .== 500)
 system = f.(vpts)
@@ -20,7 +23,7 @@ result = analyze.(output, verbose)
 ss = :skip
 impulse = :skip
 vpt_name = ["c" "Damping" "Ns/m"]
-summarize(system, vpts, result; ss, impulse, vpt_name)
+summarize(system, vpts, result; ss, impulse, vpt_name, format)
 
 end
 

@@ -15,19 +15,22 @@ Iy = 2000
 #kr = a * kf / b
 #Iy = m*a*b
 
+format = :screen
+# format = :html
+
 system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
 output = run_eom!(system)
 result = analyze(output)
 
 impulse = :skip
-summarize(system, result; impulse, format = :html)
+summarize(system, result; impulse, format)
 
 input_delay!(system, result, (a + b) / 10, [1, 2])
 system.name *= " with input delay"
-summarize(system, result; impulse, format = :html)
+summarize(system, result; impulse, format)
 
-using EoM_X3D
-animate_modes(system, result)
+# using EoM_X3D
+# animate_modes(system, result)
 
 cf = 1800
 cr = 2000
@@ -71,7 +74,7 @@ plots = [p1, p2, p3, p4]
 
 bode = :skip
 ss = :skip
-summarize(system, result; plots, impulse, bode, ss, format = :html)
+summarize(system, result; plots, impulse, bode, ss, format)
 
 end
 

@@ -104,7 +104,7 @@ t2 = 20
 
 # we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time span to EoM's ltisim, it will formulate the problem and call Julia's ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has entries z, kz, czdot, and mzddot; we could choose the initial state x0 if we wanted, but `ltisim()` will just use zeroes if we don't specify anything else
 
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result, u_vec, (t1, t2))
 
 # note that `ltisim()' returns yoft as a function handle, i.e., we can choose any time t in the interval and find yoft(t)
 
@@ -123,11 +123,11 @@ p1 = ltiplot(yoft; ylabel, label)
 # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `foft()` is defined as a function of `ω` so all we have to do is update `ω`, and `foft()` will update as well
 
 ω = 0.5 * ω_n * 2π
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result, u_vec, (t1, t2))
 p2 = ltiplot(yoft; ylabel, label)
 
 ω = 2 * ω_n * 2π
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result, u_vec, (t1, t2))
 p3 = ltiplot(yoft; ylabel, label)
 
 # now let's display all out results, along with the extra plots

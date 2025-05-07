@@ -36,7 +36,7 @@ u_vec(_, t) = [zofx(u * t)]
 
 t1 = 0
 t2 = 20
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result, u_vec, (t1, t2))
 
 animate_history(system, yoft.t, yoft[:,:])
 

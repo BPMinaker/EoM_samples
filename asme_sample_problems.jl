@@ -11,7 +11,7 @@ u_vec(_, t) = 0.2 * [sin(2π * ω * t), sin(2π * ω * (t+0.5)), sin(2π * ω * 
 
 t1 = 0
 t2 = 20
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result, u_vec, (t1, t2))
 
 label, ylabel = ltilabels(system)
 plots = [ltiplot(yoft; ylabel, label)]
@@ -19,24 +19,17 @@ summarize(system, result; plots)
 
 
 
-gfjgjh()
-
-
 # summarize(system, result; plots, format = :html)
 # animate_modes(system, result)
 
-#=
+
 system = input_ex_hanging_chain()
 sensors_animate!(system)
 output = run_eom!(system)
 result = analyze(output)
 
-y = ltisim(result.ss_eqns, u_vec, (t1, t2))
-
+y = ltisim(result, u_vec, (t1, t2))
 animate_history(system, y.t, y)
-=#
-
-
 
 
 ####
@@ -50,7 +43,7 @@ result = analyze(output)
 summarize(system, result)
 
 # summarize(system, result; format = :html)
-# animate_modes(system, result)
+animate_modes(system, result)
 
 #####
 
@@ -63,7 +56,7 @@ result = analyze(output)
 summarize(system, result)
 
 # summarize(system, result; format = :html)
-# animate_modes(system, result)
+animate_modes(system, result)
 
 
 println("Done.")

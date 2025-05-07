@@ -64,7 +64,7 @@ steer(x, t) = [steer_driver(result.ss_eqns.C * x, t)]
 t1 = 0
 t2 = 20
 # solve the equation of motion with the closed loop driver model
-yoft = ltisim(result.ss_eqns, steer, (t1, t2))
+yoft = ltisim(result, steer, (t1, t2))
 
 # notation conflict, y is system output vector, but also lateral displacement
 # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r

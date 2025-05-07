@@ -60,7 +60,7 @@ println("Solving time history...")
 t1 = 0
 t2 = 8
 
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result, u_vec, (t1, t2))
 delta = steer.(yoft.t)
 
 plots = []

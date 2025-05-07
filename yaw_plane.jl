@@ -71,7 +71,7 @@ u_vec(_, t) = [steer(t)]
 t1 = 0
 t2 = 20
 
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result, u_vec, (t1, t2))
 
 # notation conflict, y is system output vector, but also lateral displacement
 # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r

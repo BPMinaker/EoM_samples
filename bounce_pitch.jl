@@ -48,7 +48,7 @@ u_vec(_, t) = [zofx(10 * t), zofx(10 * t - (a + b))]
 println("Solving time history...")
 t1 = 0
 t2 = 10
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result, u_vec, (t1, t2))
 
 # plot bounce
 yidx = [1]

@@ -16,7 +16,7 @@ result = analyze(output)
 ω = 0.95 * result.omega_n[1] * 2π
 # define an input vector, even if it is only length one
 u_vec(_, t) = [sin(ω * t)]
-yoft = ltisim(result.ss_eqns, u_vec, (0, 10))
+yoft = ltisim(result, u_vec, (0, 10))
 
 # pull the plot labels from the system information
 label, ylabel = ltilabels(system)

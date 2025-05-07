@@ -41,7 +41,7 @@ t1 = 0
 t2 = 20
 
 # solve the equations of motion
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result, u_vec, (t1, t2))
 
 # sensors are, in order, r, β, α_u, ψ, a_lat
 

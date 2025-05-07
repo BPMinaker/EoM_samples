@@ -28,7 +28,7 @@ u_vec(_, t) = [zofx(10 * t)]
 println("Solving time history...")
 t1 = 0
 t2 = 10
-yoft = ltisim(result.ss_eqns, u_vec, (t1, t2))
+yoft = ltisim(result, u_vec, (t1, t2))
 # default is to solve at 1000 time steps, giving a dt of 0.01 s, or a dx of 0.1 m, giving a minimum of two points per wavelength at the shortest wave (Nyquist criterion), and many more at longer wavelengths
 
 # plot sprung mass

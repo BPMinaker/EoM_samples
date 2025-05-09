@@ -52,23 +52,19 @@ yoft = ltisim(result, u_vec, (t1, t2))
 
 # plot bounce
 yidx = [1]
-label, ylabel = ltilabels(system; yidx)
-p1 = ltiplot(yoft; ylabel, label, yidx)
+p1 = ltiplot(system, yoft; yidx)
 
 # plot pitch
 yidx = [2]
-label, ylabel = ltilabels(system; yidx)
-p2 = ltiplot(yoft; ylabel, label, yidx)
+p2 = ltiplot(system, yoft; yidx)
 
 # plot passenger motion
 yidx = [3]
-label, ylabel = ltilabels(system; yidx)
-p3 = ltiplot(yoft; ylabel, label, yidx)
+p3 = ltiplot(system, yoft; yidx)
 
 # plot suspension travel
 yidx = [4, 5]
-label, ylabel = ltilabels(system; yidx)
-p4 = ltiplot(yoft; ylabel, label, yidx)
+p4 = ltiplot(system, yoft; yidx)
 
 plots = [p1, p2, p3, p4]
 

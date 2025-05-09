@@ -114,8 +114,7 @@ println("Plotting...")
 
 # we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, spring force, the damping force, the inertial force, and applied force, here there are some keyword arguments for the labels, etc.
 
-label, ylabel = ltilabels(system)
-p1 = ltiplot(yoft; ylabel, label)
+p1 = ltiplot(system, yoft)
 
 # the plot is created and stored but not shown, we could send it to the screen using: display(p1); this plot would show up in a tab in VS Code or in a web browser tab
 # or we can add it to a vector of plots, and send it to the `summarize()` function
@@ -124,11 +123,11 @@ p1 = ltiplot(yoft; ylabel, label)
 
 ω = 0.5 * ω_n * 2π
 yoft = ltisim(result, u_vec, (t1, t2))
-p2 = ltiplot(yoft; ylabel, label)
+p2 = ltiplot(system, yoft)
 
 ω = 2 * ω_n * 2π
 yoft = ltisim(result, u_vec, (t1, t2))
-p3 = ltiplot(yoft; ylabel, label)
+p3 = ltiplot(system, yoft)
 
 # now let's display all out results, along with the extra plots
 

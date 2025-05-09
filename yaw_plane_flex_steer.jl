@@ -45,7 +45,7 @@ system = f.(vpts)
 output = run_eom!.(system, vpts .== 1)
 result = analyze.(output, vpts .== 1, freq=(-1,2))
 
-summarize(system, vpts, result; impulse = :skip, bode = :skip)
+summarize(system, vpts, result; impulse = :skip)
 
 ss_resp = hcat(getproperty.(result,:ss_resp)...)
 yy = LinearInterpolation(ss_resp[3,:],vpts)

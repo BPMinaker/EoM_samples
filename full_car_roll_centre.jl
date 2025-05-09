@@ -68,71 +68,59 @@ plots = []
 # yaw rate
 yidx = [9]
 uidx = [0]
-label, ylabel = ltilabels(system; yidx, uidx)
-label = [label "Steer δ"]
-ylabel *= ", δ [°]"
-push!(plots, ltiplot(yoft, delta; ylabel, label, yidx, uidx))
+label = ["Yaw rate r" "Steer δ"]
+ylabel = "r[°/s], δ [°]"
+push!(plots, ltiplot(system, yoft, delta; ylabel, label, yidx, uidx))
 
-# pitch angle
-yidx = [12]
-uidx = [0]
-label, ylabel = ltilabels(system; yidx, uidx)
-label = [label "Steer δ"]
-ylabel *= ", δ [°]"
-push!(plots, ltiplot(yoft, delta; ylabel, label, yidx, uidx))
 
-# roll angle, slip angle, understeer angle
-yidx = [11, 13]
-uidx = [0]
-label, ylabel = ltilabels(system; yidx, uidx)
+### fix me ###################################
+
+# roll angle, pitch angle, slip angle, understeer angle
+yidx = [11, 12, 13]
 label = [label "Understeer α_u" "Steer δ"]
 ylabel *= ", α_u [°], δ [°]"
-push!(plots, ltiplot(yoft, [yoft[14, :] .+ delta delta]; ylabel, label, yidx, uidx))
+push!(plots, ltiplot(system, yoft, [yoft[14, :] .+ delta delta]; ylabel, label, yidx, uidx))
 
 # G lift
 yidx = [10]
-uidx = [0]
-label, ylabel = ltilabels(system; yidx, uidx)
 label = [label "Steer δ"]
 ylabel *= ", δ [°]"
-push!(plots, ltiplot(yoft, delta; ylabel, label, yidx, uidx))
+push!(plots, ltiplot(system, yoft, delta; ylabel, label, yidx, uidx))
 
 # lateral forces (nonlinear part)
 yidx = [0]
 uidx = [1, 2, 3, 4]
-label, ylabel = ltilabels(system; yidx, uidx)
-push!(plots, ltiplot(yoft; ylabel, label, yidx, uidx))
+push!(plots, ltiplot(system, yoft; yidx, uidx))
 
 # get tire forces
 ZZ = Z0' .- yoft[[1, 2, 5, 6], :]'
 ΔZ = 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]
-
 slip = 180 / π * yoft[[3, 4, 7, 8], :]' - delta .* [1, 0, 1, 0]'
 
 YY = hcat(yoft.u.(yoft.t)...)
 acc = sum(YY, dims=1)[1, :] * 9.81 / sum(Z0)
 N = sum(system.scratch.a * YY[[1, 3], :] - system.scratch.b * YY[[2, 4], :], dims=1)[1, :]
 
-label = ["LF" "LR" "RF" "RR"]
-yidx = [0]
 uidx = [0]
+yidx = [1, 2, 5, 6]
+push!(plots, ltiplot(system, yoft, ZZ; ylabel, label, yidx, uidx))
 
-ylabel = "Vertical forces ΣZ [N]"
-push!(plots, ltiplot(yoft, ZZ; ylabel, label, yidx, uidx))
-
-ylabel = "Tire slip α [°]"
-push!(plots, ltiplot(yoft, slip; ylabel, label, yidx, uidx))
+yidx = [3, 4, 7, 8]
+ylabel = "Slip angles [°]"
+yidx = [0]
+push!(plots, ltiplot(system, yoft, slip; ylabel, label, yidx, uidx))
 
 label = ["F" "R"]
 ylabel = "Lateral weight transfer [N]"
-push!(plots, ltiplot(yoft, ΔZ; ylabel, label, yidx, uidx))
+push!(plots, ltiplot(system, yoft, ΔZ; ylabel, label, yidx, uidx))
 
+label = [""]
 ylabel = "Yaw moment N [Nm]"
-push!(plots, ltiplot(yoft, N; ylabel, yidx, uidx))
+push!(plots, ltiplot(system, yoft, N; ylabel, label, yidx, uidx))
 
 label = ["ru" "Σf/m" "vdot"]
-ylabel = "acc [m/s^2]"
-push!(plots, ltiplot(yoft, [yoft[15, :] acc acc - yoft[15, :]]; ylabel, label, yidx, uidx))
+ylabel = "Lateral accel'n [m/s^2]"
+push!(plots, ltiplot(system, yoft, [yoft[15, :] acc acc - yoft[15, :]]; ylabel, label, yidx, uidx))
 
 # recompute cornering stiffnesses
 # define the lateral force function at the actual vertical load

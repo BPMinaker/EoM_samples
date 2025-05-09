@@ -71,23 +71,19 @@ yoft = ltisim(result, steer, (t1, t2))
 
 # plot yaw rate vs time
 yidx = [1]
-label, ylabel = ltilabels(system[1]; yidx)
-plots = [ltiplot(yoft; ylabel, label, yidx)]
+plots = [ltiplot(system, yoft; yidx)]
 
 # plot body slip angle vs time
 yidx = [2]
-label, ylabel = ltilabels(system[1]; yidx)
-push!(plots, ltiplot(yoft; ylabel, label, yidx))
+push!(plots, ltiplot(system, yoft; yidx))
 
 # plot slip angles, understeer angle vs time
 yidx = [7, 8, 3]
-label, ylabel = ltilabels(system[1]; yidx)
-push!(plots, ltiplot(yoft; ylabel, label, yidx))
+push!(plots, ltiplot(system, yoft; yidx))
 
 # plot lateral acceleration vs time
 yidx = [4]
-label, ylabel = ltilabels(system[1]; yidx)
-push!(plots, ltiplot(yoft; ylabel, label, yidx))
+push!(plots, ltiplot(system, yoft; yidx))
 
 # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
 xlabel = "x [m]"
@@ -95,14 +91,14 @@ ylabel = "y [m]"
 label = ""
 lw = 2 # thicker line weight
 size = (800, 400)
-push!(plots, ltiplot(u * yoft.t, yoft[5,:]; xlabel, ylabel, label, lw, size))
+push!(plots, EoM.plot(u * yoft.t, yoft[5,:]; xlabel, ylabel, label, lw, size))
 
 # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
 ss = [1, 1, 1, 1, 0, 0, 1, 1]
 impulse = :skip
-
-summarize(system, vpts, result; plots, ss, impulse)
-# summarize(system, vpts, result; plots, ss, impulse, format = :html)
+bode = :skip
+summarize(system, result; plots, ss, impulse, bode)
+# summarize(system, result; plots, ss, impulse, bode, format = :html)
 
 end
 

@@ -13,11 +13,10 @@ t1 = 0
 t2 = 20
 yoft = ltisim(result, u_vec, (t1, t2))
 
-label, ylabel = ltilabels(system)
-plots = [ltiplot(yoft; ylabel, label)]
+plots = [ltiplot(system, yoft)]
 summarize(system, result; plots)
 
-
+sdfds()
 
 # summarize(system, result; plots, format = :html)
 # animate_modes(system, result)

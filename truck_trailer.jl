@@ -47,28 +47,23 @@ yoft = ltisim(result, u_vec, (t1, t2))
 
 # plot yaw rate vs time
 yidx = [1]
-label, ylabel = ltilabels(system; yidx)
-plots = [ltiplot(yoft; ylabel, label, yidx)]
+plots = [ltiplot(system, yoft; yidx)]
 
 # plot body slip angle vs time
 yidx = [2]
-label, ylabel = ltilabels(system; yidx)
-push!(plots, ltiplot(yoft; ylabel, label, yidx))
+push!(plots, ltiplot(system, yoft; yidx))
 
 # plot understeer angle vs time
 yidx = [3]
-label, ylabel = ltilabels(system; yidx)
-push!(plots, ltiplot(yoft; ylabel, label, yidx))
+push!(plots, ltiplot(system, yoft; yidx))
 
 # plot trailer sway angle vs time
 yidx = [4]
-label, ylabel = ltilabels(system; yidx)
-push!(plots, ltiplot(yoft; ylabel, label, yidx))
+push!(plots, ltiplot(system, yoft; yidx))
 
 # plot lateral acceleration vs time
 yidx = [5]
-label, ylabel = ltilabels(system; yidx)
-push!(plots, ltiplot(yoft; ylabel, label, yidx))
+push!(plots, ltiplot(system, yoft; yidx))
 
 impulse = :skip
 ss = :skip

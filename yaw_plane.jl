@@ -70,7 +70,6 @@ u_vec(_, t) = [steer(t)]
 # define time interval
 t1 = 0
 t2 = 20
-
 yoft = ltisim(result, u_vec, (t1, t2))
 
 # notation conflict, y is system output vector, but also lateral displacement
@@ -78,23 +77,19 @@ yoft = ltisim(result, u_vec, (t1, t2))
 
 # plot yaw rate vs time
 yidx = [1]
-label, ylabel = ltilabels(system; yidx)
-p1 = ltiplot(yoft; ylabel, label, yidx)
+p1 = ltiplot(system, yoft; yidx)
 
 # plot body slip angle vs time
 yidx = [2]
-label, ylabel = ltilabels(system; yidx)
-p2 = ltiplot(yoft; ylabel, label, yidx)
+p2 = ltiplot(system, yoft; yidx)
 
 # plot slip angles, understeer angle vs time
 yidx = [7, 8, 3]
-label, ylabel = ltilabels(system; yidx)
-p3 = ltiplot(yoft; ylabel, label, yidx)
+p3 =  ltiplot(system, yoft; yidx)
 
 # plot lateral acceleration vs time
 yidx = [4]
-label, ylabel = ltilabels(system; yidx)
-p4 = ltiplot(yoft; ylabel, label, yidx)
+p4 = ltiplot(system, yoft; yidx)
 
 # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
 xlabel = "x [m]"

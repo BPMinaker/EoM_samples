@@ -33,18 +33,15 @@ yoft = ltisim(result, u_vec, (t1, t2))
 
 # plot sprung mass
 yidx = [1]
-label, ylabel = ltilabels(system; yidx)
-p1 = ltiplot(yoft; ylabel, label, yidx)
+p1 = ltiplot(system, yoft; yidx)
 
 # plot suspension travel
 yidx = [2]
-label, ylabel = ltilabels(system; yidx)
-p2 = ltiplot(yoft; ylabel, label, yidx)
+p2 = ltiplot(system, yoft; yidx)
 
 # plot tire compression
 yidx = [3]
-label, ylabel = ltilabels(system; yidx)
-p3 = ltiplot(yoft; ylabel, label, yidx)
+p3 = ltiplot(system, yoft; yidx)
 
 plots = [p1, p2, p3]
 

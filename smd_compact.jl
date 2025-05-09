@@ -19,10 +19,9 @@ u_vec(_, t) = [sin(ω * t)]
 yoft = ltisim(result, u_vec, (0, 10))
 
 # pull the plot labels from the system information
-label, ylabel = ltilabels(system)
-plots = [ltiplot(yoft; ylabel, label)]
-ss = :skip
+plots = [ltiplot(system, yoft)]
 
+ss = :skip
 summarize(system, result; ss, plots)
 
 end

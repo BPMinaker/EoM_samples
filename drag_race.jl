@@ -156,8 +156,7 @@ t2 = 30
 # it will assume zeros as inital conditions
 yoft = ltisim(result, u_vec, (t1, t2))
 
-t = t1:0.01:t2
-y = hcat(yoft.(t)...)'
+y = yoft[:,:]'
 # convert the vector of vectors to a matrix
 
 x = y[:, 1]
@@ -176,9 +175,9 @@ Zf /= 1000 # scale third column to get kN
 
 # linear interpolation to find 1/4 mile, 60 mph times
 # note 1/4 mile = 402.336 m, 60 mph = 96.5606 km/h
-interp_xt = LinearInterpolation(x, t)
-interp_tu = LinearInterpolation(t, u)
-interp_ut = LinearInterpolation(u, t)
+interp_xt = LinearInterpolation(x, yoft.t)
+interp_tu = LinearInterpolation(yoft.t, u)
+interp_ut = LinearInterpolation(u, yoft.t)
 
 # find quarter mile time and speed, round it, and print
 if x[end] > 402.336
@@ -201,25 +200,22 @@ uidx = [0]
 # make the first plot and save it in a vector
 # we can just choose output number one, which is the distance
 yidx = [1]
-label, ylabel = ltilabels(system; yidx, uidx)
-plots = [ltiplot(yoft; ylabel, label, yidx, uidx)]
+plots = [ltiplot(system, yoft; yidx, uidx)]
 
 # update label, make the next plot, and push it onto the plot vector
 # we can't just choose output number two, which is the velocity, because we want new units
 yidx = [0]
-label = ["Velocity u"]
+label = hcat("Velocity u")
 ylabel = "Velocity [km/h]"
-display(label)
-display(ylabel)
-push!(plots, ltiplot(yoft, u; ylabel, label, yidx, uidx))
+push!(plots, ltiplot(system, yoft, u; ylabel, label, yidx, uidx))
 
-label = ["Accl'n u_dot"]
-ylabel = "Accl'n [g]"
-push!(plots, ltiplot(yoft, aG; ylabel, label, yidx, uidx, ylims=(0,Inf)))
+label = hcat("Accel'n u_dot")
+ylabel = "Accel'n [g]"
+push!(plots, ltiplot(system, yoft, aG; ylabel, label, yidx, uidx, ylims=(0,Inf)))
 
 label = ["Z_r" "Z_f"]
 ylabel = "Axle vertical load [kN]"
-push!(plots, ltiplot(yoft, [Zr Zf]; ylabel, label, yidx, uidx, ylims=(0,Inf)))
+push!(plots, ltiplot(system, yoft, [Zr Zf]; ylabel, label, yidx, uidx, ylims=(0,Inf)))
 
 # pass all the results and plots, skip the Bode plots for now
 bode = :skip

@@ -92,6 +92,7 @@ yidx = [4]
 p4 = ltiplot(system, yoft; yidx)
 
 # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
+# becasue this plot is not a function of time, we need to use the EoM.plot function
 xlabel = "x [m]"
 ylabel = "y [m]"
 label = ""

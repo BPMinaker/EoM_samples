@@ -68,29 +68,27 @@ plots = []
 # yaw rate
 yidx = [9]
 uidx = [0]
-label = ["Yaw rate r" "Steer δ"]
-ylabel = "r[°/s], δ [°]"
+label = ["Steer angle δ"]
+ylabel = ", δ [°]"
 push!(plots, ltiplot(system, yoft, delta; ylabel, label, yidx, uidx))
-
-
-### fix me ###################################
 
 # roll angle, pitch angle, slip angle, understeer angle
 yidx = [11, 12, 13]
-label = [label "Understeer α_u" "Steer δ"]
-ylabel *= ", α_u [°], δ [°]"
+label = ["Understeer angle α_u" "Steer angle δ"]
+ylabel = "Angles [°]"
 push!(plots, ltiplot(system, yoft, [yoft[14, :] .+ delta delta]; ylabel, label, yidx, uidx))
 
 # G lift
 yidx = [10]
-label = [label "Steer δ"]
-ylabel *= ", δ [°]"
+label = ["Steer angle δ"]
+ylabel = ", δ [°]"
 push!(plots, ltiplot(system, yoft, delta; ylabel, label, yidx, uidx))
 
 # lateral forces (nonlinear part)
 yidx = [0]
 uidx = [1, 2, 3, 4]
-push!(plots, ltiplot(system, yoft; yidx, uidx))
+ylabel = "Lateral forces [N]"
+push!(plots, ltiplot(system, yoft; ylabel, yidx, uidx))
 
 # get tire forces
 ZZ = Z0' .- yoft[[1, 2, 5, 6], :]'
@@ -102,19 +100,21 @@ acc = sum(YY, dims=1)[1, :] * 9.81 / sum(Z0)
 N = sum(system.scratch.a * YY[[1, 3], :] - system.scratch.b * YY[[2, 4], :], dims=1)[1, :]
 
 uidx = [0]
-yidx = [1, 2, 5, 6]
+yidx = [0]
+label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
+ylabel = "Vertical forces [N]"
 push!(plots, ltiplot(system, yoft, ZZ; ylabel, label, yidx, uidx))
 
-yidx = [3, 4, 7, 8]
+label = ["Tire slip angle α_lf" "Tire slip angle α_lr" "Tire slip angle α_rf" "Tire slip angle α_rr"]
 ylabel = "Slip angles [°]"
 yidx = [0]
 push!(plots, ltiplot(system, yoft, slip; ylabel, label, yidx, uidx))
 
-label = ["F" "R"]
+label = ["Front weight transfer" "Rear weight transfer"]
 ylabel = "Lateral weight transfer [N]"
 push!(plots, ltiplot(system, yoft, ΔZ; ylabel, label, yidx, uidx))
 
-label = [""]
+label = hcat("")
 ylabel = "Yaw moment N [Nm]"
 push!(plots, ltiplot(system, yoft, N; ylabel, label, yidx, uidx))
 
@@ -136,8 +136,8 @@ cry = -dyr(0)
 
 # rebuild the equations of motion using the updated cornering stiffnesses
 system = input_full_car_rc(; m, u, cfy, cry, hf, hr)
-output = run_eom!(system, true)
-result = analyze(output, true)
+output = run_eom!(system, false)
+result = analyze(output, false)
 
 bode = :skip
 impulse = :skip

@@ -206,11 +206,11 @@ plots = [ltiplot(system, yoft; yidx, uidx)]
 # we can't just choose output number two, which is the velocity, because we want new units
 yidx = [0]
 label = hcat("Velocity u")
-ylabel = "Velocity [km/h]"
+ylabel = "u [km/h]"
 push!(plots, ltiplot(system, yoft, u; ylabel, label, yidx, uidx))
 
-label = hcat("Accel'n u_dot")
-ylabel = "Accel'n [g]"
+label = hcat("Acceleration u_dot")
+ylabel = "u dot [g]"
 push!(plots, ltiplot(system, yoft, aG; ylabel, label, yidx, uidx, ylims=(0,Inf)))
 
 label = ["Z_r" "Z_f"]

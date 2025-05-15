@@ -21,6 +21,14 @@ system = input_full_car_a_arm_pushrod(; u, a, b, tw, r)
 output = run_eom!(system)
 result = analyze(output, freq=(-1, 2))
 
+zofxl, zofxr = random_road(class=5, dz=0.2)
+u_vec(_, t) = [0, 0, zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a - b)]
+
+println("Solving time history...")
+t1 = 0
+t2 = 20
+y = ltisim(result, u_vec, (t1, t2))
+
 impulse = :skip
 summarize(system, result; impulse, format)
 
@@ -32,9 +40,6 @@ system = input_full_car_a_arm_pushrod(; u, a, tw, r)
 sensors_animate!(system)
 output = run_eom!(system)
 result = analyze(output)
-
-zofxl, zofxr = random_road(class=5, dz=0.2)
-u_vec(_, t) = [0, 0, zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a - b)]
 
 println("Solving time history...")
 t1 = 0

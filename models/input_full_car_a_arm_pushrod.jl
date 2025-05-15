@@ -58,6 +58,7 @@ function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, 
     item.gain = kt
     item.rate_gain = ct
     item.units = "m"
+    item.desc = "LF Ground profile"
     add_item!(item, the_system)
 
 
@@ -69,6 +70,7 @@ function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, 
     item.gain = kt
     item.rate_gain = ct
     item.units = "m"
+    item.desc = "LR Ground profile"
     add_item!(item, the_system)
 
 
@@ -83,6 +85,7 @@ function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, 
     item.location[1] = [a, tw / 2, r]
     item.location[2] = [a, tw / 2, r - 0.1]
     item.units = "m"
+    item.desc = "Chassis motion"
     add_item!(item, the_system)
 
     item = sensor("z_LFc-z_LF")
@@ -91,6 +94,7 @@ function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, 
     item.location[1] = [a, tw / 2, r]
     item.location[2] = [a, tw / 2, r - 0.1]
     item.units = "m"
+    item.desc = "Suspension travel"
     add_item!(item, the_system)
 
     item = sensor("z_LF-u_LF")
@@ -100,6 +104,7 @@ function input_full_car_a_arm_pushrod(; u = 10.0, a = 1.2, b = 1.3, cf = 40000, 
     item.location[2] = [a, tw / 2, r - 0.1]
     item.actuator = "u_LF"
     item.units = "m"
+    item.desc = "Tire compression"
     add_item!(item, the_system)
 
 

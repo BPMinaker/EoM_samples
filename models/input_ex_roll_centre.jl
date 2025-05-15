@@ -35,7 +35,7 @@ function input_full_car_rc(; kwargs...)
     # add one body representing the chassis
     item = body("chassis")
     item.mass = m
-    item.moments_of_inertia = [Ix, Iy, Iz]  ## Only the Iy term matters here
+    item.moments_of_inertia = [Ix, Iy, Iz]
     item.products_of_inertia = [0, 0, 0]
     item.location = [0, 0, hG]
     item.velocity = [u, 0, 0]

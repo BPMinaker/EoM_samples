@@ -23,32 +23,35 @@ function quarter_car_a_arm_pushrod(; u = 10, a = 1.2, cf = 40000, m = 400, r = 0
     tire!(the_system, str = "LF ", front = true; a, tw, cf, kt, ct, u)
 
     # add sensors
-    item = sensor("LF Chassis motion")
+    item = sensor("z_1")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [a, tw / 2, r]
     item.location[2] = [a, tw / 2, r - 0.1]
     item.units = "m"
+    item.desc = "Chassis motion"
     add_item!(item, the_system)
 
-    item = sensor("LF Suspension travel")
+    item = sensor("z_2-z_1")
     item.body[1] = "Chassis"
     item.body[2] = "LF Wheel+hub"
     item.location[1] = [a, tw / 2, r]
     item.location[2] = [a, tw / 2, r - 0.1]
     item.units = "m"
+    item.desc = "Suspension travel"
     add_item!(item, the_system)
 
-    item = sensor("LF Tire compression")
+    item = sensor("z_2-z_0")
     item.body[1] = "LF Wheel+hub"
     item.body[2] = "ground"
     item.location[1] = [a, tw / 2, r]
     item.location[2] = [a, tw / 2, r - 0.1]
-    item.actuator = "u_LF"
+    item.actuator = "z_0"
     item.units = "m"
+    item.desc = "Tire compression"
     add_item!(item, the_system)
 
-    item = actuator("u_LF")
+    item = actuator("z_0")
     item.body[1] = "LF Wheel+hub"
     item.body[2] = "ground"
     item.location[1] = [a, tw / 2, 0]
@@ -56,6 +59,7 @@ function quarter_car_a_arm_pushrod(; u = 10, a = 1.2, cf = 40000, m = 400, r = 0
     item.gain = kt
     item.rate_gain = ct
     item.units = "m"
+    item.desc = "Ground profile"
     add_item!(item, the_system)
 
 

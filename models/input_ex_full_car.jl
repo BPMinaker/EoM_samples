@@ -1,4 +1,20 @@
-function input_ex_full_car(; u = 0, a = 1.189, b = 2.885 - 1.189, tf = 1.595, tr = 1.631, kf = 17000, kr = 19000, cf = 1000, cr = 1200, m = 16975 / 9.81, Ix = 818, Iy = 3267, kt = 180000, muf = 35, mur = 30)
+function input_ex_full_car(;
+     u = 0,
+    a = 1.189,
+    b = 2.885 - 1.189,
+    tf = 1.595,
+    tr = 1.631,
+    kf = 17000,
+    kr = 19000,
+    cf = 1000,
+    cr = 1200,
+    m = 16975 / 9.81,
+    Ix = 818,
+    Iy = 3267,
+    kt = 180000,
+    muf = 35,
+    mur = 30
+    )
 
     the_system = mbd_system("Full Car Model")
 

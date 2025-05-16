@@ -1,36 +1,31 @@
-
-@kwdef mutable struct params_list
-    m = 1800. # mass
-    u = 20. # speed
-    a = 1.5 # wheelbase, front
-    b = 1.5
-    tf = 1.6 # track width, front
-    tr = 1.6
-    kf = 30000. # suspension stiffness, front
-    kr = 30000.
-    cf = 2500. # suspension damping, front
-    cr = 2500.
-    krf = 500. # anti-roll stiffness, front
-    krr = 500.
-    muf = 20. # unsprung mass, front
-    mur = 20.
-    hf = 0.2 # roll centre height, front
-    hr = 0.2
-    hG = 0.5 # mass centre height
-    cfy = 40000. # cornering stiffness, front
-    cry = 40000.
-    Ix = 818. # moments of inertia
-    Iy = 3267.
-    Iz = 3508.
-    kt = 180000. # tire vertical stiffness
+function input_full_car_rc(;
+    m = 1800, # mass
+    u = 20, # speed
+    a = 1.5, # wheelbase, front
+    b = 1.5,
+    tf = 1.6, # track width, front
+    tr = 1.6,
+    kf = 30000, # suspension stiffness, front
+    kr = 30000,
+    cf = 2500, # suspension damping, front
+    cr = 2500,
+    krf = 500, # anti-roll stiffness, front
+    krr = 500,
+    muf = 20, # unsprung mass, front
+    mur = 20,
+    hf = 0.2, # roll centre height, front
+    hr = 0.2,
+    hG = 0.5, # mass centre height
+    cfy = 40000, # cornering stiffness, front
+    cry = 40000,
+    Ix = 818, # moments of inertia
+    Iy = 3267,
+    Iz = 3508,
+    kt = 180000, # tire vertical stiffness
     r = 0.3 # wheel radius
-end
-
-function input_full_car_rc(; kwargs...)
+    )
 
     the_system = mbd_system("Full Car Model with Swing Axles")
-    the_system.scratch = params_list(; kwargs...)
-    (; m, u, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur, hf, hr, hG, cfy, cry, Ix, Iy, Iz, kt, r) = the_system.scratch
 
     # add one body representing the chassis
     item = body("chassis")
@@ -273,6 +268,17 @@ function input_full_car_rc(; kwargs...)
     item.desc = "Tire lateral force"
     add_item!(item, the_system)
 
+    item = sensor("N_lf")
+    item.body[1] = "ground"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 0]
+    item.location[2] = [1, 0, 0]
+    item.units = "N*m"
+    item.actuator = "Y_lf"
+    item.actuator_gain = a
+    item.desc = "Yaw moment"
+    add_item!(item, the_system)
+
     item = actuator("Y_lr")
     item.body[1] = "LR wheel"
     item.body[2] = "ground"
@@ -280,6 +286,17 @@ function input_full_car_rc(; kwargs...)
     item.location[2] = [-b, tr / 2 - 0.1, 0]
     item.units = "N"
     item.desc = "Tire lateral force"
+    add_item!(item, the_system)
+
+    item = sensor("N_lr")
+    item.body[1] = "ground"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 0]
+    item.location[2] = [1, 0, 0]
+    item.units = "N*m"
+    item.actuator = "Y_lr"
+    item.actuator_gain = -b
+    item.desc = "Yaw moment"
     add_item!(item, the_system)
 
     # tire measure vertical force
@@ -330,7 +347,7 @@ function input_full_car_rc(; kwargs...)
 
     mirror!(the_system) # note that the mirror can't go any further without adressing the change in the location in the sequence of items in the main file
 
-    # 9
+    # 13
     item = sensor("r")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -344,7 +361,7 @@ function input_full_car_rc(; kwargs...)
     add_item!(item, the_system)
 
     # measure the bounce, pitch, and roll
-    # 10
+    # 14
     item = sensor("z_G")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -355,7 +372,7 @@ function input_full_car_rc(; kwargs...)
     item.desc = "Vertical displacement"
     add_item!(item, the_system)
 
-    #11
+    #15
     item = sensor("ϕ")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -367,7 +384,7 @@ function input_full_car_rc(; kwargs...)
     item.desc = "Roll angle"
     add_item!(item, the_system)
 
-    #12
+    #16
     item = sensor("θ")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -379,7 +396,7 @@ function input_full_car_rc(; kwargs...)
     item.desc = "Pitch angle"
     add_item!(item, the_system)
 
-    #13
+    #17
     item = sensor("β")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -392,7 +409,7 @@ function input_full_car_rc(; kwargs...)
     item.desc = "Slip angle"
     add_item!(item, the_system)
 
-    #14
+    #18
     item = sensor("α_u-δ")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -405,7 +422,7 @@ function input_full_car_rc(; kwargs...)
     item.desc = "Understeer term"
     add_item!(item, the_system)
 
-    #15
+    #19
     item = sensor("ru")
     item.body[1] = "chassis"
     item.body[2] = "ground"
@@ -423,4 +440,37 @@ function input_full_car_rc(; kwargs...)
 end
 
 
-# u=0, a=1.189, b=2.885 - 1.189, tf=1.595, tr=1.631, kf=17000, kr=19000, cf=1000, cr=1200, m=16975 / 9.81, Ix=818, Iy=3267, Iz=3508, kt=180000, muf=35, mur=30, hf=0.1, hr=0.2, hG=0.4, krf=100, krr=100, cfy=40000, cry=40000, r = 0.3
+
+# @kwdef mutable struct params_list
+#     m = 1800. # mass
+#     u = 20. # speed
+#     a = 1.5 # wheelbase, front
+#     b = 1.5
+#     tf = 1.6 # track width, front
+#     tr = 1.6
+#     kf = 30000. # suspension stiffness, front
+#     kr = 30000.
+#     cf = 2500. # suspension damping, front
+#     cr = 2500.
+#     krf = 500. # anti-roll stiffness, front
+#     krr = 500.
+#     muf = 20. # unsprung mass, front
+#     mur = 20.
+#     hf = 0.2 # roll centre height, front
+#     hr = 0.2
+#     hG = 0.5 # mass centre height
+#     cfy = 40000. # cornering stiffness, front
+#     cry = 40000.
+#     Ix = 818. # moments of inertia
+#     Iy = 3267.
+#     Iz = 3508.
+#     kt = 180000. # tire vertical stiffness
+#     r = 0.3 # wheel radius
+# end
+
+# function input_full_car_rc(; kwargs...)
+
+#     the_system = mbd_system("Full Car Model with Swing Axles")
+#     the_system.scratch = params_list(; kwargs...)
+#     (; m, u, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur, hf, hr, hG, cfy, cry, Ix, Iy, Iz, kt, r) = the_system.scratch
+

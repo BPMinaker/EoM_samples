@@ -1,5 +1,4 @@
 module bicycle
-
 using EoM
 
 include(joinpath("models", "input_ex_bicycle_rider.jl"))
@@ -7,10 +6,9 @@ include(joinpath("models", "input_ex_bicycle_rider.jl"))
 format = :screen
 # format = :html
 
-f(x) = input_ex_bicycle_rider(u=x)
 vpts = 0:0.08:10
-system = f.(vpts)
 
+system = [input_ex_bicycle_rider(u=x) for x in vpts]
 output = run_eom!.(system, vpts .== 0)
 result = analyze.(output, vpts .== 0)
 

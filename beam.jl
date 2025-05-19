@@ -1,5 +1,4 @@
 module rect_beam
-
 using EoM
 
 include(joinpath("models", "input_ex_beam.jl"))

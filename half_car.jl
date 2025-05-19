@@ -1,5 +1,4 @@
 module half_car
-
 using EoM
 
 include(joinpath("models", "input_ex_half_car.jl"))

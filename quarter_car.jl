@@ -1,5 +1,4 @@
 module quarter_car
-
 using EoM
 
 include(joinpath("models", "input_ex_quarter_car.jl"))
@@ -14,10 +13,9 @@ cs = 500
 format = :screen
 # format = :html
 
-verbose = true
 system = input_ex_quarter_car(; ms, mu, kt, ks, cs)
-output = run_eom!(system, verbose)
-result = analyze(output, verbose)
+output = run_eom!(system)
+result = analyze(output)
 
 # here we set the input as a random road where z is a function of distance x; it is a sum of 500 sin waves with random phase angles, and ampltiude decreasing as wavelength shortens; it will be different each time you run the code; the longest wavelength in the sum is the full length of the road, a default of 100 m; the wavelengths shorten as the sequence 100/2, 100/3, 100/4,..., with the shortest wavelength at 100/2000, or 20 cm; the class here is the road roughness, an integer ranging from 3-9.  A class 3 road is very smooth (on the boundary of ISO classes A and B), where class 9 is extremely rough (boundary of ISO classes G and H); the random road function returns a function handle that gives back `z` as a function of `x`
 zofx = random_road(class=5)

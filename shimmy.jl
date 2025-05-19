@@ -1,5 +1,4 @@
 module shimmy
-
 using EoM
 
 include(joinpath("models", "input_ex_shimmy.jl"))
@@ -9,17 +8,16 @@ k = 0.3 * m
 l = 1
 u = l
 I = 0.21 * m * l^2
+vpts = range(0, 1; length=151)
+vpt_name = ["a/l" "Mass centre location" ""]
 
-f(x) = input_ex_shimmy(; m, k, a=x * l, b=l - (x * l), u, I)
-vpts = 0:0.008:1
-
-system = f.(vpts)
+system = [input_ex_shimmy(; m, k, a=x * l, b=l - (x * l), u, I) for x in vpts]
 output = run_eom!.(system)
 result = analyze.(output)
 
+ss = :skip
 impulse = :skip
-vpt_name = ["a/l" "Mass centre location" ""]
-summarize(system, vpts, result; impulse, vpt_name)
+summarize(system, vpts, result; impulse, ss, vpt_name)
 
 end
 

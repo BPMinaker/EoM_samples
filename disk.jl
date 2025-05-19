@@ -5,10 +5,9 @@ using EoM
 
 include(joinpath("models", "input_ex_disk.jl"))
 
-f(x) = input_ex_disk(u = x)
 vpts = 0:3/125:3
 
-system = f.(vpts)
+system = [input_ex_disk(u = x) for x in vpts]
 output = run_eom!.(system)
 result = analyze.(output; freq=(-1, 1))
 

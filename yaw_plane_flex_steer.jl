@@ -1,5 +1,4 @@
 module yaw_plane
-
 using EoM, Interpolations
 
 dpr = 180 / π
@@ -40,8 +39,7 @@ Izs = Iz - muf*a^2 - mur*b^2
 
 include(joinpath("models", "input_ex_yaw_plane_flex_steer.jl"))
 
-f(x) = input_ex_yaw_plane_flex_steer(; u=x, ms, muf, mur, a, b, Izs, cf, cr, ptf, ptr, lf, lr, kf, kr)
-system = f.(vpts)
+system = [input_ex_yaw_plane_flex_steer(; u=x, ms, muf, mur, a, b, Izs, cf, cr, ptf, ptr, lf, lr, kf, kr) for x in vpts]
 output = run_eom!.(system, vpts .== 1)
 result = analyze.(output, vpts .== 1, freq=(-1,2))
 

@@ -1,5 +1,4 @@
 module yaw_plane
-
 using EoM, Interpolations
 
 g = 9.81
@@ -24,12 +23,11 @@ k_phi = (2.71 / dpr) / g  # rad / m/s^2 roll flexibility
 
 include(joinpath("models", "input_ex_yaw_plane_roll_steer.jl"))
 
-f(x) = input_ex_yaw_plane_roll_steer(; u=x, m, a, b, Iz, cf, cr, ef, er, k_phi, ptf, ptr)
-system = f.(vpts)
+system = [input_ex_yaw_plane_roll_steer(; u=x, m, a, b, Iz, cf, cr, ef, er, k_phi, ptf, ptr) for x in vpts]
 output = run_eom!.(system, vpts .== 1)
 result = analyze.(output, vpts .== 1, freq=(-1,2))
 
- ss = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+ss = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 summarize(system, vpts, result; ss, impulse = :skip, bode = :skip)
 
 ss_resp = hcat(getproperty.(result,:ss_resp)...)

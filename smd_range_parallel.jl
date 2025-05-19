@@ -11,7 +11,7 @@ m = 1.0
 f(x) = input_ex_smd(; k, m, c=x)
 
 # then we define the range of values for c
-vpts = 0:0.001:1
+vpts = 0:0.005:1
 
 # timing experiment
 # looping vs vectorizing vs piping vs chaining
@@ -36,6 +36,10 @@ end
 
 @time begin
     result = (analyze ∘ run_eom! ∘ f).(vpts)  
+end
+
+@time begin
+    result = (analyze ∘ run_eom! ∘ (x -> input_ex_smd(; k, m, c=x))).(vpts)
 end
 
 # looping and vectorizing with anonymous function inline
@@ -63,5 +67,12 @@ end
 @time begin
     result = vpts .|> (x -> input_ex_smd(; k, m, c=x)) .|> run_eom! .|> analyze
 end
+
+@time begin
+    g(x) = analyze(run_eom!(input_ex_smd(; k, m, c=x)))
+    result = g.(vpts)
+end
+
+
 
 println("Done.")

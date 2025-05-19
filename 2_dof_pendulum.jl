@@ -1,5 +1,4 @@
 module two_dof
-
 using EoM
 
 include(joinpath("models", "input_ex_2_dof_pendulum.jl"))

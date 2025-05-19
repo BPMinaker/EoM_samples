@@ -1,5 +1,4 @@
 module bounce_pitch
-
 using EoM
 
 include(joinpath("models", "input_ex_bounce_pitch.jl"))

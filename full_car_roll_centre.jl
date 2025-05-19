@@ -9,16 +9,22 @@ include(joinpath("models", "input_ex_roll_centre.jl"))
 # here the value of m and u are set, but we can add many more if we like
 m = 1500
 u = 80 / 3.6
+a = 1.5
+b = 1.5
 cfy = 0
 cry = 0
 hf = 0.3
 hr = 0.3
+kf = 30000
+kr = 30000
+krf = 500
+krr = 500
 
 format = :screen
 # format = :html
 
 # build system description with no cornering stiffnesses
-system = input_full_car_rc(; m, u, cfy, cry, hf, hr) # make sure to include all parameters here, and again below!!!
+system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr) # make sure to include all parameters here, and again below!!!
 output = run_eom!(system, true)
 result = analyze(output, true)
 
@@ -37,7 +43,10 @@ end
 # a smooth step function, 3 degrees, with its midpoint (i.e. 1.5) at t = 2
 # the 0.5 terms change the range from -1...1 to 0...1
 # the 4 determines how quickly the step occurs
-steer(t) = 3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
+#steer(t) = 3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
+
+steer(t) = t/10
+
 
 # get static tire normal loads (kN)
 # assume LF, LR, RF, RR sequence
@@ -58,7 +67,7 @@ end
 
 println("Solving time history...")
 t1 = 0
-t2 = 8
+t2 = 30
 
 yoft = ltisim(result, u_vec, (t1, t2))
 delta = steer.(yoft.t)
@@ -92,12 +101,12 @@ ylabel = "Lateral forces [N]"
 push!(plots, ltiplot(system, yoft; ylabel, yidx, uidx))
 
 # yaw moment
-N = sum(yoft[[1, 2, 7, 8], :]; dims=1)[1,:]
+N = sum(yoft[[1, 2, 7, 8], :]; dims=1)[1, :]
 yidx = [1, 2, 7, 8]
 uidx = [0]
 label = ["Total"]
 ylabel = "Yaw moments [Nm]"
-push!(plots, ltiplot(system, yoft, N; ylabel, label, yidx, uidx, formatter = :plain))
+push!(plots, ltiplot(system, yoft, N; ylabel, label, yidx, uidx, formatter=:plain))
 
 uidx = [0]
 yidx = [0]
@@ -140,7 +149,7 @@ dyr(x) = ForwardDiff.derivative(yr, x)
 cry = -dyr(0)
 
 # rebuild the equations of motion using the updated cornering stiffnesses
-system = input_full_car_rc(; m, u, cfy, cry, hf, hr)
+system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr)
 output = run_eom!(system, false)
 result = analyze(output, false)
 

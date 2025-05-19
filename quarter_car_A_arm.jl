@@ -1,5 +1,4 @@
 module quarter_car
-
 using EoM
 
 include(joinpath("models", "input_quarter_car_a_arm_pushrod.jl"))

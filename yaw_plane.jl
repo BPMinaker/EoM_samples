@@ -27,11 +27,8 @@ ptr = dr / cr
 format = :screen
 # format = :html
 
-# define a dummy function that just calls our input function, but also adds the parameters we just set
-f(x) = input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr)
-
-# generate our system
-system = f.(vpts)
+# generate our vector of systems
+system = [input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr) for x in vpts]
 
 # generate the equations of motion, but many times, for every different value of forward speed
 output = run_eom!.(system)
@@ -44,8 +41,7 @@ result = analyze.(output; freq=(-1, 1))
 ss = [1, 1, 1, 1, 0, 0, 1, 1]
 impulse = :skip
 bode = :skip
-summarize(system, vpts, result; ss, impulse, bode)
-#summarize(system, vpts, result; ss, impulse, bode, format=:html)
+summarize(system, vpts, result; ss, impulse, bode, format)
 
 # now, let's also do some time domain solutions; let's pick a speed of 50 mph, or 22.4 m/s, and get the equations of motion and the results for that speed
 u = 22.4
@@ -64,7 +60,9 @@ sin(2π * 0.7 * (t - 2)) * EoM.pulse(t, 2, 2 + 0.75 / 0.7)
 - EoM.pulse(t, 2 + 0.75 / 0.7, 2.5 + 0.75 / 0.7)
 + sin(2π * 0.7 * (t - 2.5)) * EoM.pulse(t, 2.5 + 0.75 / 0.7, 2.5 + 1 / 0.7))
 
-# define input function to be steer but to also accept x and then ignore it, then put it in a vector
+# define input function to be steer 
+# put it in the form to also accept x (i.e., u=f(x,t))) but then ignore x
+# and return a vector even though it is length of one
 u_vec(_, t) = [steer(t)]
 
 # define time interval
@@ -115,7 +113,7 @@ vpts = 0.4:0.4:140
 
 using Interpolations
 
-system = f.(vpts)
+system = [input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr) for x in vpts]
 output = run_eom!.(system)
 result = analyze.(output; freq=(-1, 1))
 

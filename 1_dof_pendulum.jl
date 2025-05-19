@@ -1,5 +1,4 @@
 module one_dof
-
 using EoM
 
 include(joinpath("models", "input_ex_1_dof_pendulum.jl"))

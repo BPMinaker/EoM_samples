@@ -16,11 +16,10 @@ yoft = ltisim(result, u_vec, (t1, t2))
 plots = [ltiplot(system, yoft)]
 summarize(system, result; plots)
 
-sdfds()
+
 
 # summarize(system, result; plots, format = :html)
 # animate_modes(system, result)
-
 
 system = input_ex_hanging_chain()
 sensors_animate!(system)

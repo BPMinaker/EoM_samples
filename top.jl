@@ -4,10 +4,9 @@ using EoM
 
 include(joinpath("models", "input_ex_top.jl"))
 
-f(x) = input_ex_top(r=x)
 vpts = 0:10/125:10
 
-system = f.(vpts)
+system = [input_ex_top(r=x) for x in vpts]
 output = run_eom!.(system)
 result = analyze.(output)
 

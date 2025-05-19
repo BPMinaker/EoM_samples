@@ -1,5 +1,4 @@
 module smd
-
 using EoM
 
 include(joinpath("models", "input_ex_smd.jl"))
@@ -12,13 +11,10 @@ system = input_ex_smd(; k, m, c)
 output = run_eom!(system)
 result = analyze(output)
 
-# equations of motion are found, now do time history solution
 ω = 0.95 * result.omega_n[1] * 2π
-# define an input vector, even if it is only length one
 u_vec(_, t) = [sin(ω * t)]
 yoft = ltisim(result, u_vec, (0, 10))
 
-# pull the plot labels from the system information
 yidx = [1]
 p1 = ltiplot(system, yoft; yidx)
 

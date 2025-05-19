@@ -1,5 +1,4 @@
 module n_dof
-
 using EoM
 
 include(joinpath("models", "input_n_dof.jl"))

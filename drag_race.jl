@@ -1,5 +1,4 @@
 module drag_race
-
 using EoM, Interpolations
 
 # read in the function that will define our drag race vehicle model
@@ -202,8 +201,9 @@ uidx = [0]
 yidx = [1]
 plots = [ltiplot(system, yoft; yidx, uidx)]
 
-# update label, make the next plot, and push it onto the plot vector
+# make the next plot, and push it onto the plot vector
 # we can't just choose output number two, which is the velocity, because we want new units
+# manually set the label and ylabel
 yidx = [0]
 label = hcat("Velocity u")
 ylabel = "u [km/h]"

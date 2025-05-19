@@ -1,5 +1,4 @@
 module yaw_plane
-
 using EoM, ForwardDiff
 
 include(joinpath("models", "input_ex_yaw_plane.jl"))

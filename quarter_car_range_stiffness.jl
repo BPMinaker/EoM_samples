@@ -1,5 +1,4 @@
 module quarter_car
-
 using EoM
 
 include(joinpath("models", "input_ex_quarter_car.jl"))
@@ -8,21 +7,19 @@ include(joinpath("models", "input_ex_quarter_car.jl"))
 ms = 500
 mu = 50
 kt = 150000
-vpts = 15000:100:30000
 cs = 500
+vpts = 15000:100:30000
+vpt_name = ["k" "Stiffness" "N/m"]
 
 format = :screen
 # format = :html
 
-f(x) = input_ex_quarter_car(; ks=x, ms, mu, kt, cs)
-verbose = (vpts .== 15000)
-system = f.(vpts)
-output = run_eom!.(system, verbose)
-result = analyze.(output, verbose)
+system = [input_ex_quarter_car(; ks=x, ms, mu, kt, cs) for x in vpts]
+output = run_eom!.(system)
+result = analyze.(output)
 
 ss = :skip
 impulse = :skip
-vpt_name = ["k" "Stiffness" "N/m"]
 summarize(system, vpts, result; ss, impulse, vpt_name, format)
 
 end

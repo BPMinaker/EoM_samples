@@ -1,5 +1,4 @@
 module truck_trailer
-
 using EoM
 
 include(joinpath("models", "input_ex_truck_trailer.jl"))
@@ -16,8 +15,7 @@ vpts = 0.4:0.4:40
 format = :screen
 # format = :html
 
-f(x) = input_ex_truck_trailer(; u=x, m, Iz, d, e, h, mt, It)
-system = f.(vpts)
+system = [input_ex_truck_trailer(; u=x, m, Iz, d, e, h, mt, It) for x in vpts]
 output = run_eom!.(system, vpts .== 1)
 result = analyze.(output, vpts .== 1; freq=(-1, 1))
 

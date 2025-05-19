@@ -1,7 +1,8 @@
 module roll_centre
+using EoM
 
-using EoM, ForwardDiff
-
+# note that this mmodel has four actuators, one for each tire lateral force, so we can use an external calculation for the tire model, anything we like, e.g. a magic formula
+# the tire model is defined in the function tire(Z, slip), where Z is the vertical load and slip is the slip angle
 include(joinpath("models", "input_ex_roll_centre.jl"))
 
 # see the input file for the list of parameters and their default values
@@ -20,6 +21,9 @@ kr = 30000
 krf = 500
 krr = 500
 
+# magic formula tire model parameters
+mtm = [1.6929, -55.2084E-6, 1.27128, 1601.8 * 180 / pi, 6494.6, 4.7966E-3 * 180 / pi, -0.3875E-3, 1.0]
+
 format = :screen
 # format = :html
 
@@ -30,7 +34,6 @@ result = analyze(output, true)
 
 # define a nonlinear tire with load sensitivity
 function tire(Z, slip)
-    mtm = [1.6929, -55.2084E-6, 1.27128, 1601.8 * 180 / pi, 6494.6, 4.7966E-3 * 180 / pi, -0.3875E-3, 1.0]
     C = mtm[1]
     D = (mtm[2] * Z .+ mtm[3]) .* Z
     B = mtm[4] * sin.(2 * atan.(Z / mtm[5])) / C ./ D
@@ -40,13 +43,8 @@ function tire(Z, slip)
     -D .* sin.(C * atan.((1.0 .- E) .* Bslip + E .* atan.(Bslip)))
 end
 
-# a smooth step function, 3 degrees, with its midpoint (i.e. 1.5) at t = 2
-# the 0.5 terms change the range from -1...1 to 0...1
-# the 4 determines how quickly the step occurs
-#steer(t) = 3 * (0.5 * tanh(4 * (t - 1.5)) + 0.5)
-
+# define a steer function, use a slowly increasing steer angle
 steer(t) = t/10
-
 
 # get static tire normal loads (kN)
 # assume LF, LR, RF, RR sequence
@@ -72,6 +70,7 @@ t2 = 30
 yoft = ltisim(result, u_vec, (t1, t2))
 delta = steer.(yoft.t)
 
+println("Plotting results...")
 # empty plot vector to push plots into
 plots = []
 
@@ -136,19 +135,12 @@ label = ["ru" "Σf/m" "vdot"]
 ylabel = "Lateral accel'n [m/s^2]"
 push!(plots, ltiplot(system, yoft, [yoft[19, :] acc acc - yoft[19, :]]; ylabel, label, yidx, uidx))
 
-# recompute cornering stiffnesses
-# define the lateral force function at the actual vertical load
-yf(x) = tire(Z0[1], x)
-# differentiate by slip angle
-dyf(x) = ForwardDiff.derivative(yf, x)
-# evaluate a slip angle of zero
-cfy = -dyf(0)
-# repeat for rear
-yr(x) = tire(Z0[2], x)
-dyr(x) = ForwardDiff.derivative(yr, x)
-cry = -dyr(0)
+# compute cornering stiffnesses from the magic tire model
+cfy = mtm[4] * sin.(2 * atan.(Z0[1] / mtm[5])) 
+cry = mtm[4] * sin.(2 * atan.(Z0[2] / mtm[5])) 
 
 # rebuild the equations of motion using the updated cornering stiffnesses
+# really only need to do this if we want to see the effect of the cornering stiffnesses on the yaw eigenvalues
 system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr)
 output = run_eom!(system, false)
 result = analyze(output, false)

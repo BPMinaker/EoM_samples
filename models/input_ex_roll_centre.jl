@@ -11,8 +11,8 @@ function input_full_car_rc(;
     cr = 2500,
     krf = 500, # anti-roll stiffness, front
     krr = 500,
-    muf = 20, # unsprung mass, front
-    mur = 20,
+    muf = 50, # unsprung mass, front
+    mur = 50,
     hf = 0.2, # roll centre height, front
     hr = 0.2,
     hG = 0.5, # mass centre height
@@ -179,6 +179,7 @@ function input_full_car_rc(;
     item.location[2] = [a - 0.2, -tf / 2 + 0.2, r - 0.1]
     item.stiffness = krf
     item.twist = 1
+    item.preload = 0
     add_item!(item, the_system)
 
     item = spring("R anti-roll")
@@ -188,6 +189,7 @@ function input_full_car_rc(;
     item.location[2] = [-b + 0.2, -tr / 2 + 0.2, r - 0.1]
     item.stiffness = krr
     item.twist = 1
+    item.preload = 0
     add_item!(item, the_system)
 
 

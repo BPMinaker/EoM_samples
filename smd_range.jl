@@ -1,5 +1,4 @@
 module smd
-
 using EoM, Polynomials
 
 # this file repeats the spring mass damper example, but shows how we can analyze a series of systems, using Julia's dot notation

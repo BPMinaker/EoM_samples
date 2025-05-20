@@ -15,10 +15,10 @@ b = 1.5
 cfy = 0
 cry = 0
 hf = 0.3
-hr = 0.3
+hr = 0.4
 kf = 30000
 kr = 30000
-krf = 500
+krf = 1500
 krr = 500
 
 # magic formula tire model parameters
@@ -107,11 +107,35 @@ label = ["Total"]
 ylabel = "Yaw moments [Nm]"
 push!(plots, ltiplot(system, yoft, N; ylabel, label, yidx, uidx, formatter=:plain))
 
+# plots not directly from inputs or outputs
 uidx = [0]
 yidx = [0]
 
-# get tire forces
+# get tire lateral forces
+YY = hcat(yoft.u.(yoft.t)...)
+
+# find total front and rear tire forces
+YF = (YY[1,:] + YY[3,:])
+YR = (YY[2,:] + YY[4,:])
+
+# get tire vertical forces
 ZZ = Z0' .- yoft[[3, 4, 9, 10], :]'
+
+# get tire slip angles
+slip = 180 / π * yoft[[5, 6, 11, 12], :]' - delta .* [1, 0, 1, 0]'
+
+# get tire forces using slip but with static normal loads
+Y0 = hcat([tire.(Z0, i * π / 180) for i in eachrow(slip)]...)
+
+# find total front and rear tire forces
+YF0 = (Y0[1,:] + Y0[3,:])
+YR0 = (Y0[2,:] + Y0[4,:])
+
+# get the difference between the static max and actual tire forces
+ΔYF = YF0 - YF
+ΔYR = YR0 - YR
+
+# find weight transfer
 ΔZ = 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]
 
 label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
@@ -122,18 +146,20 @@ label = ["Front weight transfer" "Rear weight transfer"]
 ylabel = "Lateral weight transfer [N]"
 push!(plots, ltiplot(system, yoft, ΔZ; ylabel, label, yidx, uidx))
 
-slip = 180 / π * yoft[[5, 6, 11, 12], :]' - delta .* [1, 0, 1, 0]'
+label = ["Front grip loss" "Rear grip loss"]
+ylabel = "Lateral grip loss due to weight transfer [N]"
+push!(plots, ltiplot(system, yoft, [ΔYF ΔYR]; ylabel, label, yidx, uidx))
 
 label = ["Tire slip angle α_lf" "Tire slip angle α_lr" "Tire slip angle α_rf" "Tire slip angle α_rr"]
 ylabel = "Slip angles [°]"
 push!(plots, ltiplot(system, yoft, slip; ylabel, label, yidx, uidx))
 
-YY = hcat(yoft.u.(yoft.t)...)
 acc = sum(YY, dims=1)[1, :] * 9.81 / sum(Z0)
-
 label = ["ru" "Σf/m" "vdot"]
 ylabel = "Lateral accel'n [m/s^2]"
 push!(plots, ltiplot(system, yoft, [yoft[19, :] acc acc - yoft[19, :]]; ylabel, label, yidx, uidx))
+
+println("Plotted results.")
 
 # compute cornering stiffnesses from the magic tire model
 cfy = mtm[4] * sin.(2 * atan.(Z0[1] / mtm[5])) 

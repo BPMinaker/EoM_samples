@@ -1,20 +1,19 @@
-module top
-
 using EoM
-
 include(joinpath("models", "input_ex_top.jl"))
 
-vpts = 0:10/125:10
+function main()
 
-system = [input_ex_top(r=x) for x in vpts]
-output = run_eom!.(system)
-result = analyze.(output)
+    vpts = 0:10/125:10
+    vpt_name = ["r" "Angular speed" "rad/s"]
 
-ss = :skip
-impulse = :skip
-vpt_name = ["r" "Angular speed" "rad/s"]
-summarize(system, vpts, result; ss, impulse, vpt_name)
+    system = [input_ex_top(r=x) for x in vpts]
+    output = run_eom!.(system)
+    result = analyze.(output)
+
+    summarize(system, vpts, result; ss=:skip, impulse=:skip, vpt_name)
+
+    println("Done.")
 
 end
 
-println("Done.")
+main()

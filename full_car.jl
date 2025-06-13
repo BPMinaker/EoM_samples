@@ -1,30 +1,31 @@
-module full_car
 using EoM
-
+# using EoM_X3D
 include(joinpath("models", "input_ex_full_car.jl"))
 
-m = 2000
-a = 2.65 * 0.58
-b = 2.65 * 0.42
-tf = 1.71
-tr = 1.71
-cf = 100
-cr = 100
-Iy = 2000
+function main()
 
-format = :screen
-# format = :html
+    m = 2000
+    a = 2.65 * 0.58
+    b = 2.65 * 0.42
+    tf = 1.71
+    tr = 1.71
+    cf = 100
+    cr = 100
+    Iy = 2000
 
-system = input_ex_full_car(; m, a, b, tf, tr, cf, cr, Iy)
-output = run_eom!(system)
-result = analyze(output)
+    format = :screen
+    # format = :html
 
-impulse = :skip
-summarize(system, result; impulse, format)
+    system = input_ex_full_car(; m, a, b, tf, tr, cf, cr, Iy)
+    output = run_eom!(system)
+    result = analyze(output)
 
-# using EoM_X3D
-# animate_modes(system, result)
+    impulse = :skip
+    summarize(system, result; impulse, format)
+
+    # animate_modes(system, result)
+    println("Done.")
 
 end
 
-println("Done.")
+main()

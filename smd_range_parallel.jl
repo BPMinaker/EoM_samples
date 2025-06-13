@@ -11,31 +11,50 @@ m = 1.0
 f(x) = input_ex_smd(; k, m, c=x)
 
 # then we define the range of values for c
-vpts = 0:0.005:1
+vpts = 0:0.001:1
 
 # timing experiment
 # looping vs vectorizing vs piping vs chaining
 
+id = zeros(length(vpts))
+
 @time begin
-    for i in vpts
-        system = f(i)
+    for i in eachindex(id)
+        id[i] = Threads.threadid()
+        system = f(vpts[i])
         output = run_eom!(system)
         result = analyze(output)
     end
 end
+#println(id)
 
-@time begin    
+@time begin
+    Threads.@threads for i in eachindex(id)
+        id[i] = Threads.threadid()
+        system = f(vpts[i])
+        output = run_eom!(system)
+        result = analyze(output)
+    end
+end
+#println(id)
+
+
+@time begin
     system = f.(vpts)
     output = run_eom!.(system)
-    result = analyze.(output)    
+    result = analyze.(output)
 end
+
+
+
+sdfdssdf()
 
 @time begin
     result = vpts .|> f .|> run_eom! .|> analyze
 end
 
 @time begin
-    result = (analyze ∘ run_eom! ∘ f).(vpts)  
+    result = (analyze ∘ run_eom! ∘ f).(vpts)
 end
 
 @time begin
@@ -52,16 +71,16 @@ end
     end
 end
 
-@time begin    
+@time begin
     system = (x -> input_ex_smd(; k, m, c=x)).(vpts)
     output = run_eom!.(system)
-    result = analyze.(output)    
+    result = analyze.(output)
 end
 
-@time begin    
+@time begin
     system = map(x -> input_ex_smd(; k, m, c=x), vpts)
     output = run_eom!.(system)
-    result = analyze.(output)    
+    result = analyze.(output)
 end
 
 @time begin

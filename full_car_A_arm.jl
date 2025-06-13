@@ -1,52 +1,55 @@
-module full_car
-using EoM
+using EoM, EoM_X3D
 
 include(joinpath("models", "input_full_car_a_arm_pushrod.jl"))
 include(joinpath("models", "susp.jl"))
 include(joinpath("models", "tire.jl"))
 include(joinpath("models", "drive.jl"))
 
-# here you can enter your vehicle specs by name, and set the speed
-a = 2.65 * 0.58
-b = 2.65 * 0.42
-tw = 1.94 - 0.23
-r = 0.346
-u = 10
+function main()
 
-format = :screen
-# format = :html
+    # here you can enter your vehicle specs by name, and set the speed
+    a = 2.65 * 0.58
+    b = 2.65 * 0.42
+    tw = 1.94 - 0.23
+    r = 0.346
+    u = 10
 
-system = input_full_car_a_arm_pushrod(; u, a, b, tw, r)
-output = run_eom!(system)
-result = analyze(output, freq=(-1, 2))
+    format = :screen
+    # format = :html
 
-zofxl, zofxr = random_road(class=5, dz=0.2)
-u_vec(_, t) = [0, 0, zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a - b)]
+    system = input_full_car_a_arm_pushrod(; u, a, b, tw, r)
+    output = run_eom!(system)
+    result = analyze(output, freq=(-1, 2))
 
-println("Solving time history...")
-t1 = 0
-t2 = 20
-y = ltisim(result, u_vec, (t1, t2))
+    zofxl, zofxr = random_road(class=5, dz=0.2)
+    u_vec(_, t) = [0, 0, zofxl(u * t), zofxl(u * t - a - b), zofxr(u * t), zofxr(u * t - a - b)]
 
-impulse = :skip
-summarize(system, result; impulse, format)
+    println("Solving time history...")
+    t1 = 0
+    t2 = 20
+    y = ltisim(result, u_vec, (t1, t2))
 
-using EoM_X3D
-# animate_modes(system, result, true)
-eom_draw(system)
+    impulse = :skip
+    summarize(system, result; impulse, format)
 
-system = input_full_car_a_arm_pushrod(; u, a, tw, r)
-sensors_animate!(system)
-output = run_eom!(system)
-result = analyze(output)
+    # animate_modes(system, result, true)
+    eom_draw(system)
 
-println("Solving time history...")
-t1 = 0
-t2 = 20
-y = ltisim(result, u_vec, (t1, t2))
+    # rebuild the system for the time history animation
+    system = input_full_car_a_arm_pushrod(; u, a, b, tw, r)
+    sensors_animate!(system)
+    output = run_eom!(system)
+    result = analyze(output)
 
-animate_history(system, y.t, y)
+    println("Solving time history...")
+    t1 = 0
+    t2 = 20
+    y = ltisim(result, u_vec, (t1, t2))
+
+    animate_history(system, y.t, y)
+
+    println("Done.")
 
 end
 
-println("Done.")
+main()

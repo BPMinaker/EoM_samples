@@ -1,17 +1,19 @@
-module two_dof
 using EoM
-
+# using EoM_X3D
 include(joinpath("models", "input_ex_2_dof_double_pendulum.jl"))
 
-system = input_double_pendulum()
-output = run_eom!(system)
-result = analyze(output)
+function main()
 
-summarize(system, result)
+    system = input_double_pendulum()
+    output = run_eom!(system)
+    result = analyze(output)
 
-# using EoM_X3D
-# animate_modes(system, result)
+    summarize(system, result)
+
+    # animate_modes(system, result)
+
+    println("Done.")
 
 end
 
-println("Done.")
+main()

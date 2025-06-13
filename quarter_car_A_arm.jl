@@ -1,50 +1,51 @@
-module quarter_car
-using EoM
+using EoM, EoM_X3D
 
 include(joinpath("models", "input_quarter_car_a_arm_pushrod.jl"))
 include(joinpath("models", "susp.jl"))
 include(joinpath("models", "tire.jl"))
 
-# here you can enter your vehicle specs by name
-a = 2.65 * 0.58
-tw = 1.71
-r = 0.346
-u = 10
+function main()
 
-format = :screen
-# format = :html
+    # here you can enter your vehicle specs by name
+    a = 2.65 * 0.58
+    tw = 1.71
+    r = 0.346
+    u = 10
 
-system = quarter_car_a_arm_pushrod(; u, a, tw, r)
-output = run_eom!(system)
-result = analyze(output)
+    format = :screen
+    # format = :html
 
-zofx = random_road(class=5, L=200)
-u_vec(_, t) = [zofx(u * t)]
+    system = quarter_car_a_arm_pushrod(; u, a, tw, r)
+    output = run_eom!(system)
+    result = analyze(output)
 
-t1 = 0
-t2 = 20
-yoft = ltisim(result, u_vec, (t1, t2))
+    zofx = random_road(class=5, L=200)
+    u_vec(_, t) = [zofx(u * t)]
 
-ylabel = "Distance [m]"
-plots = [ltiplot(system, yoft; ylabel)]
+    t1 = 0
+    t2 = 20
+    yoft = ltisim(result, u_vec, (t1, t2))
 
-impulse = :skip
-summarize(system, result; plots, impulse, format)
+    ylabel = "Distance [m]"
+    plots = [ltiplot(system, yoft; ylabel)]
 
+    impulse = :skip
+    summarize(system, result; plots, impulse, format)
 
-using EoM_X3D
-#animate_modes(system, result)
-#eom_draw(system)
+    #animate_modes(system, result)
+    #eom_draw(system)
 
-system = quarter_car_a_arm_pushrod(; u, a, tw, r)
-sensors_animate!(system)
-output = run_eom!(system)
-result = analyze(output)
+    system = quarter_car_a_arm_pushrod(; u, a, tw, r)
+    sensors_animate!(system)
+    output = run_eom!(system)
+    result = analyze(output)
 
-yoft = ltisim(result, u_vec, (t1, t2))
+    yoft = ltisim(result, u_vec, (t1, t2))
 
-animate_history(system, yoft.t, yoft[:,:])
+    animate_history(system, yoft.t, yoft[:, :])
+
+    println("Done.")
 
 end
 
-println("Done.")
+main()

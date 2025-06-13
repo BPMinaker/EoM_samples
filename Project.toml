@@ -1,3 +1,9 @@
+
+authors = ["BPMinaker <bminaker@uwindsor.ca>"]
+name = "EoM_samples"
+version = "0.1.0"
+uuid = "25d7ee20-f19a-11e8-093a-7b526cbd2d90"
+
 [deps]
 EoM = "25d7ee20-f19a-11e8-093a-7b526cbd2d90"
 EoM_X3D = "29d18a9a-f19a-11e8-3142-81fd2672d0ac"

@@ -1,28 +1,30 @@
-module half_car
 using EoM
-
+# using EoM_X3D
 include(joinpath("models", "input_ex_half_car.jl"))
 
-m = 2000
-a = 1.5
-b = 1.3
-cf = 100
-cr = 100
-Iy = 2000
+function main()
 
-format = :screen
-# format = :html
+    m = 2000
+    a = 1.5
+    b = 1.3
+    cf = 100
+    cr = 100
+    Iy = 2000
 
-system = input_ex_half_car(; m, a, b, cf, cr, Iy)
-output = run_eom!(system)
-result = analyze(output)
+    format = :screen
+    # format = :html
 
-impulse = :skip
-summarize(system, result; impulse, format)
+    system = input_ex_half_car(; m, a, b, cf, cr, Iy)
+    output = run_eom!(system)
+    result = analyze(output)
 
-# using EoM_X3D
-# animate_modes(system, result)
+    impulse = :skip
+    summarize(system, result; impulse, format)
+
+    # animate_modes(system, result)
+
+    println("Done.")
 
 end
 
-println("Done.")
+main()

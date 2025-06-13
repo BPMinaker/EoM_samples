@@ -1,15 +1,17 @@
-module n_dof
 using EoM
-
+# using EoM_X3D
 include(joinpath("models", "input_n_dof.jl"))
 
-system = input_n_dof(n=10)
-output = run_eom!(system, true)
-result = analyze(output, true)
+function main()
 
-summarize(system, result)
+    system = input_n_dof(n=10)
+    output = run_eom!(system, true)
+    result = analyze(output, true)
 
-# using EoM_X3D
-# animate_modes(system, result, scale = 0.5)
+    summarize(system, result)
+
+    # animate_modes(system, result, scale = 0.5)
 
 end
+
+main()

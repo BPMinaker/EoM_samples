@@ -1,76 +1,79 @@
-module bounce_pitch
 using EoM
-
 include(joinpath("models", "input_ex_bounce_pitch.jl"))
-m = 2000
-a = 1.5
-b = 1.3
-kf = 25000
-kr = 30000
-cf = 600
-cr = 500
-Iy = 2000
 
-#kr = a * kf / b
-#Iy = m*a*b
+function main()
 
-format = :screen
-# format = :html
+    m = 2000
+    a = 1.5
+    b = 1.3
+    kf = 25000
+    kr = 30000
+    cf = 600
+    cr = 500
+    Iy = 2000
 
-system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
-output = run_eom!(system)
-result = analyze(output)
+    #kr = a * kf / b
+    #Iy = m*a*b
 
-impulse = :skip
-summarize(system, result; impulse, format)
+    format = :screen
+    # format = :html
 
-input_delay!(system, result, (a + b) / 10, [1, 2])
-system.name *= " with input delay"
-summarize(system, result; impulse, format)
+    system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
+    output = run_eom!(system)
+    result = analyze(output)
 
-# using EoM_X3D
-# animate_modes(system, result)
+    impulse = :skip
+    summarize(system, result; impulse, format)
 
-cf = 1800
-cr = 2000
+    input_delay!(system, result, (a + b) / 10, [1, 2])
+    system.name *= " with input delay"
+    summarize(system, result; impulse, format)
 
-system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
-output = run_eom!(system)
-result = analyze(output)
-system.name *= " time history"
+    # using EoM_X3D
+    # animate_modes(system, result)
 
-zofx = random_road(class=5)
+    cf = 1800
+    cr = 2000
 
-# but we need to convert to time index, where x=ut; assuming a forward speed of u=10 m/s gives
-u_vec(_, t) = [zofx(10 * t), zofx(10 * t - (a + b))]
+    system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
+    output = run_eom!(system)
+    result = analyze(output)
+    system.name *= " time history"
 
-println("Solving time history...")
-t1 = 0
-t2 = 10
-yoft = ltisim(result, u_vec, (t1, t2))
+    zofx = random_road(class=5)
 
-# plot bounce
-yidx = [1]
-p1 = ltiplot(system, yoft; yidx)
+    # but we need to convert to time index, where x=ut; assuming a forward speed of u=10 m/s gives
+    u_vec(_, t) = [zofx(10 * t), zofx(10 * t - (a + b))]
 
-# plot pitch
-yidx = [2]
-p2 = ltiplot(system, yoft; yidx)
+    println("Solving time history...")
+    t1 = 0
+    t2 = 10
+    yoft = ltisim(result, u_vec, (t1, t2))
 
-# plot passenger motion
-yidx = [3]
-p3 = ltiplot(system, yoft; yidx)
+    # plot bounce
+    yidx = [1]
+    p1 = ltiplot(system, yoft; yidx)
 
-# plot suspension travel
-yidx = [4, 5]
-p4 = ltiplot(system, yoft; yidx)
+    # plot pitch
+    yidx = [2]
+    p2 = ltiplot(system, yoft; yidx)
 
-plots = [p1, p2, p3, p4]
+    # plot passenger motion
+    yidx = [3]
+    p3 = ltiplot(system, yoft; yidx)
 
-bode = :skip
-ss = :skip
-summarize(system, result; plots, impulse, bode, ss, format)
+    # plot suspension travel
+    yidx = [4, 5]
+    p4 = ltiplot(system, yoft; yidx)
+
+    plots = [p1, p2, p3, p4]
+
+    bode = :skip
+    ss = :skip
+    summarize(system, result; plots, impulse, bode, ss, format)
+
+    println("Done.")
 
 end
 
-println("Done.")
+main()

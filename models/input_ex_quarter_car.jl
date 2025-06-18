@@ -1,4 +1,4 @@
-function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs = 1500)
+function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs = 1500, ct = 500)
 
     # A 'quarter-car' model, two bodys, constrained to ground, allowing translation in the z axis only, with two point springs connecting them.  The point spring has stiffness and damping defined in translation along the z axis only.  An actuator connects the sprung mass to the ground as well, to provide input forces.
     ##  Note that the ground body is pre-defined.
@@ -24,6 +24,7 @@ function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs =
     item.body[1] = "unsprung"
     item.body[2] = "ground"
     item.stiffness = [kt, 0]
+    item.damping = [ct, 0]
     item.location = [0, 0, 0.15]
     item.forces = 1
     item.moments = 0
@@ -67,6 +68,7 @@ function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs =
     item.body[1] = "unsprung"
     item.body[2] = "ground"
     item.gain = kt
+    item.rate_gain = ct
     item.location[1] = [0.05, 0, 0.3]
     item.location[2] = [0.05, 0, 0]
     item.units = "m"
@@ -102,6 +104,39 @@ function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs =
     item.location[2] = [0.1, 0, 0]
     item.units = "m"
     item.desc = "Tire compression"
+    add_item!(item, the_system)
+
+    item = sensor("fs")
+    item.body[1] = "unsprung"
+    item.body[2] = "sprung"
+    item.location[1] = [0.1, 0, 0.3]
+    item.location[2] = [0.1, 0, 0.6]
+    item.units = "N"
+    item.order = 1
+    item.gain = ks
+    item.desc = "Suspension spring force"
+    add_item!(item, the_system)
+
+    item = sensor("fd")
+    item.body[1] = "unsprung"
+    item.body[2] = "sprung"
+    item.location[1] = [0.1, 0, 0.3]
+    item.location[2] = [0.1, 0, 0.6]
+    item.units = "N"
+    item.order = 2
+    item.gain = cs
+    item.desc = "Suspension damper force"
+    add_item!(item, the_system)
+
+    item = sensor("fi")
+    item.body[1] = "sprung"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0.05, 0.6]
+    item.location[2] = [0, 0.05, 0]
+    item.units = "N"
+    item.gain = ms
+    item.order = 3
+    item.desc = "Sprung mass inertial force"
     add_item!(item, the_system)
 
     the_system

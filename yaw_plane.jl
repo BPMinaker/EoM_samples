@@ -1,4 +1,5 @@
 using EoM
+using Interpolations
 include(joinpath("models", "input_ex_yaw_plane.jl"))
 
 function main()
@@ -112,14 +113,13 @@ function main()
     # generate over a huge range of speeds to find characteristic speed
     vpts = 0.4:0.4:140
 
-    using Interpolations
 
     system = [input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr) for x in vpts]
     output = run_eom!.(system)
     result = analyze.(output; freq=(-1, 1))
 
     ss_resp = hcat(getproperty.(result, :ss_resp)...)
-    if maximum(yaw_plane.ss_resp[3, :]) > 0.5
+    if maximum(ss_resp[3, :]) > 0.5
         yy = LinearInterpolation(ss_resp[3, :], vpts)
         uchar = yy(0.5)
         println("Characteristic speed $(my_round(uchar)) m/s.")

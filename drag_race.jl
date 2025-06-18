@@ -159,24 +159,24 @@ function main()
     # convert the vector of vectors to a matrix
 
     x = y[:, 1]
-    u = y[:, 2] * 3.6 # scale second column to convert to km/h
+    uu = y[:, 2] * 3.6 # scale second column to convert to km/h
     aG = y[:, 3] / 9.81 # acc'n in g
 
-    Zr = y[:, 4] + y[:, 5]
+    ZZr = y[:, 4] + y[:, 5]
     # add damping load to spring load
-    Zr *= -1.0 # take compressive loads as positve (switch signs)
-    Zr .+= Zr0 # add static load, note .+= increments each entry in the vector
-    Zr /= 1000 # scale third column to get kN
-    Zf = y[:, 6] + y[:, 7]
-    Zf *= -1.0 # take compressive loads as positve (switch signs)
-    Zf .+= Zf0 # add static load, note .+= increments each entry in the vector
-    Zf /= 1000 # scale third column to get kN
+    ZZr *= -1.0 # take compressive loads as positve (switch signs)
+    ZZr .+= Zr0 # add static load, note .+= increments each entry in the vector
+    ZZr /= 1000 # scale third column to get kN
+    ZZf = y[:, 6] + y[:, 7]
+    ZZf *= -1.0 # take compressive loads as positve (switch signs)
+    ZZf .+= Zf0 # add static load, note .+= increments each entry in the vector
+    ZZf /= 1000 # scale third column to get kN
 
     # linear interpolation to find 1/4 mile, 60 mph times
     # note 1/4 mile = 402.336 m, 60 mph = 96.5606 km/h
     interp_xt = LinearInterpolation(x, yoft.t)
-    interp_tu = LinearInterpolation(yoft.t, u)
-    interp_ut = LinearInterpolation(u, yoft.t)
+    interp_tu = LinearInterpolation(yoft.t, uu)
+    interp_ut = LinearInterpolation(uu, yoft.t)
 
     # find quarter mile time and speed, round it, and print
     if x[end] > 402.336
@@ -187,7 +187,7 @@ function main()
     end
 
     # find 0-60 time, round it, and print
-    if u[end] > 96.5606
+    if uu[end] > 96.5606
         println("0-60 mph time: ", round(interp_ut(96.5606), digits=2), " s.")
     else
         println("Simulation ended below 60 mph!")
@@ -207,7 +207,7 @@ function main()
     yidx = [0]
     label = hcat("Velocity u")
     ylabel = "u [km/h]"
-    push!(plots, ltiplot(system, yoft, u; ylabel, label, yidx, uidx))
+    push!(plots, ltiplot(system, yoft, uu; ylabel, label, yidx, uidx))
 
     label = hcat("Acceleration u_dot")
     ylabel = "u dot [g]"
@@ -215,7 +215,7 @@ function main()
 
     label = ["Z_r" "Z_f"]
     ylabel = "Axle vertical load [kN]"
-    push!(plots, ltiplot(system, yoft, [Zr Zf]; ylabel, label, yidx, uidx, ylims=(0, Inf)))
+    push!(plots, ltiplot(system, yoft, [ZZr ZZf]; ylabel, label, yidx, uidx, ylims=(0, Inf)))
 
     # pass all the results and plots, skip the Bode plots for now
     bode = :skip

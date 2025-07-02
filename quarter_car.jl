@@ -6,24 +6,19 @@ function main()
 
     # here you can enter your vehicle specs by name
     ms = 500
-    mu = 50
-    kt = 150000
+    mu = 65
+    kt = 200000
     ks = 18000
-    cs = 600
-    ct = 60
+    cs = 1500
+#    cs = sqrt(ks * ms / 2 * (2 * ks + kt) / kt)  # try Genta's "optimal" damping ratio for passenger acceleration
+    ct = 100
 
     format = :screen
     # format = :html
 
     system = input_ex_quarter_car(; ms, mu, kt, ks, cs, ct)
     output = run_eom!(system)
-
-    display(output)
-
     result = analyze(output)
-
-    display(result.ss_eqns)
-
 
     # here we set the input as a random road where z is a function of distance x; it is a sum of 500 sin waves with random phase angles, and ampltiude decreasing as wavelength shortens; it will be different each time you run the code; the longest wavelength in the sum is the full length of the road, a default of 100 m; the wavelengths shorten as the sequence 100/2, 100/3, 100/4,..., with the shortest wavelength at 100/500, or 20 cm; the class here is the road roughness, an integer ranging from 3-9.  A class 3 road is very smooth (on the boundary of ISO classes A and B), where class 9 is extremely rough (boundary of ISO classes G and H); the random road function returns a function handle that gives back `z` as a function of `x`
     zofx = random_road(class=5)
@@ -37,6 +32,7 @@ function main()
     yoft = ltisim(result, u_vec, (t1, t2))
     # default for ltisim is to solve at 1000 Hz, so at 10 m/s, a dx of 0.01 m, or 1 cm, giving 20 points per wavelength at the shortest wave, much more than the minimum of 2 points per wavelength (Nyquist criterion), and many more at longer wavelengths
 
+    println("Plotting results...")
     # plot sprung mass
     yidx = [1]
     p1 = ltiplot(system, yoft; yidx)

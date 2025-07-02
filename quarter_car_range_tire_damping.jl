@@ -8,14 +8,14 @@ function main()
     mu = 65
     kt = 200000
     ks = 18000
-    ct = 100
-    vpts = 500:20:3000
-    vpt_name = ["c" "Damping" "Ns/m"]
+    cs = 2300
+    vpts = 0:10:500
+    vpt_name = ["ct" "Tire damping" "Ns/m"]
 
     format = :screen
     # format = :html
 
-    system = [input_ex_quarter_car(; ks, ms, mu, kt, ct, cs=x) for x in vpts]
+    system = [input_ex_quarter_car(; ks, ms, mu, kt, ct=x, cs) for x in vpts]
     output = run_eom!.(system)
     result = analyze.(output)
 

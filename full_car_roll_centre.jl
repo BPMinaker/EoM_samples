@@ -127,7 +127,7 @@ function main()
     p = ltiplot(system, yoft, ZZ; ylabel, label, yidx, uidx)
     push!(plots, p)
 
-   # find weight transfer
+    # find weight transfer
     ΔZ = 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]
 
     label = ["Front weight transfer" "Rear weight transfer"]
@@ -144,7 +144,7 @@ function main()
     push!(plots, p)
 
     # get tire lateral forces
-    YY = hcat(yoft.u.(yoft.t)...)
+    YY = hcat(yoft.u...)
 
     # find total front and rear tire forces
     YF = (YY[1, :] + YY[3, :])

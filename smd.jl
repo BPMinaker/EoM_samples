@@ -106,7 +106,9 @@ function main()
 
     yoft = ltisim(result, u_vec, (t1, t2))
 
-    # note that `ltisim()' returns yoft as a function handle, i.e., we can choose any time t in the interval and find yoft(t)
+    # the result is a structured variable that holds the time vector t, and the output vector y, which has the same length as t; we can access the time vector using `yoft.t`, the output vector using `yoft.y`, and the input vector using `yoft.u`; there are some specialzed functions to allow simply yoft[5,:] if, for example, we want to access the fifth output
+
+    display(yoft)
 
     # our result is the displacement, the spring force, the damping force, and the inertial force;
 

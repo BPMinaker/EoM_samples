@@ -1,8 +1,7 @@
-
-authors = ["BPMinaker <bminaker@uwindsor.ca>"]
 name = "EoM_samples"
+uuid = "843d7ffb-e6c5-4c2b-9337-20d6ba731113"
+authors = ["Bruce Minaker <bminaker@uwindsor.ca>"]
 version = "0.1.0"
-uuid = "25d7ee20-f19a-11e8-093a-7b526cbd2d90"
 
 [deps]
 EoM = "25d7ee20-f19a-11e8-093a-7b526cbd2d90"
@@ -13,3 +12,13 @@ PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
 PlotlyKaleido = "f2990250-8cf9-495f-b13a-cce12b45703c"
 Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
 Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
+
+[compat]
+EoM = "2.0.0"
+EoM_X3D = "0.1.0"
+ForwardDiff = "1.0.1"
+Interpolations = "0.16.1"
+PlotlyBase = "0.8.21"
+PlotlyKaleido = "2.3.0"
+Polynomials = "4.1.0"
+Roots = "2.2.8"

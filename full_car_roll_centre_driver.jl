@@ -107,7 +107,7 @@ function main()
     t2 = 15
 
     yoft = ltisim(result, u_vec, (t1, t2))
-    delta = steer_driver.(yoft.(yoft.t), yoft.t)
+    delta = steer_driver.(yoft.y, yoft.t)
 
     println("Plotting results...")
     # empty plot vector to push plots into
@@ -181,7 +181,7 @@ function main()
     push!(plots, p)
 
     # get tire lateral forces
-    YY = hcat(yoft.u.(yoft.t)...)
+    YY = hcat(yoft.u...)
 
     # find total front and rear tire forces
     YF = (YY[1, :] + YY[3, :])

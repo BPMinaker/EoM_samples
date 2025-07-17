@@ -1,8 +1,8 @@
 using EoM, ForwardDiff
 # using EoM_X3D
 include(joinpath("models", "input_ex_roll_centre.jl"))
-# note that this mmodel has four actuators, one for each tire lateral force, so we can use an external calculation for the tire model, anything we like, e.g. a magic formula
-# the tire model is defined in the function tire(Z, slip), where Z is the vertical load and slip is the slip angle
+# note that this mmodel has four actuators, one for each tire lateral force, so an external calculation is used for the tire model, anything we like, e.g. a magic formula
+# the tire model is defined in the function tire(Z, slip), where Z is the vertical load and α is the slip angle
 
 function main()
 
@@ -23,8 +23,8 @@ function main()
     krf = 1500
     krr = 500
 
-    # format = :screen
-    format = :html
+    format = :screen
+    # format = :html
 
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
     system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr) # make sure to include all parameters here, and again below!!!
@@ -45,22 +45,17 @@ function main()
         -D .* sin.(C * atan.((1.0 .- E) .* Bslip + E .* atan.(Bslip)))
     end
 
-    # define a steer function, use a slowly increasing steer angle
-#    steer(t) = t / 10
-
     # get static tire normal loads (kN)
     # assume LF, LR, RF, RR sequence
     # display(getfield.(system.flex_points,:name))
     Z0 = vcat(getfield.(system.flex_points[[1, 2, 5, 6]], :preload)...)
 
     function track(x)
-
-        # define road y coordinate using the built-in function pulse to paste together a piecewise function of sines and constant
-
+        # define road y coordinate using the EoM function `pulse()` to paste together a piecewise function of sines and constant; pulse(x, a, b) = 1 if a<x<b, 0 otherwise
+        # this defines a value of y=0 for x<50, y ramps from 0 to 4 along a cosine curve for 50<x<100, y=4 for 100<x<150, y ramps from 4 back to 0 along a cosine for 150<x<200 and y=0 for x>200
         y(x) = EoM.pulse(x, 50, 100) * (2 - 2 * cos(2π / 100 * (x - 50))) + EoM.pulse(x, 100, 150) * 4 + EoM.pulse(x, 150, 200) * (2 + 2 * cos(2π / 100 * (x - 150)))
 
-        # use automatic differentiation to find the heading angle and curvature; as long as the angles are small we can approximate slope with the derivative and the curvature as the second derivative; automatic differentiation is a powerful numerical (i.e. not symbolic!) technique to compute the derivative of any function, using the fact that every function must be computed using basic arithmetic operations
-
+        # use automatic differentiation to find the heading angle and curvature; as long as the angles are small we can approximate heading with the slope found with the derivative and the curvature as the second derivative; automatic differentiation is a powerful numerical (i.e., not symbolic!) technique to compute the derivative of any function, using the fact that every function must be computed numerically using basic arithmetic operations (+-*/), and that the derivative of these operations is well defined
         dy(x) = ForwardDiff.derivative(y, x)
         d2y(x) = ForwardDiff.derivative(dy, x)
 
@@ -68,10 +63,8 @@ function main()
         y(x), dy(x), d2y(x)
     end
 
-    # now let's define the driver model, based on the vehicle location and heading, and the road
-
-    function steer_driver(y, t)
-
+    # now define the driver model, based on the vehicle location and heading, and the road
+    function steer(y, t)
         # get vehicle location and heading from sensors (y is the output vector)
         offset = y[20]
         heading = y[21] * π / 180 # convert back to radians
@@ -83,12 +76,9 @@ function main()
         offset_error = offset_t - offset
         heading_error = heading_t - heading
 
-        # compute the appropriate steer angle to return to the road
-        180 / π * ((a + b) * curvature + 1.1 * heading_error + 0.1 * offset_error)
+        # compute the appropriate steer angle to return to the road; note curvature is the inverse of the radius of curvature, so we it can be used to compute the kinematic steer angle, which is then modified based on the heading and offset errors
+        (a + b) * curvature + 1.1 * heading_error + 0.1 * offset_error
     end
-
-    # define a dummy function to convert the driver model from a function of the output to a function of the state, because the solver requires the input to be a function of the state
-    steer(x, t) = steer_driver(result.ss_eqns.C * x, t)
 
     # compute applied tire force
     function u_vec(x, t)
@@ -97,17 +87,19 @@ function main()
         # get total normal load
         Z = Z0 - y[[3, 4, 9, 10]]
         # get slip angles from sensors, subtract steer on front
-        slip = y[[5, 6, 11, 12]] .- steer(x, t) * [1, 0, 1, 0] * π / 180
+        δ = steer(y, t)
+        α = y[[5, 6, 11, 12]] - [δ, 0, δ, 0]
         # compute tire force
-        tire(Z, slip)
+        tire(Z, α)
     end
 
     println("Solving time history...")
     t1 = 0
     t2 = 15
-
     yoft = ltisim(result, u_vec, (t1, t2))
-    delta = steer_driver.(yoft.y, yoft.t)
+
+    # go back and recompute what the steer angle was, which is the output of the driver model (it wasn't recorded during the simulation because it is not an input or output of the system, the input is the tire force)
+    delta = 180 / π * steer.(yoft.y, yoft.t)
 
     println("Plotting results...")
     # empty plot vector to push plots into

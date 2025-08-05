@@ -76,20 +76,20 @@ function main()
     # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
 
     # plot yaw rate vs time
-    yidx = [1]
-    p1 = ltiplot(system, yoft; yidx)
+    sidx = ["r"]
+    p1 = ltiplot(system, yoft; sidx)
 
     # plot body slip angle vs time
-    yidx = [2]
-    p2 = ltiplot(system, yoft; yidx)
+    sidx = ["β"]
+    p2 = ltiplot(system, yoft; sidx)
 
     # plot slip angles, understeer angle vs time
-    yidx = [7, 8, 3]
-    p3 = ltiplot(system, yoft; yidx)
+    sidx = ["α_f", "α_r", "α_u"]
+    p3 = ltiplot(system, yoft; sidx)
 
     # plot lateral acceleration vs time
-    yidx = [4]
-    p4 = ltiplot(system, yoft; yidx)
+    sidx = ["a_lat"]
+    p4 = ltiplot(system, yoft; sidx)
 
     # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
     # becasue this plot is not a function of time, we need to use the EoM.plot function

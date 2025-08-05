@@ -34,21 +34,21 @@ function main()
 
     println("Plotting results...")
     # plot sprung mass
-    yidx = [1]
-    p1 = ltiplot(system, yoft; yidx)
+    sidx = ["z_s"]
+    p1 = ltiplot(system, yoft; sidx)
     # at 1000 Hz, a time interval of 10 s gives us 10000 points, which is fine until we want to plot on a screen with only 1920 pixels, so by default we downsample to plot a maximum 2000 points, unless you set an intger variable scale = x in the `ltiplot` call, where x is the number of points to skip; for example, `ltiplot(system, yoft; yidx, scale=50)` will plot every 50th point, or 200 points in total if the time interval is 10 s at 1000 Hz
 
     # plot suspension travel
-    yidx = [2]
-    p2 = ltiplot(system, yoft; yidx)
+    sidx = ["z_s-z_u"]
+    p2 = ltiplot(system, yoft; sidx)
 
     # plot tire compression
-    yidx = [3]
-    p3 = ltiplot(system, yoft; yidx)
+    sidx = ["z_u-z_g"]
+    p3 = ltiplot(system, yoft; sidx)
 
     uidx = [0]
-    yidx = [4, 5, 6]
-    p4 = ltiplot(system, yoft; uidx, yidx)
+    sidx = ["f_s", "f_d", "f_i"]
+    p4 = ltiplot(system, yoft; uidx, sidx)
 
     plots = [p1, p2, p3, p4]
 

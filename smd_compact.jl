@@ -18,11 +18,11 @@ function main()
     u_vec(_, t) = [sin(ω * t)]
     yoft = ltisim(result, u_vec, (0, 10))
 
-    yidx = [1]
-    p1 = ltiplot(system, yoft; yidx)
+    sidx = ["z"]
+    p1 = ltiplot(system, yoft; sidx)
 
-    yidx = [2, 3, 4]
-    p2 = ltiplot(system, yoft; yidx)
+    sidx = ["kz", "czdot", "mzddot"]
+    p2 = ltiplot(system, yoft; sidx)
 
     plots = [p1, p2]
 

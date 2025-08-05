@@ -1,8 +1,9 @@
-using EoM, ForwardDiff
-# using EoM_X3D
+using EoM
 include(joinpath("models", "input_ex_roll_centre.jl"))
+include(joinpath("models", "track.jl"))
+include(joinpath("models", "driver.jl"))
 # note that this mmodel has four actuators, one for each tire lateral force, so an external calculation is used for the tire model, anything we like, e.g. a magic formula
-# the tire model is defined in the function tire(Z, slip), where Z is the vertical load and α is the slip angle
+# the tire model is defined in the function tire(Z, α, γ), where Z is the vertical load, α is the slip angle, and γ is the camber angle
 
 function main()
 
@@ -22,75 +23,43 @@ function main()
     kr = 30000
     krf = 1500
     krr = 500
+    r = 0.315
 
+    l = a + b
     format = :screen
     # format = :html
 
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
-    system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr) # make sure to include all parameters here, and again below!!!
+    system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr, r) # make sure to include all parameters here, and again below!!!
     output = run_eom!(system, true)
     result = analyze(output, true)
 
-    # magic formula tire model parameters
-    mtm = [1.6929, -55.2084E-6, 1.27128, 1601.8 * 180 / π, 6494.6, 4.7966E-3 * 180 / π, -0.3875E-3, 1.0]
-
-    # define a nonlinear tire with load sensitivity
-    function tire(Z, slip)
-        C = mtm[1]
-        D = (mtm[2] * Z .+ mtm[3]) .* Z
-        B = mtm[4] * sin.(2 * atan.(Z / mtm[5])) / C ./ D
-        Bslip = B .* slip
-        E = mtm[7] * Z .+ mtm[8]
-
-        -D .* sin.(C * atan.((1.0 .- E) .* Bslip + E .* atan.(Bslip)))
-    end
-
     # get static tire normal loads (kN)
-    # assume LF, LR, RF, RR sequence
-    # display(getfield.(system.flex_points,:name))
-    Z0 = vcat(getfield.(system.flex_points[[1, 2, 5, 6]], :preload)...)
+    tires = (get.([system.flex_points_name], ["LF tire, Z", "LR tire, Z", "RF tire, Z", "RR tire, Z"], 0))
+    Z0 = vcat(getfield.(tires, :preload)...)
 
-    function track(x)
-        # define road y coordinate using the EoM function `pulse()` to paste together a piecewise function of sines and constant; pulse(x, a, b) = 1 if a<x<b, 0 otherwise
-        # this defines a value of y=0 for x<50, y ramps from 0 to 4 along a cosine curve for 50<x<100, y=4 for 100<x<150, y ramps from 4 back to 0 along a cosine for 150<x<200 and y=0 for x>200
-        y(x) = EoM.pulse(x, 50, 100) * (2 - 2 * cos(2π / 100 * (x - 50))) + EoM.pulse(x, 100, 150) * 4 + EoM.pulse(x, 150, 200) * (2 + 2 * cos(2π / 100 * (x - 150)))
-
-        # use automatic differentiation to find the heading angle and curvature; as long as the angles are small we can approximate heading with the slope found with the derivative and the curvature as the second derivative; automatic differentiation is a powerful numerical (i.e., not symbolic!) technique to compute the derivative of any function, using the fact that every function must be computed numerically using basic arithmetic operations (+-*/), and that the derivative of these operations is well defined
-        dy(x) = ForwardDiff.derivative(y, x)
-        d2y(x) = ForwardDiff.derivative(dy, x)
-
-        # evaluate all three and return those values
-        y(x), dy(x), d2y(x)
-    end
-
-    # now define the driver model, based on the vehicle location and heading, and the road
-    function steer(y, t)
-        # get vehicle location and heading from sensors (y is the output vector)
-        offset = y[20]
-        heading = y[21] * π / 180 # convert back to radians
-
-        # get the road location, heading
-        offset_t, heading_t, curvature = track(u * t)
-
-        # find the error in location and heading
-        offset_error = offset_t - offset
-        heading_error = heading_t - heading
-
-        # compute the appropriate steer angle to return to the road; note curvature is the inverse of the radius of curvature, so we it can be used to compute the kinematic steer angle, which is then modified based on the heading and offset errors
-        (a + b) * curvature + 1.1 * heading_error + 0.1 * offset_error
-    end
+    # find the output indices for tire normal loads and slip angles
+    Zidx = get.([system.sidx], ["Z_lf", "Z_lr", "Z_rf", "Z_rr"], 0)
+    αidx = get.([system.sidx], ["α_lf", "α_lr", "α_rf", "α_rr"], 0)
 
     # compute applied tire force
     function u_vec(x, t)
         # get sensor outputs (D=0)
         y = result.ss_eqns.C * x
         # get total normal load
-        Z = Z0 - y[[3, 4, 9, 10]]
+        Z = Z0 - y[Zidx]
+
+        # get vehicle location and heading from sensors (y is the output vector)
+        offset = y[20]
+        heading = y[21] * π / 180 # convert back to radians
+        δ = driver(l, offset, heading, u * t)
+
         # get slip angles from sensors, subtract steer on front
-        δ = steer(y, t)
-        α = y[[5, 6, 11, 12]] - [δ, 0, δ, 0]
-        # compute tire force
-        tire(Z, α)
+        # flip sign on RF and RR slip angles
+        α = (y[αidx] - [δ, 0, δ, 0]) .* [1, 1, -1, -1]
+        # compute tire force, ignore camber effect, restroing moment
+        Y = tire(Z, α, [0, 0, 0, 0])[1]
+        Y .* [-1, -1, 1, 1] # flip sign on LF and LR tire forces (mirror)
     end
 
     println("Solving time history...")
@@ -99,45 +68,46 @@ function main()
     yoft = ltisim(result, u_vec, (t1, t2))
 
     # go back and recompute what the steer angle was, which is the output of the driver model (it wasn't recorded during the simulation because it is not an input or output of the system, the input is the tire force)
-    delta = 180 / π * steer.(yoft.y, yoft.t)
+
+    δ = 180 / π * driver.(l, yoft[20, :], yoft[21, :] * π / 180, u * yoft.t)
 
     println("Plotting results...")
     # empty plot vector to push plots into
     plots = []
 
     # yaw rate
-    yidx = [13]
+    sidx = ["r"]
     uidx = [0]
     label = ["Steer angle δ"]
     ylabel = ", δ [°]"
-    p = ltiplot(system, yoft, delta; ylabel, label, yidx, uidx)
+    p = ltiplot(system, yoft, δ; ylabel, label, sidx, uidx)
     push!(plots, p)
 
-
     # roll angle, pitch angle, slip angle, understeer angle
-    yidx = [15, 16, 17, 21]
+    sidx = ["ϕ", "θ", "β", "ψ"]
     label = ["Understeer angle α_u" "Steer angle δ"]
     ylabel = "Angles [°]"
-    p = ltiplot(system, yoft, [yoft[18, :] .+ delta delta]; ylabel, label, yidx, uidx)
+    p = ltiplot(system, yoft, [yoft[18, :] .+ δ δ]; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # G lift
-    yidx = [14]
+    sidx = ["z_G"]
     label = ["Steer angle δ"]
     ylabel = ", δ [°]"
-    p = ltiplot(system, yoft, delta; ylabel, label, yidx, uidx)
+    p = ltiplot(system, yoft, δ; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # lateral forces
     yidx = [0]
-    uidx = [1, 2, 3, 4]
+    aidx = ["Y_lf", "Y_lr", "Y_rf", "Y_rr"]
     ylabel = "Lateral forces [N]"
-    p = ltiplot(system, yoft; ylabel, yidx, uidx)
+    p = ltiplot(system, yoft; ylabel, yidx, aidx)
     push!(plots, p)
 
     # yaw moment
-    N = sum(yoft[[1, 2, 7, 8], :]; dims=1)[1, :]
-    yidx = [1, 2, 7, 8]
+    Nidx = get.([system.sidx], ["N_lf", "N_lr", "N_rf", "N_rr"], 0)
+    N = sum(yoft[Nidx, :]; dims=1)[1, :]
+    yidx = Nidx
     uidx = [0]
     label = ["Total"]
     ylabel = "Yaw moments [Nm]"
@@ -149,14 +119,14 @@ function main()
     yidx = [0]
 
     # get tire vertical forces
-    ZZ = Z0' .- yoft[[3, 4, 9, 10], :]'
+    ZZ = Z0' .- yoft[Zidx, :]'
 
     label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
     ylabel = "Vertical forces [N]"
     p = ltiplot(system, yoft, ZZ; ylabel, label, yidx, uidx)
     push!(plots, p)
 
-   # find weight transfer
+    # find weight transfer
     ΔZ = 0.5 * [ZZ[:, 3] - ZZ[:, 1] ZZ[:, 4] - ZZ[:, 2]]
 
     label = ["Front weight transfer" "Rear weight transfer"]
@@ -165,35 +135,15 @@ function main()
     push!(plots, p)
 
     # get tire slip angles
-    slips = 180 / π * yoft[[5, 6, 11, 12], :]' - delta .* [1, 0, 1, 0]'
+    α = 180 / π * yoft[αidx, :]' - δ .* [1, 0, 1, 0]'
 
     label = ["Tire slip angle α_lf" "Tire slip angle α_lr" "Tire slip angle α_rf" "Tire slip angle α_rr"]
     ylabel = "Slip angles [°]"
-    p = ltiplot(system, yoft, slips; ylabel, label, yidx, uidx)
+    p = ltiplot(system, yoft, α; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # get tire lateral forces
     YY = hcat(yoft.u...)
-
-    # find total front and rear tire forces
-    YF = (YY[1, :] + YY[3, :])
-    YR = (YY[2, :] + YY[4, :])
-
-    # get tire forces using slip but with static normal loads
-    Y0 = hcat([tire.(Z0, i * π / 180) for i in eachrow(slips)]...)
-
-    # find total front and rear tire forces
-    YF0 = (Y0[1, :] + Y0[3, :])
-    YR0 = (Y0[2, :] + Y0[4, :])
-
-    # get the difference between the static max and actual tire forces
-    ΔYF = YF0 - YF
-    ΔYR = YR0 - YR
-
-    label = ["Front grip loss" "Rear grip loss"]
-    ylabel = "Lateral grip loss due to weight transfer [N]"
-    p = ltiplot(system, yoft, [ΔYF ΔYR]; ylabel, label, yidx, uidx)
-    push!(plots, p)
 
     acc = sum(YY, dims=1)[1, :] * 9.81 / sum(Z0)
     label = ["ru" "Σf/m" "vdot"]
@@ -216,16 +166,6 @@ function main()
     push!(plots, p)
 
     println("Plotted results.")
-
-    # compute cornering stiffnesses from the magic tire model
-    cfy = mtm[4] * sin.(2 * atan.(Z0[1] / mtm[5]))
-    cry = mtm[4] * sin.(2 * atan.(Z0[2] / mtm[5]))
-
-    # rebuild the equations of motion using the updated cornering stiffnesses
-    # really only need to do this if we want to see the effect of the cornering stiffnesses on the yaw eigenvalues
-    system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr)
-    output = run_eom!(system, false)
-    result = analyze(output, false)
 
     bode = :skip
     impulse = :skip

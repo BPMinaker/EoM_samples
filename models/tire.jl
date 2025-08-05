@@ -35,7 +35,7 @@ function tire!(the_system; a = 1.2, tw = 1.5, kt = 150000, ct = 100, cf = 30000,
     item.body[1] = str * "Wheel+hub"
     item.body[2] = str * "Contact patch"
     item.location = [a, tw / 2, 0]
-    item.stiffness = [135000, 0]
+    item.stiffness = [0.8 * kt, 0]
     item.forces = 1
     item.moments = 0
     item.axis = [0, 1, 0]

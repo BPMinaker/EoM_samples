@@ -215,7 +215,7 @@ function input_full_car_rc(;
 
 
     # tire vertical stifness
-    item = flex_point("LF tire, k_t")
+    item = flex_point("LF tire, Z")
     item.body[1] = "LF wheel"
     item.body[2] = "ground"
     item.stiffness = [kt, 0]
@@ -227,7 +227,7 @@ function input_full_car_rc(;
     item.rolling_axis = [0, 1, 0]
     add_item!(item, the_system)
 
-    item = flex_point("LR tire, k_t")
+    item = flex_point("LR tire, Z")
     item.body[1] = "LR wheel"
     item.body[2] = "ground"
     item.stiffness = [kt, 0]
@@ -240,7 +240,7 @@ function input_full_car_rc(;
     add_item!(item, the_system)
 
     # tire cornering stiffness
-    item = flex_point("LF tire, c_f")
+    item = flex_point("LF tire, Y")
     item.body[1] = "LF wheel"
     item.body[2] = "ground"
     item.damping = [cfy / u, 0]
@@ -250,7 +250,7 @@ function input_full_car_rc(;
     item.axis = [0, 1, 0]
     add_item!(item, the_system)
 
-    item = flex_point("LR tire, c_r")
+    item = flex_point("LR tire, Y")
     item.body[1] = "LR wheel"
     item.body[2] = "ground"
     item.damping = [cry / u, 0]
@@ -448,7 +448,7 @@ function input_full_car_rc(;
     add_item!(item, the_system)
 
     # also won't reach steady state with constant delta input
-    item = sensor("θ")
+    item = sensor("ψ")
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, 0]

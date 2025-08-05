@@ -47,24 +47,24 @@ function main()
     # sensors are, in order, r, β, α_u, ψ, a_lat
 
     # plot yaw rate vs time
-    yidx = [1]
-    plots = [ltiplot(system, yoft; yidx)]
+    sidx = ["r"]
+    plots = [ltiplot(system, yoft; sidx)]
 
     # plot body slip angle vs time
-    yidx = [2]
-    push!(plots, ltiplot(system, yoft; yidx))
+    sidx = ["β"]
+    push!(plots, ltiplot(system, yoft; sidx))
 
     # plot understeer angle vs time
-    yidx = [3]
-    push!(plots, ltiplot(system, yoft; yidx))
+    sidx = ["α_u"]
+    push!(plots, ltiplot(system, yoft; sidx))
 
     # plot trailer sway angle vs time
-    yidx = [4]
-    push!(plots, ltiplot(system, yoft; yidx))
+    sidx = ["γ"]
+    push!(plots, ltiplot(system, yoft; sidx))
 
     # plot lateral acceleration vs time
-    yidx = [5]
-    push!(plots, ltiplot(system, yoft; yidx))
+    sidx = ["a_lat"]
+    push!(plots, ltiplot(system, yoft; sidx))
 
     impulse = :skip
     ss = :skip

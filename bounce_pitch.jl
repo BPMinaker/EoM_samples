@@ -23,17 +23,17 @@ function main()
     result = analyze(output)
 
     impulse = :skip
-    summarize(system, result; impulse, format)
+    bode = [1 1; 1 1; 1 1; 0 0; 0 0]
+    display(bode)
+    summarize(system, result; impulse, bode, format)
 
+    bode = [1, 1, 1, 0, 0]
     input_delay!(system, result, (a + b) / 10, [1, 2])
     system.name *= " with input delay"
-    summarize(system, result; impulse, format)
+    summarize(system, result; impulse, bode, format)
 
     # using EoM_X3D
     # animate_modes(system, result)
-
-    cf = 1800
-    cr = 2000
 
     system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
     output = run_eom!(system)
@@ -51,25 +51,26 @@ function main()
     yoft = ltisim(result, u_vec, (t1, t2))
 
     # plot bounce
-    yidx = [1]
-    p1 = ltiplot(system, yoft; yidx)
+    sidx = ["z_G"]
+    p1 = ltiplot(system, yoft; sidx)
 
     # plot pitch
-    yidx = [2]
-    p2 = ltiplot(system, yoft; yidx)
+    sidx = ["θ(a+b)"]
+    p2 = ltiplot(system, yoft; sidx)
 
     # plot passenger motion
-    yidx = [3]
-    p3 = ltiplot(system, yoft; yidx)
+    sidx = ["z_P"]
+    p3 = ltiplot(system, yoft; sidx)
 
     # plot suspension travel
-    yidx = [4, 5]
-    p4 = ltiplot(system, yoft; yidx)
+    sidx = ["z_f", "z_r"]
+    p4 = ltiplot(system, yoft; sidx)
 
     plots = [p1, p2, p3, p4]
 
-    bode = :skip
     ss = :skip
+    bode  = :skip
+    impulse = :skip
     summarize(system, result; plots, impulse, bode, ss, format)
 
     println("Done.")

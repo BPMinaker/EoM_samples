@@ -1,8 +1,7 @@
 using EoM
 # using EoM_X3D
 include(joinpath("models", "input_ex_roll_centre.jl"))
-# note that this mmodel has four actuators, one for each tire lateral force, so we can use an external calculation for the tire model, anything we like, e.g. a magic formula
-# the tire model is defined in the function tire(Z, slip), where Z is the vertical load and slip is the slip angle
+# note that this model has four actuators, one for each tire lateral force, so we can use an external calculation for the tire model, anything we like, e.g. a magic formula
 
 function main()
 
@@ -22,47 +21,40 @@ function main()
     kr = 30000
     krf = 1500
     krr = 500
+    r = 0.315
 
     format = :screen
     # format = :html
 
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
-    system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr) # make sure to include all parameters here, and again below!!!
+    system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr, r) # make sure to include all parameters here, and again below!!!
     output = run_eom!(system, true)
     result = analyze(output, true)
 
-    # magic formula tire model parameters
-    mtm = [1.6929, -55.2084E-6, 1.27128, 1601.8 * 180 / π, 6494.6, 4.7966E-3 * 180 / π, -0.3875E-3, 1.0]
-
-    # define a nonlinear tire with load sensitivity
-    function tire(Z, slip)
-        C = mtm[1]
-        D = (mtm[2] * Z .+ mtm[3]) .* Z
-        B = mtm[4] * sin.(2 * atan.(Z / mtm[5])) / C ./ D
-        Bslip = B .* slip
-        E = mtm[7] * Z .+ mtm[8]
-
-        -D .* sin.(C * atan.((1.0 .- E) .* Bslip + E .* atan.(Bslip)))
-    end
-
-    # define a steer function, use a slowly increasing steer angle
+    # define a steer function, use a slowly increasing steer angle, in units of degrees, i.e., 3 degrees after 30 seconds
     steer(t) = t / 10
 
     # get static tire normal loads (kN)
-    # assume LF, LR, RF, RR sequence
-    # display(getfield.(system.flex_points,:name))
-    Z0 = vcat(getfield.(system.flex_points[[1, 2, 5, 6]], :preload)...)
+    tires = (get.([system.flex_points_name], ["LF tire, Z", "LR tire, Z", "RF tire, Z", "RR tire, Z"], 0))
+    Z0 = vcat(getfield.(tires, :preload)...)
+
+    # find the output indices for tire normal loads and slip angles
+    Zidx = get.([system.sidx], ["Z_lf", "Z_lr", "Z_rf", "Z_rr"], 0)
+    αidx = get.([system.sidx], ["α_lf", "α_lr", "α_rf", "α_rr"], 0)
 
     # compute applied tire force
     function u_vec(x, t)
         # get sensor outputs (D=0)
         y = result.ss_eqns.C * x
         # get total normal load
-        Z = Z0 - y[[3, 4, 9, 10]]
-        # get slip angles from sensors, subtract steer on front
-        slip = y[[5, 6, 11, 12]] .- steer(t) * [1, 0, 1, 0] * π / 180
-        # compute tire force
-        tire(Z, slip)
+        Z = Z0 - y[Zidx]
+        # get slip angles from sensors, subtract steer on front, correct for units
+        α = y[αidx] .- steer(t) * [1, 0, 1, 0] * π / 180
+        α .*= [1, 1, -1, -1] # flip sign on RF and RR slip angles (modified iso sign convention)
+
+        # compute tire force, ignore camber effect, restroing moment
+        Y = tire(Z, α, [0, 0, 0, 0])[1]
+        Y .* [-1, -1, 1, 1] # flip sign on LF and LR tire forces (mirror)
     end
 
     println("Solving time history...")
@@ -70,45 +62,46 @@ function main()
     t2 = 30
 
     yoft = ltisim(result, u_vec, (t1, t2))
-    delta = steer.(yoft.t)
+    δ = steer.(yoft.t)
 
     println("Plotting results...")
     # empty plot vector to push plots into
     plots = []
 
     # yaw rate
-    yidx = [13]
+    sidx = ["r"]
     uidx = [0]
     label = ["Steer angle δ"]
     ylabel = ", δ [°]"
-    p = ltiplot(system, yoft, delta; ylabel, label, yidx, uidx)
+    p = ltiplot(system, yoft, δ; ylabel, label, sidx, uidx)
     push!(plots, p)
 
 
     # roll angle, pitch angle, slip angle, understeer angle
-    yidx = [15, 16, 17]
+    sidx = ["ϕ", "θ", "β"]
     label = ["Understeer angle α_u" "Steer angle δ"]
     ylabel = "Angles [°]"
-    p = ltiplot(system, yoft, [yoft[18, :] .+ delta delta]; ylabel, label, yidx, uidx)
+    p = ltiplot(system, yoft, [yoft[18, :] .+ δ δ]; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # G lift
-    yidx = [14]
+    sidx = ["z_G"]
     label = ["Steer angle δ"]
     ylabel = ", δ [°]"
-    p = ltiplot(system, yoft, delta; ylabel, label, yidx, uidx)
+    p = ltiplot(system, yoft, δ; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # lateral forces
     yidx = [0]
-    uidx = [1, 2, 3, 4]
+    aidx = ["Y_lf", "Y_lr", "Y_rf", "Y_rr"]
     ylabel = "Lateral forces [N]"
-    p = ltiplot(system, yoft; ylabel, yidx, uidx)
+    p = ltiplot(system, yoft; ylabel, yidx, aidx)
     push!(plots, p)
 
     # yaw moment
-    N = sum(yoft[[1, 2, 7, 8], :]; dims=1)[1, :]
-    yidx = [1, 2, 7, 8]
+    Nidx = get.([system.sidx], ["N_lf", "N_lr", "N_rf", "N_rr"], 0)
+    N = sum(yoft[Nidx, :]; dims=1)[1, :]
+    yidx = Nidx
     uidx = [0]
     label = ["Total"]
     ylabel = "Yaw moments [Nm]"
@@ -120,7 +113,7 @@ function main()
     yidx = [0]
 
     # get tire vertical forces
-    ZZ = Z0' .- yoft[[3, 4, 9, 10], :]'
+    ZZ = Z0' .- yoft[Zidx, :]'
 
     label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
     ylabel = "Vertical forces [N]"
@@ -136,22 +129,24 @@ function main()
     push!(plots, p)
 
     # get tire slip angles
-    slips = 180 / π * yoft[[5, 6, 11, 12], :]' - delta .* [1, 0, 1, 0]'
+    α = 180 / π * yoft[αidx, :]' - δ .* [1, 0, 1, 0]'
 
     label = ["Tire slip angle α_lf" "Tire slip angle α_lr" "Tire slip angle α_rf" "Tire slip angle α_rr"]
     ylabel = "Slip angles [°]"
-    p = ltiplot(system, yoft, slips; ylabel, label, yidx, uidx)
+    p = ltiplot(system, yoft, α; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # get tire lateral forces
     YY = hcat(yoft.u...)
-
     # find total front and rear tire forces
     YF = (YY[1, :] + YY[3, :])
     YR = (YY[2, :] + YY[4, :])
 
-    # get tire forces using slip but with static normal loads
-    Y0 = hcat([tire.(Z0, i * π / 180) for i in eachrow(slips)]...)
+    # get tire forces using slip but with static normal loads, remember to flip signs because of sign convention, mirror
+    α[:, 3:4] *= -1
+    Y00 = hcat([tire.(Z0, i * π / 180, [0, 0, 0, 0]) for i in eachrow(α)]...)
+    Y0 = [i[1] for i in Y00]
+    Y0[1:2, :] *= -1
 
     # find total front and rear tire forces
     YF0 = (Y0[1, :] + Y0[3, :])
@@ -174,6 +169,7 @@ function main()
 
     println("Plotted results.")
 
+    #=
     # compute cornering stiffnesses from the magic tire model
     cfy = mtm[4] * sin.(2 * atan.(Z0[1] / mtm[5]))
     cry = mtm[4] * sin.(2 * atan.(Z0[2] / mtm[5]))
@@ -183,6 +179,7 @@ function main()
     system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr)
     output = run_eom!(system, false)
     result = analyze(output, false)
+    =#
 
     bode = :skip
     impulse = :skip

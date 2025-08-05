@@ -106,7 +106,7 @@ function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs =
     item.desc = "Tire compression"
     add_item!(item, the_system)
 
-    item = sensor("fs")
+    item = sensor("f_s")
     item.body[1] = "unsprung"
     item.body[2] = "sprung"
     item.location[1] = [0.1, 0, 0.3]
@@ -117,7 +117,7 @@ function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs =
     item.desc = "Suspension spring force"
     add_item!(item, the_system)
 
-    item = sensor("fd")
+    item = sensor("f_d")
     item.body[1] = "unsprung"
     item.body[2] = "sprung"
     item.location[1] = [0.1, 0, 0.3]
@@ -128,7 +128,7 @@ function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs =
     item.desc = "Suspension damper force"
     add_item!(item, the_system)
 
-    item = sensor("fi")
+    item = sensor("f_i")
     item.body[1] = "sprung"
     item.body[2] = "ground"
     item.location[1] = [0, 0.05, 0.6]

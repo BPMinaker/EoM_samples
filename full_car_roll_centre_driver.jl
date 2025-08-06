@@ -35,8 +35,12 @@ function main()
     result = analyze(output, true)
 
     # get static tire normal loads (kN)
-    tires = (get.([system.flex_points_name], ["LF tire, Z", "LR tire, Z", "RF tire, Z", "RR tire, Z"], 0))
-    Z0 = vcat(getfield.(tires, :preload)...)
+    Z0 = [
+        system.flex_points_name["LF tire, Z"].preload[1],
+        system.flex_points_name["LR tire, Z"].preload[1],
+        system.flex_points_name["RF tire, Z"].preload[1],
+        system.flex_points_name["RR tire, Z"].preload[1]
+    ]
 
     # find the output indices for tire normal loads and slip angles
     Zidx = get.([system.sidx], ["Z_lf", "Z_lr", "Z_rf", "Z_rr"], 0)
@@ -50,14 +54,14 @@ function main()
         Z = Z0 - y[Zidx]
 
         # get vehicle location and heading from sensors (y is the output vector)
-        offset = y[20]
-        heading = y[21] * π / 180 # convert back to radians
+        offset = y[system.sidx["y"]]
+        heading = y[system.sidx["ψ"]] * π / 180 # convert back to radians
         δ = driver(l, offset, heading, u * t)
 
         # get slip angles from sensors, subtract steer on front
         # flip sign on RF and RR slip angles
         α = (y[αidx] - [δ, 0, δ, 0]) .* [1, 1, -1, -1]
-        # compute tire force, ignore camber effect, restroing moment
+        # compute tire force, ignore camber effect, restoring moment
         Y = tire(Z, α, [0, 0, 0, 0])[1]
         Y .* [-1, -1, 1, 1] # flip sign on LF and LR tire forces (mirror)
     end
@@ -69,7 +73,7 @@ function main()
 
     # go back and recompute what the steer angle was, which is the output of the driver model (it wasn't recorded during the simulation because it is not an input or output of the system, the input is the tire force)
 
-    δ = 180 / π * driver.(l, yoft[20, :], yoft[21, :] * π / 180, u * yoft.t)
+    δ = 180 / π * driver.(l, yoft[system.sidx["y"], :], yoft[system.sidx["ψ"], :] * π / 180, u * yoft.t)
 
     println("Plotting results...")
     # empty plot vector to push plots into
@@ -87,7 +91,7 @@ function main()
     sidx = ["ϕ", "θ", "β", "ψ"]
     label = ["Understeer angle α_u" "Steer angle δ"]
     ylabel = "Angles [°]"
-    p = ltiplot(system, yoft, [yoft[18, :] .+ δ δ]; ylabel, label, sidx, uidx)
+    p = ltiplot(system, yoft, [yoft[system.sidx["α_u-δ"], :] .+ δ δ]; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # G lift
@@ -148,7 +152,7 @@ function main()
     acc = sum(YY, dims=1)[1, :] * 9.81 / sum(Z0)
     label = ["ru" "Σf/m" "vdot"]
     ylabel = "Lateral accel'n [m/s^2]"
-    p = ltiplot(system, yoft, [yoft[19, :] acc acc - yoft[19, :]]; ylabel, label, yidx, uidx)
+    p = ltiplot(system, yoft, [yoft[system.sidx["ru"], :] acc acc - yoft[system.sidx["ru"], :]]; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m

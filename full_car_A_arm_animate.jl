@@ -23,12 +23,29 @@ function main()
     output = run_eom!(system)
     result = analyze(output)
 
+    lfidx = system.aidx["u_LF"]
+    lridx = system.aidx["u_LR"]
+    rfidx = system.aidx["u_RF"]
+    rridx = system.aidx["u_RR"]
+
+    zofxl, zofxr = random_road(class=5, dz=0.2)
+    function u_vec(_, t)
+        uu = zeros(length(system.aidx)) 
+       
+        uu[lfidx] = zofxl(u * t)
+        uu[rfidx] = zofxr(u * t)
+        uu[lridx] = zofxl(u * t - a - b)
+        uu[rridx] = zofxr(u * t - a - b)
+
+        uu
+    end
+
     println("Solving time history...")
     t1 = 0
     t2 = 20
-    y = ltisim(result, u_vec, (t1, t2))
+    yoft = ltisim(result, u_vec, (t1, t2))
 
-    animate_history(system, y.t, y)
+    animate_history(system, yoft)
 
     println("Done.")
 

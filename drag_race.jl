@@ -54,8 +54,8 @@ function main()
 
     # static preloads are computed as part of the generation of the equations of motion
     # we need these for the tire model, so save them in convenient notation
-    Zf0 = system.flex_points[1].preload[1]
-    Zr0 = system.flex_points[2].preload[1]
+    Zf0 = system.flex_points_name["front spring"].preload[1]
+    Zr0 = system.flex_points_name["rear spring"].preload[1]
     println("Static Zf=", round(Zf0, digits=2), " N")
     println("Static Zr=", round(Zr0, digits=2), " N")
 
@@ -64,6 +64,16 @@ function main()
 
     # save the state space matrices in a convenient notation
     (; A, B, C, D) = result.ss_eqns
+
+    uuidx = system.sidx["u_G"]
+
+    Xaidx = system.aidx["X_a"]
+    Xtidx = system.aidx["X_t"]
+
+    Zsfidx = system.sidx["Zs_f"]
+    Zsridx = system.sidx["Zs_r"]
+    Zdfidx = system.sidx["Zd_f"]
+    Zdridx = system.sidx["Zd_r"]
 
     # build the function that is the input to the equation of motion (i.e., the external forces)
     # we will call this function through the ODE solver
@@ -93,17 +103,17 @@ function main()
         ρ = 1.23
         af = 2.85
         cd = 0.35
-        u[1] = ρ / 2 * af * cd * y[2] * abs(y[2]) # use speed times abs(speed) instead of speed squared to switch force direction if we are moving backwards (which should never happen, but sometimes the rolling resistance model can cause weird things at very low speed)
+        u[Xaidx] = ρ / 2 * af * cd * y[uuidx] * abs(y[uuidx]) # use speed times abs(speed) instead of speed squared to switch force direction if we are moving backwards (which should never happen, but sometimes the rolling resistance model can cause weird things at very low speed)
 
         # find which gear we should use
         # note the .< returns a vector, i.e, (y[2] .< vmax) returns a vector of true or false where the current speed is below the shift point, we use findnext to find the index of the first true
-        n = findnext(y[2] .< vmax, 1)
+        n = findnext(y[uuidx] .< vmax, 1)
         if isnothing(n) # if we are above redline in top gear
             n = length(gear) # use top gear
         end
 
         # find engine speed (in rpm)
-        ω = y[2] * gear[n] * fd * slip * 60 / 2π / re
+        ω = y[uuidx] * gear[n] * fd * slip * 60 / 2π / re
 
         # if somehow we are moving backwards, set w=0, to prevent interpolation error (although it means we must have an issue somewhere else!)
         # note the shortcut conditional, in lieu of if statement
@@ -118,8 +128,8 @@ function main()
         Xf = (1 - rdf) * X
 
         # calculate axle load, static plus dynamic load, note the dynamic is negative if the spring is in compression, but this should add to static, hence negative sign
-        Zr = Zr0 - y[4] - y[5]
-        Zf = Zf0 - y[6] - y[7]
+        Zr = Zr0 - y[Zsridx] - y[Zdridx]
+        Zf = Zf0 - y[Zsfidx] - y[Zdfidx]
 
         # check for wheelspin, conditional
         Xrmax = μ * Zr
@@ -140,7 +150,7 @@ function main()
         end
 
         # include rolling resistance loss, and note sign function to reverse force if needed, set traction force
-        u[2] = Xr + Xf - (0.013 + 6.5e-6 * y[2]^2) * 9.81 * m * sign(y[2])
+        u[Xtidx] = Xr + Xf - (0.013 + 6.5e-6 * y[2]^2) * 9.81 * m * sign(y[2])
 
         # return u
         u
@@ -198,8 +208,8 @@ function main()
 
     # make the first plot and save it in a vector
     # we can just choose output number one, which is the distance
-    yidx = [1]
-    plots = [ltiplot(system, yoft; yidx, uidx)]
+    sidx = ["x_G"]
+    plots = [ltiplot(system, yoft; sidx, uidx)]
 
     # make the next plot, and push it onto the plot vector
     # we can't just choose output number two, which is the velocity, because we want new units

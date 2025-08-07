@@ -23,13 +23,13 @@ function main()
     result = analyze(output, true)
 
     # now lets try some closed loop feedback, where the driver input depends on the location
-  
+
     # define a dummy function to convert the driver model from a function of the output to a function of the state, because the solver requires the input to be a function of the state
     function u_vec(x, t)
         y = result.ss_eqns.C * x
         # get vehicle location and heading from sensors (y is the output vector)
-        offset = y[5]
-        heading = y[6] * π / 180 # convert back to radians
+        offset = y[system.sidx["y"]]
+        heading = y[system.sidx["ψ"]] * π / 180 # convert back to radians
         [180/π * driver(l, offset, heading, u * t)]
     end
 
@@ -43,21 +43,20 @@ function main()
     # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
 
     # plot yaw rate vs time
-    # plot yaw rate vs time
-    yidx = [1]
-    p1 = ltiplot(system, yoft; yidx)
+    sidx = ["r"]
+    p1 = ltiplot(system, yoft; sidx)
 
     # plot body slip angle vs time
-    yidx = [2]
-    p2 = ltiplot(system, yoft; yidx)
+    sidx = ["β"]
+    p2 = ltiplot(system, yoft; sidx)
 
     # plot slip angles, understeer angle vs time
-    yidx = [7, 8, 3]
-    p3 = ltiplot(system, yoft; yidx)
+    sidx = ["α_f", "α_r", "α_u"]
+    p3 = ltiplot(system, yoft; sidx)
 
     # plot lateral acceleration vs time
-    yidx = [4]
-    p4 = ltiplot(system, yoft; yidx)
+    sidx = ["a_lat"]
+    p4 = ltiplot(system, yoft; sidx)
 
     # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
     # becasue this plot is not a function of time, we need to use the EoM.plot function

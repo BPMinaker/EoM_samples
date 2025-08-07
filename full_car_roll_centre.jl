@@ -53,7 +53,7 @@ function main()
         # get total normal load
         Z = Z0 - y[Zidx]
         # get slip angles from sensors, subtract steer on front, correct for units
-        α = y[αidx] .- steer(t) * [1, 0, 1, 0] * π / 180
+        α = y[αidx] - steer(t) * [1, 0, 1, 0] * π / 180
         α .*= [1, 1, -1, -1] # flip sign on RF and RR slip angles (modified iso sign convention)
 
         # compute tire force, ignore camber effect, restoring moment
@@ -79,7 +79,6 @@ function main()
     ylabel = ", δ [°]"
     p = ltiplot(system, yoft, δ; ylabel, label, sidx, uidx)
     push!(plots, p)
-
 
     # roll angle, pitch angle, slip angle, understeer angle
     sidx = ["ϕ", "θ", "β"]
@@ -172,18 +171,6 @@ function main()
     push!(plots, p)
 
     println("Plotted results.")
-
-    #=
-    # compute cornering stiffnesses from the magic tire model
-    cfy = mtm[4] * sin.(2 * atan.(Z0[1] / mtm[5]))
-    cry = mtm[4] * sin.(2 * atan.(Z0[2] / mtm[5]))
-
-    # rebuild the equations of motion using the updated cornering stiffnesses
-    # really only need to do this if we want to see the effect of the cornering stiffnesses on the yaw eigenvalues
-    system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr)
-    output = run_eom!(system, false)
-    result = analyze(output, false)
-    =#
 
     bode = :skip
     impulse = :skip

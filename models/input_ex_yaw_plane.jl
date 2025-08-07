@@ -155,7 +155,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     add_item!(item, the_system)
 
     # also won't reach steady state with constant delta input
-    item = sensor("θ")
+    item = sensor("ψ")
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, 0]

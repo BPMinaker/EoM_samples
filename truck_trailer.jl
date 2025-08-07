@@ -24,7 +24,6 @@ function main()
 
     impulse = :skip
     bode = :skip
-    #summarize(system, vpts, result; impulse)
     summarize(system, vpts, result; impulse, bode, format)
 
     # choose the equations of motion for 18 m/s (note function notation)

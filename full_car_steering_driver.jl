@@ -156,15 +156,6 @@ function main()
     p = ltiplot(system, yoft; ylabel, aidx, yidx)
     push!(plots, p)
 
-    #=
-    # roll angle, pitch angle, slip angle, understeer angle
-    yidx = [15, 16, 17, 21]
-    label = ["Understeer angle α_u" "Steer angle δ"]
-    ylabel = "Angles [°]"
-    p = ltiplot(system, yoft, [yoft[18, :] .+ δ δ]; ylabel, label, yidx, uidx)
-    push!(plots, p)
-    =#
-
     sidx = ["z"]
     p = ltiplot(system, yoft; sidx, uidx)
     push!(plots, p)

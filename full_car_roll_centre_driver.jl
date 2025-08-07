@@ -72,7 +72,6 @@ function main()
     yoft = ltisim(result, u_vec, (t1, t2))
 
     # go back and recompute what the steer angle was, which is the output of the driver model (it wasn't recorded during the simulation because it is not an input or output of the system, the input is the tire force)
-
     δ = 180 / π * driver.(l, yoft[system.sidx["y"], :], yoft[system.sidx["ψ"], :] * π / 180, u * yoft.t)
 
     println("Plotting results...")
@@ -139,7 +138,7 @@ function main()
     push!(plots, p)
 
     # get tire slip angles
-    α = 180 / π * yoft[αidx, :]' - δ .* [1, 0, 1, 0]'
+    α = 180 / π * yoft[αidx, :]' - δ * [1, 0, 1, 0]'
 
     label = ["Tire slip angle α_lf" "Tire slip angle α_lr" "Tire slip angle α_rf" "Tire slip angle α_rr"]
     ylabel = "Slip angles [°]"

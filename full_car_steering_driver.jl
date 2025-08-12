@@ -207,11 +207,3 @@ end
 
 @time main()
 
-
-# for (i, j) in enumerate(system.sensors)
-#     println("Sensor $(i): $(j.name)")
-# end
-
-# for (i, j) in enumerate(system.actuators)
-#     println("Actuator $(i): $(j.name)")
-# end

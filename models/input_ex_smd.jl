@@ -79,7 +79,7 @@ function input_ex_smd(; m = 1.0, c = 0.1, k = 10.0)
     item.gain = m
     item.order = 3
     item.units = "N"
-    item.desc = "Intertial force"
+    item.desc = "Inertial force"
     add_item!(item, the_system)
 
     the_system

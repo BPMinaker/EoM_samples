@@ -21,7 +21,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.mass = m
     item.moments_of_inertia = [0, 0, Iz]
     item.products_of_inertia = [0, 0, 0]
-    item.location = [0, 0, 0]
+    item.location = [0, 0, 0.3]
     item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
@@ -149,7 +149,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, 0]
-    item.location[2] = [0, 0.1, 0]
+    item.location[2] = [0, -0.1, 0]
     item.units = "m"
     item.desc = "Lateral position"
     add_item!(item, the_system)
@@ -159,7 +159,7 @@ function input_ex_yaw_plane(; u = 10.0, a = 1.189, b = 2.885 - 1.189, cf = 80000
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, 0]
-    item.location[2] = [0, 0, 0.1]
+    item.location[2] = [0, 0, -0.1]
     item.twist = 1 # angular
     item.gain = 180 / π
     item.units = "°"

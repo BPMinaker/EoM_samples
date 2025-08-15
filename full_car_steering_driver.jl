@@ -28,6 +28,7 @@ function main()
     # format = :html
 
     system = input_full_car_steering(; u, a, b, m, muf, mur, hG, Ix, Iy, Iz, Iw, tf, tr, kf, kr, cf, cr, krf, krr, front, rear)
+    sensors_animate!(system)
     output = run_eom!(system)
     #    eom_draw(system)
     result = analyze(output)
@@ -89,6 +90,8 @@ function main()
     t1 = 0
     t2 = 15
     yoft = ltisim(result, u_vec, (t1, t2))
+
+    animate_history(system, yoft)
 
     # go back and recompute what the steer angle was, which is the output of the driver model (it wasn't recorded during the simulation because it is not an input or output of the system, the input is the tire force)
     δ = driver.(l, yoft[system.sidx["y"], :], yoft[system.sidx["ψ"], :], u * yoft.t)

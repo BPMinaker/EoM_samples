@@ -31,6 +31,7 @@ function main()
 
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
     system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr, r) # make sure to include all parameters here, and again below!!!
+    sensors_animate!(system)
     output = run_eom!(system, true)
     result = analyze(output, true)
 
@@ -70,6 +71,8 @@ function main()
     t1 = 0
     t2 = 15
     yoft = ltisim(result, u_vec, (t1, t2))
+
+    animate_history(system, yoft)
 
     # go back and recompute what the steer angle was, which is the output of the driver model (it wasn't recorded during the simulation because it is not an input or output of the system, the input is the tire force)
     δ = 180 / π * driver.(l, yoft[system.sidx["y"], :], yoft[system.sidx["ψ"], :] * π / 180, u * yoft.t)

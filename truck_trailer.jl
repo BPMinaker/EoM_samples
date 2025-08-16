@@ -62,7 +62,7 @@ function main()
     push!(plots, ltiplot(system, yoft; sidx))
 
     # plot lateral acceleration vs time
-    sidx = ["a_lat"]
+    sidx = ["a_y"]
     push!(plots, ltiplot(system, yoft; sidx))
 
     impulse = :skip

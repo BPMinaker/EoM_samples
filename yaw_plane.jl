@@ -88,7 +88,7 @@ function main()
     p3 = ltiplot(system, yoft; sidx)
 
     # plot lateral acceleration vs time
-    sidx = ["a_lat"]
+    sidx = ["a_y"]
     p4 = ltiplot(system, yoft; sidx)
 
     # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m

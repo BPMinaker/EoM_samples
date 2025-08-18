@@ -18,7 +18,7 @@ function main()
 
     system = input_ex_quarter_car(; ms, mu, kt, ks, cs, ct)
     output = run_eom!(system)
-    result = analyze(output)
+    result = analyze(output; impulse=:skip)
 
     # here we set the input as a random road where z is a function of distance x; it is a sum of 500 sin waves with random phase angles, and ampltiude decreasing as wavelength shortens; it will be different each time you run the code; the longest wavelength in the sum is the full length of the road, a default of 100 m; the wavelengths shorten as the sequence 100/2, 100/3, 100/4,..., with the shortest wavelength at 100/500, or 20 cm; the class here is the road roughness, an integer ranging from 3-9.  A class 3 road is very smooth (on the boundary of ISO classes A and B), where class 9 is extremely rough (boundary of ISO classes G and H); the random road function returns a function handle that gives back `z` as a function of `x`
     zofx = random_road(class=5)
@@ -52,8 +52,7 @@ function main()
 
     plots = [p1, p2, p3, p4]
 
-    impulse = :skip
-    summarize(system, result; plots, impulse, format)
+    summarize(system, result; plots, format)
 
     # generate animations of the mode shapes
     # animate_modes(system, result, scale=0.2)

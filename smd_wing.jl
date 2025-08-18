@@ -12,9 +12,9 @@ function main()
 
     system = input_ex_smd_wing(; k, m, c)
     output = run_eom!(system)
-    result = analyze(output)
+    result = analyze(output; ss=:skip)
 
-    summarize(system, result; ss=:skip, format)
+    summarize(system, result; format)
 
     println("Done.")
 end

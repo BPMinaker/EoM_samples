@@ -20,11 +20,9 @@ function main()
 
     system = [input_ex_truck_trailer(; u=x, m, Iz, d, e, h, mt, It) for x in vpts]
     output = run_eom!.(system, vpts .== 1)
-    result = analyze.(output, vpts .== 1; freq=(-1, 1))
 
-    impulse = :skip
-    bode = :skip
-    summarize(system, vpts, result; impulse, bode, format)
+    result = analyze.(output, vpts .== 1; freq=(-1, 1), impulse=:skip, bode=:skip)
+    summarize(system, vpts, result; format)
 
     # choose the equations of motion for 18 m/s (note function notation)
     n = findfirst(vpts .== 18)
@@ -65,9 +63,7 @@ function main()
     sidx = ["a_y"]
     push!(plots, ltiplot(system, yoft; sidx))
 
-    impulse = :skip
-    ss = :skip
-    summarize(system, result; plots, impulse, ss, format)
+    summarize(system, result; plots, format)
 
     # animate_modes(system, result)
 

@@ -20,24 +20,27 @@ function main()
 
     system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
     output = run_eom!(system)
-    result = analyze(output)
+    result = analyze(output; impulse = :skip)
 
-    impulse = :skip
     bode = [1 1; 1 1; 1 1; 0 0; 0 0]
-    display(bode)
-    summarize(system, result; impulse, bode, format)
+    summarize(system, result; bode, format)
 
     bode = [1, 1, 1, 0, 0]
+    impulse = [0, 0, 0, 0, 0]
+    ss = [0, 0, 0, 0, 0]
     input_delay!(system, result, (a + b) / 10, [1, 2])
     system.name *= " with input delay"
-    summarize(system, result; impulse, bode, format)
+    summarize(system, result; bode, ss, impulse, format)
 
     # using EoM_X3D
     # animate_modes(system, result)
 
     system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
     output = run_eom!(system)
-    result = analyze(output)
+    ss = :skip
+    bode  = :skip
+    impulse = :skip
+    result = analyze(output; ss, bode, impulse)
     system.name *= " time history"
 
     zofx = random_road(class=5)
@@ -67,11 +70,7 @@ function main()
     p4 = ltiplot(system, yoft; sidx)
 
     plots = [p1, p2, p3, p4]
-
-    ss = :skip
-    bode  = :skip
-    impulse = :skip
-    summarize(system, result; plots, impulse, bode, ss, format)
+    summarize(system, result; plots, format)
 
     println("Done.")
 

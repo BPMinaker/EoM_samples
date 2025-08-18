@@ -30,7 +30,7 @@ function main()
     system = input_ex_yaw_plane(; u, m, a, b, Iz, cf, cr, ptf, ptr)
     sensors_animate!(system)
     output = run_eom!(system)
-    result = analyze(output)
+    result = analyze(output; ss = :skip, impulse = :skip, bode = :skip)
 
     #define the steer angle as a function of time, a sin w dwell input ala FMVSS 126
     # a 0.7 Hz sinewave with origin at t=2 times zero everywhere except times one from t=2 for 3/4 of a wavelength
@@ -48,8 +48,7 @@ function main()
         # get vehicle location and heading from sensors (y is the output vector)
         offset = y[system.sidx["chassis_2"]]
         heading = y[system.sidx["chassis_6"]]
-        δ = driver(a+b, offset, heading, u * t)
-        [-180/ pi * δ]
+        [-dpr * driver(a+b, offset, heading, u * t)]
     end
 
     # define time interval
@@ -59,23 +58,44 @@ function main()
 
     animate_history(system, yoft)
 
+    # notation conflict, y is system output vector, but also lateral displacement
+    # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
+
+    # plot yaw rate vs time
+    sidx = ["r"]
+    p1 = ltiplot(system, yoft; sidx)
+
+    # plot body slip angle vs time
+    sidx = ["β"]
+    p2 = ltiplot(system, yoft; sidx)
+
+    # plot slip angles, understeer angle vs time
+    sidx = ["α_f", "α_r", "α_u"]
+    p3 = ltiplot(system, yoft; sidx)
+
+    # plot lateral acceleration vs time
+    sidx = ["a_y"]
+    p4 = ltiplot(system, yoft; sidx)
+
     # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
     # becasue this plot is not a function of time, we need to use the EoM.plot function
     xlabel = "x [m]"
     ylabel = "y [m]"
-    label = ""
+    label = ["Path" "Target path"]
     lw = 2 # thicker line weight
     yidx= system.sidx["y"]
     size = (800, 400)
-    p = EoM.plot(u * yoft.t, yoft[yidx, :]; xlabel, ylabel, label, lw, size)
 
-    plots = [p]
+    x = u * yoft.t
+    track_y(x) = track(x)[1]
+    path = track_y.(x)
+
+    p5 = EoM.plot(x, [yoft[yidx, :] path]; xlabel, ylabel, label, lw, size)
+
+    plots = [p1, p2, p3, p4, p5]
 
     # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
-    ss = :skip
-    impulse = :skip
-    bode = :skip
-    summarize(system, result; plots, ss, impulse, bode, format)
+    summarize(system, result; plots, format)
 
     println("Done.")
 

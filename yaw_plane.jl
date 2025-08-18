@@ -34,14 +34,14 @@ function main()
     output = run_eom!.(system)
 
     # do the eigenvalues, freq resp, etc, for each forward speed
-    result = analyze.(output; freq=(-1, 1))
+    ss =[1, 1, 1, 1, 0, 0, 1, 1]
+    impulse = :skip
+    bode = :skip
+    result = analyze.(output; freq=(-1, 1), ss, impulse, bode)
 
     # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
     # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
-    ss = [1, 1, 1, 1, 0, 0, 1, 1]
-    impulse = :skip
-    bode = :skip
-    summarize(system, vpts, result; ss, impulse, bode, format)
+    summarize(system, vpts, result; format)
 
     # now, let's also do some time domain solutions; let's pick a speed of 100 km/h, or 22.8 m/s, and get the equations of motion and the results for that speed
     u = 22.8
@@ -103,9 +103,8 @@ function main()
     plots = [p1, p2, p3, p4, p5]
 
     # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
-    ss = :skip
-    impulse = :skip
-    summarize(system, result; plots, ss, impulse, format)
+
+    summarize(system, result; plots, format)
 
     #using EoM_X3D
     #animate_modes(system, result)
@@ -113,10 +112,9 @@ function main()
     # generate over a huge range of speeds to find characteristic speed
     vpts = 0.4:0.4:140
 
-
     system = [input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr) for x in vpts]
     output = run_eom!.(system)
-    result = analyze.(output; freq=(-1, 1))
+    result = analyze.(output; freq=(-1, 1), bode, impulse)
 
     ss_resp = hcat(getproperty.(result, :ss_resp)...)
     if maximum(ss_resp[3, :]) > 0.5

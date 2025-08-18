@@ -10,9 +10,9 @@ function main()
 
     system = [input_ex_disk(u=x) for x in vpts]
     output = run_eom!.(system)
-    result = analyze.(output; freq=(-1, 1))
+    result = analyze.(output; ss=:skip, impulse=:skip, freq=(-1, 1))
 
-    summarize(system, vpts, result; ss=:skip, impulse=:skip, format)
+    summarize(system, vpts, result; format)
 
     println("Done.")
 

@@ -23,7 +23,8 @@ function main()
     output = run_eom!.(system)
 
     # we take the vector of output equations, and analyze all of them, again using dot notation
-    result = analyze.(output)
+    impulse = [1, 0, 0, 0]
+    result = analyze.(output; impulse, ss = :skip)
 
     # now, just for fun, let's plot ms^2 + cs + k over a range of s, to confirm how the roots align with our eigenvalues
     xlabel = "s [rad/s]"
@@ -41,9 +42,8 @@ function main()
     plots = [p1]
 
     # the `summarize()` function has been written using another feature of Julia, called `multiple dispatch`, which allows the same function to do different things, depending on the type of arguments, `summarize()` recognizes if `system` and `result` are vectors, and if so, it drops the tables, and gives a series of plots instead
-    ss = :skip
-    impulse = [1, 0, 0, 0]
-    summarize(system, vpts, result; ss, impulse, vpt_name, plots, format)
+
+    summarize(system, vpts, result; vpt_name, plots, format)
 
     println("Done.")
 

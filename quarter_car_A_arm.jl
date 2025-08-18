@@ -17,7 +17,7 @@ function main()
 
     system = quarter_car_a_arm_pushrod(; u, a, tw, r)
     output = run_eom!(system)
-    result = analyze(output)
+    result = analyze(output; impulse = :skip)
 
     zofx = random_road(class=5, L=200)
     u_vec(_, t) = [zofx(u * t)]
@@ -29,8 +29,7 @@ function main()
     ylabel = "Distance [m]"
     plots = [ltiplot(system, yoft; ylabel)]
 
-    impulse = :skip
-    summarize(system, result; plots, impulse, format)
+    summarize(system, result; plots, format)
 
     #animate_modes(system, result)
     #eom_draw(system)
@@ -38,11 +37,11 @@ function main()
     system = quarter_car_a_arm_pushrod(; u, a, tw, r)
     sensors_animate!(system)
     output = run_eom!(system)
-    result = analyze(output)
+    result = analyze(output; impulse = :skip)
 
     yoft = ltisim(result, u_vec, (t1, t2))
 
-    animate_history(system, yoft.t, yoft[:, :])
+    animate_history(system, yoft)
 
     println("Done.")
 

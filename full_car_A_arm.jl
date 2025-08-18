@@ -19,7 +19,7 @@ function main()
 
     system = input_full_car_a_arm_pushrod(; u, a, b, tw, r)
     output = run_eom!(system)
-    result = analyze(output, freq=(-1, 2))
+    result = analyze(output; impulse = :skip, freq=(-1, 2))
 
     lfidx = system.aidx["u_LF"]
     lridx = system.aidx["u_LR"]
@@ -56,8 +56,7 @@ function main()
 
     plots = [p1, p2, p3]
 
-    impulse = :skip
-    summarize(system, result; plots, impulse, format)
+    summarize(system, result; plots, format)
 
     println("Done.")
 

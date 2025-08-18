@@ -29,7 +29,7 @@ function main()
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
     system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr, r) # make sure to include all parameters here, and again below!!!
     output = run_eom!(system, true)
-    result = analyze(output, true)
+    result = analyze(output, true; bode=:skip, impulse=:skip, ss=:skip)
 
     # define a steer function, use a slowly increasing steer angle, in units of degrees, i.e., 3 degrees after 30 seconds
     steer(t) = t / 10
@@ -172,10 +172,7 @@ function main()
 
     println("Plotted results.")
 
-    bode = :skip
-    impulse = :skip
-    ss = :skip
-    summarize(system, result; plots, bode, ss, impulse, format)
+    summarize(system, result; plots, format)
 
     # generate animations of the mode shapes
     # animate_modes(system, result, true)

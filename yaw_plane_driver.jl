@@ -19,8 +19,9 @@ function main()
     # generate the equations of motion
     output = run_eom!(system, true)
 
-    # do the eigenvalues, freq resp
-    result = analyze(output, true)
+    # do the eigenvalues, steady state
+    ss = [1, 1, 1, 1, 0, 0, 1, 1]
+    result = analyze(output, true; impulse=:skip, bode=:skip)
 
     # now lets try some closed loop feedback, where the driver input depends on the location
 
@@ -29,13 +30,13 @@ function main()
         y = result.ss_eqns.C * x
         # get vehicle location and heading from sensors (y is the output vector)
         offset = y[system.sidx["y"]]
-        heading = y[system.sidx["ψ"]] * π / 180 # convert back to radians
-        [180/π * driver(l, offset, heading, u * t)]
+        heading = y[system.sidx["ψ"]] * π/180 # convert back to radians
+        [-180/π * driver(l, offset, heading, u * t)]
     end
 
     # define time interval
     t1 = 0
-    t2 = 20
+    t2 = 10
     # solve the equation of motion with the closed loop driver model
     yoft = ltisim(result, u_vec, (t1, t2))
 
@@ -55,7 +56,7 @@ function main()
     p3 = ltiplot(system, yoft; sidx)
 
     # plot lateral acceleration vs time
-    sidx = ["a_lat"]
+    sidx = ["a_y"]
     p4 = ltiplot(system, yoft; sidx)
 
     # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
@@ -74,10 +75,7 @@ function main()
     plots = [p1, p2, p3, p4, p5]
 
     # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
-    ss = [1, 1, 1, 1, 0, 0, 1, 1]
-    impulse = :skip
-    bode = :skip
-    summarize(system, result; plots, ss, impulse, bode)
+    summarize(system, result; plots)
 
     println("Done.")
 

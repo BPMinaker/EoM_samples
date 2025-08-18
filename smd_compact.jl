@@ -12,7 +12,7 @@ function main()
 
     system = input_ex_smd(; k, m, c)
     output = run_eom!(system)
-    result = analyze(output)
+    result = analyze(output; ss=:skip)
 
     ω = 0.95 * result.omega_n[1] * 2π
     u_vec(_, t) = [sin(ω * t)]
@@ -26,7 +26,7 @@ function main()
 
     plots = [p1, p2]
 
-    summarize(system, result; ss=:skip, plots, format)
+    summarize(system, result; plots, format)
 
     println("Done.")
 end

@@ -21,7 +21,7 @@ function main()
     system = input_full_car_a_arm_pushrod(; u, a, b, tw, r)
     sensors_animate!(system)
     output = run_eom!(system)
-    result = analyze(output)
+    result = analyze(output; ss = :skip, bode = :skip, impulse = :skip)
 
     lfidx = system.aidx["u_LF"]
     lridx = system.aidx["u_LR"]

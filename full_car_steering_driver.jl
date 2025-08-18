@@ -31,7 +31,10 @@ function main()
     sensors_animate!(system)
     output = run_eom!(system)
     #    eom_draw(system)
-    result = analyze(output)
+    bode = :skip
+    impulse = :skip
+    ss = :skip
+    result = analyze(output; ss, bode, impulse)
 
     # get static tire normal loads (kN)
     Z0 = [
@@ -196,10 +199,7 @@ function main()
 
     println("Plotted results.")
 
-    bode = :skip
-    impulse = :skip
-    ss = :skip
-    summarize(system, result; plots, bode, ss, impulse, format)
+    summarize(system, result; plots, format)
 
     # generate animations of the mode shapes
     # animate_modes(system, result, true)

@@ -13,11 +13,9 @@ function main()
 
     system = [input_ex_shimmy(; m, k, a=x * l, b=l - (x * l), u, I) for x in vpts]
     output = run_eom!.(system)
-    result = analyze.(output)
+    result = analyze.(output; ss=:skip, impulse=:skip)
 
-    ss = :skip
-    impulse = :skip
-    summarize(system, vpts, result; impulse, ss, vpt_name)
+    summarize(system, vpts, result; vpt_name)
 
     println("Done.")
 

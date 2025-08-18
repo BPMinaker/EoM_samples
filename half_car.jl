@@ -16,10 +16,10 @@ function main()
 
     system = input_ex_half_car(; m, a, b, cf, cr, Iy)
     output = run_eom!(system)
-    result = analyze(output)
-
     impulse = :skip
-    summarize(system, result; impulse, format)
+    result = analyze(output; impulse)
+
+    summarize(system, result; format)
 
     # animate_modes(system, result)
 

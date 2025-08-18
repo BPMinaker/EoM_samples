@@ -60,7 +60,9 @@ function main()
     println("Static Zr=", round(Zr0, digits=2), " N")
 
     # do some analysis, to convert the equations to state space form
-    result = analyze(output)
+    bode = :skip
+    impulse = :skip
+    result = analyze(output; bode, impulse)
 
     # save the state space matrices in a convenient notation
     (; A, B, C, D) = result.ss_eqns
@@ -227,10 +229,8 @@ function main()
     ylabel = "Axle vertical load [kN]"
     push!(plots, ltiplot(system, yoft, [ZZr ZZf]; ylabel, label, yidx, uidx, ylims=(0, Inf)))
 
-    # pass all the results and plots, skip the Bode plots for now
-    bode = :skip
-    impulse = :skip
-    summarize(system, result; plots, bode, impulse, format)
+    # pass all the results and plots
+    summarize(system, result; plots, format)
 
     println("Done.")
 

@@ -8,9 +8,9 @@ function main()
 
     system = [input_ex_top(r=x) for x in vpts]
     output = run_eom!.(system)
-    result = analyze.(output)
+    result = analyze.(output; ss=:skip, impulse=:skip)
 
-    summarize(system, vpts, result; ss=:skip, impulse=:skip, vpt_name)
+    summarize(system, vpts, result; vpt_name)
 
     println("Done.")
 

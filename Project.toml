@@ -11,6 +11,10 @@ Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
 Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
 Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
 
+[sources]
+EoM = {url = "https://github.com/BPMinaker/EoM.jl", rev = "main"}
+EoM_X3D= {url = "https://github.com/BPMinaker/EoM_X3D.jl", rev = "main"}
+
 [compat]
 EoM = "2.0.0"
 EoM_X3D = "0.1.0"

@@ -13,8 +13,6 @@ function main()
     u = 80 / 3.6
     a = 1.5
     b = 1.5
-    cfy = 0
-    cry = 0
     hf = 0.3
     hr = 0.4
     kf = 30000
@@ -22,6 +20,9 @@ function main()
     krf = 1500
     krr = 500
     r = 0.315
+    # because we are using a nonlinear model of the tire, we have to set the cornering stiffness of the linear tire model to zero; we need to include a tire model that captures the load sensitivity effect in order to predict any jacking
+    cfy = 0
+    cry = 0
 
     format = :screen
     # format = :html

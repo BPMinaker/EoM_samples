@@ -1,4 +1,4 @@
-using EoM
+using EoM, EoM_X3D
 include(joinpath("models", "input_ex_roll_centre.jl"))
 include(joinpath("models", "track.jl"))
 include(joinpath("models", "driver.jl"))

@@ -1,6 +1,6 @@
 # EoM_samples
 
-Note that in order to run these sample models, you should download a .zip of the this folder (under the green '<> Code' button above).  There is no need to download the EoM library itself from github - that will be done as part of your Julia setup: run Julia, hit ] to go to pkg> prompt, and enter: add https://github.com/BPMinaker/EoM.jl
+Note that in order to run these sample models, you should download a .zip of the this folder (under the green '<> Code' button above).  There is no need to download the EoM library itself from github - that will be done as part of your Julia setup: navigate to this folder after you download and unzip it (you can do this on the command line, or if you are using VS Code, make sure you use File, Open Folder), run Julia (or launch a REPL if you are in VS Code), hit ] to go to pkg> prompt.  If the prompt says v1.11> or something like that, enter: activate . to activate the current folder (the prompt should change to EoM_samples>), then enter: instantiate
 
 These are a bunch of sample input files for EoM.  You can edit them for your use, but you should find here code for:
 1. the spring mass damper model, to get started
@@ -21,3 +21,4 @@ These are a bunch of sample input files for EoM.  You can edit them for your use
 16. spining top model.  A classic problem in dynamics
 17. Euler beam element model. EoM allows you to include beams with or without mass in your models
 
+and many others...

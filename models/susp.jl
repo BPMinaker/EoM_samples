@@ -58,7 +58,7 @@ function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u 
     upre = [a, tw / 2 - 0.5, r + 0.1]  ## upper push-rod end
     lpre = [a, tw / 2 - 0.2, r - 0.1]  ## lower push-rod end
 
-    item = thin_rod(str * "Push-rod", [upre lpre], 1)
+    item = thin_rod(str * "Push-rod", [upre, lpre], 1)
     item.velocity = velocity
     add_item!(item, the_system)
     add_item!(weight(item, g), the_system)
@@ -66,7 +66,7 @@ function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u 
     itre = [a - 0.25 * sgn, tw / 2 - 0.6, r - 0.04]  ## inner tie-rod end
     otre = [a - 0.07 * sgn, tw / 2 - 0.1, r]  ## outer tie-rod end
 
-    item = thin_rod(str * "Tie-rod", [itre otre], 1)
+    item = thin_rod(str * "Tie-rod", [itre, otre], 1)
     item.velocity = velocity
     add_item!(item, the_system)
     add_item!(weight(item, g), the_system)
@@ -74,7 +74,7 @@ function susp!(the_system; a = 1.2, tw = 1.5, cs = 2000, ks = 60000, r = 0.3, u 
     aram = [a + 0.05 * sgn, 0.25, r + 0.05]
     aral = [a + 0.05 * sgn, 0.25, r + 0.2]
 
-    item = thin_rod(str * "Anti-roll arm", [aram aral], 1)
+    item = thin_rod(str * "Anti-roll arm", [aram, aral], 1)
     item.velocity = velocity
     add_item!(item, the_system)
     add_item!(weight(item, g), the_system)

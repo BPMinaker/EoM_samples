@@ -60,10 +60,10 @@ function input_quarter_car_planar_a_arm(; kwargs...)
     item.location = [a, tw / 2 - 0.15, r]
     add_item!(item, the_system)
 
-    item=thin_rod("LF Lower arm", [[a,wli,hli] [a,wlo,hlo]], 0)
+    item=thin_rod("LF Lower arm", [[a,wli,hli], [a,wlo,hlo]], 0)
     add_item!(item, the_system)
 
-    item=thin_rod("LF Upper arm", [[a,wui,hui] [a,wuo,huo]], 0)
+    item=thin_rod("LF Upper arm", [[a,wui,hui], [a,wuo,huo]], 0)
     add_item!(item, the_system)
 
 

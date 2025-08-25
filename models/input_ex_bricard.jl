@@ -16,23 +16,23 @@ function input_ex_bricard(; l = 0.2, m = 1.0, g = 9.81)
     # p5*=0.2
 
 
-    item = thin_rod("Rod 1", [p0 p1], m)
+    item = thin_rod("Rod 1", [p0, p1], m)
     add_item!(item, the_system)
     add_item!(weight(item, g), the_system)
 
-    item = thin_rod("Rod 2", [p1 p2], m)
+    item = thin_rod("Rod 2", [p1, p2], m)
     add_item!(item, the_system)
     add_item!(weight(item, g), the_system)
 
-    item = thin_rod("Rod 3", [p2 p3], m)
+    item = thin_rod("Rod 3", [p2, p3], m)
     add_item!(item, the_system)
     add_item!(weight(item, g), the_system)
 
-    item = thin_rod("Rod 4", [p3 p4], m)
+    item = thin_rod("Rod 4", [p3, p4], m)
     add_item!(item, the_system)
     add_item!(weight(item, g), the_system)
 
-    item = thin_rod("Rod 5", [p4 p5], m)
+    item = thin_rod("Rod 5", [p4, p5], m)
     add_item!(item, the_system)
     add_item!(weight(item, g), the_system)
 

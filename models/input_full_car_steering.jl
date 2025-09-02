@@ -382,6 +382,7 @@ function input_full_car_steering(;
     item.location[1] = [-b + 0.25, 0.45, rear.sle[3] - 0.05]
     item.location[2] = item.location[1] .* [1, -1, 1]
     item.stiffness = krr
+    item.preload = 0
     item.twist = 1
     add_item!(item, the_system)
 

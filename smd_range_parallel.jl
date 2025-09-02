@@ -38,14 +38,17 @@ end
 end
 #println(id)
 
+# @time begin
+#     system = f.(vpts)
+#     output = run_eom!.(system)
+#     result = analyze.(output)
+# end
 
 @time begin
-    system = f.(vpts)
+    system = [input_ex_smd(; k, m, c=x) for x in vpts]
     output = run_eom!.(system)
     result = analyze.(output)
 end
-
-
 
 sdfdssdf()
 

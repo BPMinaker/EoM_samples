@@ -1,9 +1,4 @@
-function input_double_pendulum(; m=1.0, l=1.0, x=0)
-
-    draw = any(string.(Base.loaded_modules_array()) .== "EoM_X3D")
-    if draw
-        println("Drawing...")
-    end
+function input_ex_double_pendulum(; m=1.0, l=1.0, x=0)
 
     # Define the double pendulum system
     the_system = mbd_system("Double Pendulum")
@@ -11,18 +6,12 @@ function input_double_pendulum(; m=1.0, l=1.0, x=0)
     g = 9.807
 
     # Add the first pendulum body
-    item = thin_rod("pendulum1", [[0, 0, x * l], [0, 0, -(1 - x) * l]], m)
-    if draw
-        item.x3d = EoM_X3D.x3d_cyl([[0, 0, l / 2] [0, 0, -l/2]], rad=0.018, col=[0.25, 0.25, 0.25])
-    end
+    item = thin_rod("pendulum1", [[0, 0, x * l], [0, 0, -(1 - x) * l]], m; draw = true)
     add_item!(item, the_system)
     add_item!(weight(item), the_system)
 
     # Add the second pendulum body
-    item = thin_rod("pendulum2", [[0, 0.05, -(1 - 2x) * l], [0, 0.05, -(1 - x) * 2l]], m)
-    if draw
-        item.x3d = EoM_X3D.x3d_cyl([[0, 0, l / 2] [0, 0, -l/2]], rad=0.018, col=[0.25, 0.25, 0.25])
-    end
+    item = thin_rod("pendulum2", [[0, 0.05, -(1 - 2x) * l], [0, 0.05, -(1 - x) * 2l]], m; draw = true)
     add_item!(item, the_system)
     add_item!(weight(item), the_system)
 

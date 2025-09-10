@@ -1,10 +1,9 @@
-using EoM
-using EoM_X3D
-include(joinpath("models", "input_ex_2_dof_double_pendulum.jl"))
+using EoM, EoM_X3D
+include(joinpath("models", "input_ex_2_dof_five_bar_pendulum.jl"))
 
 function main()
 
-    system = input_ex_double_pendulum(;x=0.25)
+    system = input_ex_five_bar_pendulum()
     output = run_eom!(system)
     result = analyze(output)
 

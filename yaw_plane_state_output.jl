@@ -28,12 +28,13 @@ function main()
     system = [input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr) for x in vpts]
 
     for st in system
-        s = findall(typeof.(st.item) .== sensor .&& getfield.(st.item, :name) .!= "β" )
+        s = findall(typeof.(st.item) .== sensor .&& getfield.(st.item, :name) .!= "β" .&& getfield.(st.item, :name) .!= "r")
         deleteat!(st.item, s)
     end
 
     output = run_eom!.(system)
     result = analyze.(output; bode=:skip)
+
     summarize(system, vpts, result; format)
 
     println("Done.")

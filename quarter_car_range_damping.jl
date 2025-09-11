@@ -17,7 +17,7 @@ function main()
 
     system = [input_ex_quarter_car(; ks, ms, mu, kt, ct, cs=x) for x in vpts]
     output = run_eom!.(system)
-    result = analyze.(output; ss = :skip, impulse = :skip)
+    result = analyze.(output; ss = :skip)
 
     summarize(system, vpts, result; vpt_name, format)
 

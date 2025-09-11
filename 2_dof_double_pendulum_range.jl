@@ -16,9 +16,6 @@ function main()
 
     summarize(system, vpts, result; vpt_name, format)
 
-
-    # animate_modes(system, result)
-
     println("Done.")
 
 end

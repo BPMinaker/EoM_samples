@@ -7,10 +7,10 @@ function main()
 
     format = :html
 
-    mmpi = 0.0254
-    h = 2 * mmpi
-    b = 1 * mmpi
-    t = 0.060 * mmpi
+    mpi = 0.0254
+    h = 2 * mpi
+    b = 1 * mpi
+    t = 0.060 * mpi
     E = 200e9 # Pa
     ρ = 7850  # kg/m^3
 

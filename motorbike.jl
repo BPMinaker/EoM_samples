@@ -3,7 +3,8 @@ include(joinpath("models", "input_ex_GSXR.jl"))
 
 function main()
 
-    format = :html
+    format = :screen
+    # format = :html
 
     u = 20.0 # speed in m/s
     system = input_ex_GSXR(; u)

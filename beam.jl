@@ -5,7 +5,8 @@ include(joinpath("models", "input_ex_beam.jl"))
 
 function main()
 
-    format = :html
+    format = :screen
+    # format = :html
 
     mpi = 0.0254
     h = 2 * mpi

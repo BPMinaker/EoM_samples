@@ -14,7 +14,7 @@ function main()
     ct = 100
 
     format = :screen
-    format = :html
+    # format = :html
 
     system = input_ex_quarter_car(; ms, mu, kt, ks, cs, ct)
     output = run_eom!(system)

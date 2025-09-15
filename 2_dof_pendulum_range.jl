@@ -5,7 +5,6 @@ include(joinpath("models", "input_ex_2_dof_pendulum.jl"))
 
 function main()
 
-
     vpts = 0.1:0.01:1
     vpt_name = ["l" "Length" "m"]
 

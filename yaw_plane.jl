@@ -34,7 +34,7 @@ function main()
     output = run_eom!.(system)
 
     # do the eigenvalues, freq resp, etc, for each forward speed
-    ss =[1, 1, 1, 1, 0, 0, 1, 1]
+    ss = [1, 1, 1, 1, 0, 0, 1, 1]
     impulse = :skip
     bode = :skip
     result = analyze.(output; freq=(-1, 1), ss, impulse, bode)

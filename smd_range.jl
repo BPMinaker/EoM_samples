@@ -24,7 +24,7 @@ function main()
 
     # we take the vector of output equations, and analyze all of them, again using dot notation
     impulse = [1, 0, 0, 0]
-    result = analyze.(output; impulse, ss = :skip)
+    result = analyze.(output; impulse, ss=:skip)
 
     # now, just for fun, let's plot ms^2 + cs + k over a range of s, to confirm how the roots align with our eigenvalues
     xlabel = "s [rad/s]"

@@ -10,7 +10,7 @@ function main()
     format = :screen
     # format = :html
 
-    system = [input_ex_double_pendulum(;x) for x in vpts]
+    system = [input_ex_double_pendulum(; x) for x in vpts]
     output = run_eom!.(system)
     result = analyze.(output; ss=:skip)
 

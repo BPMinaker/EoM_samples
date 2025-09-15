@@ -14,7 +14,7 @@ function main()
     ct = 100
 
     format = :screen
-    # format = :html
+    format = :html
 
     system = input_ex_quarter_car(; ms, mu, kt, ks, cs, ct)
     output = run_eom!(system)
@@ -46,18 +46,16 @@ function main()
     sidx = ["z_u-z_g"]
     p3 = ltiplot(system, yoft; sidx)
 
-    uidx = [0]
-    sidx = ["f_s", "f_d", "f_i"]
-    p4 = ltiplot(system, yoft; uidx, sidx)
-
-    plots = [p1, p2, p3, p4]
+    plots = [p1, p2, p3]
 
     summarize(system, result; plots, format)
 
     # generate animations of the mode shapes
     # animate_modes(system, result, scale=0.2)
-    println("Done.")
 
 end
 
+println("Starting...")
 main()
+println("Done.")
+

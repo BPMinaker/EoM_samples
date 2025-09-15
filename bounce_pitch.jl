@@ -72,8 +72,8 @@ function main()
     plots = [p1, p2, p3, p4]
     summarize(system, result; plots, format)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

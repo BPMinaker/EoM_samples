@@ -45,8 +45,8 @@ function main()
 
     summarize(system, vpts, result; vpt_name, plots, format)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

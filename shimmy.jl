@@ -17,11 +17,11 @@ function main()
 
     summarize(system, vpts, result; vpt_name)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")
 
 
 # error check

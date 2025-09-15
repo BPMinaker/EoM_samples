@@ -42,8 +42,8 @@ function main()
     end
     # animate_modes(system[1], result[1], overwrite = false)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

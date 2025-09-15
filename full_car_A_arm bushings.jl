@@ -66,11 +66,11 @@ function main()
 
     display(eigen(AA).values)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")
 
 #=
 

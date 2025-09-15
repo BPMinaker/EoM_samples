@@ -37,8 +37,8 @@ function main()
 
     summarize(system, vpts, result; format)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

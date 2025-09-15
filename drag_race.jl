@@ -232,8 +232,8 @@ function main()
     # pass all the results and plots
     summarize(system, result; plots, format)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

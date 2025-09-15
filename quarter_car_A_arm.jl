@@ -54,8 +54,8 @@ function main()
 
     animate_history(system, yoft)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

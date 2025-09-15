@@ -97,8 +97,8 @@ function main()
     # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
     summarize(system, result; plots, format)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

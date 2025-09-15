@@ -14,4 +14,6 @@ function main()
 
 end
 
+println("Starting...")
 main()
+println("Done.")

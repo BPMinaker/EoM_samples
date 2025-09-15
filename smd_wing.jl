@@ -16,7 +16,8 @@ function main()
 
     summarize(system, result; format)
 
-    println("Done.")
 end
 
+println("Starting...")
 main()
+println("Done.")

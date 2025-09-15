@@ -125,8 +125,8 @@ function main()
         println("Understeer gradient $(my_round(K)) degrees/g.")
     end
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

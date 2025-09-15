@@ -141,8 +141,8 @@ function main()
     # if you want to animate the modes, you can uncomment the line below; it will create a 3D animation of the system, showing the modes of vibration; it requires the EoM_X3D library, which is not loaded by default
     # animate_modes(system, result)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

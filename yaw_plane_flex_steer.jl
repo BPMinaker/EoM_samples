@@ -52,8 +52,8 @@ function main()
     K = dpr * (a + b) * 9.81 / uchar^2
     println("Understeer gradient $(my_round(K)) degrees/g.")
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

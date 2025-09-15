@@ -65,8 +65,8 @@ function main()
     #eom_draw(system[1])
     #animate_modes(system[end], result[end], scale=0.2)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

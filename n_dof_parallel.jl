@@ -13,6 +13,6 @@ function main()
 
 end
 
-println("Done.")
-
+println("Starting...")
 main()
+println("Done.")

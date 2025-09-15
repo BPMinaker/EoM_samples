@@ -23,8 +23,8 @@ function main()
 
     # animate_modes(system, result)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

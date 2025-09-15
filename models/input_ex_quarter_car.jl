@@ -106,6 +106,7 @@ function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs =
     item.desc = "Tire compression"
     add_item!(item, the_system)
 
+    #=
     item = sensor("f_s")
     item.body[1] = "unsprung"
     item.body[2] = "sprung"
@@ -138,6 +139,7 @@ function input_ex_quarter_car(; mu = 50, ms = 500, ks = 18000, kt = 180000, cs =
     item.order = 3
     item.desc = "Sprung mass inertial force"
     add_item!(item, the_system)
+    =#
 
     the_system
 

@@ -24,8 +24,9 @@ function main()
     summarize(system, result; impulse, format)
 
     # animate_modes(system, result)
-    println("Done.")
 
 end
 
+println("Starting...")
 main()
+println("Done.")

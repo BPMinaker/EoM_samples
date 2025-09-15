@@ -4,7 +4,7 @@ include(joinpath("models", "input_ex_2_dof_double_pendulum.jl"))
 
 function main()
 
-    vpts = 0:0.005:0.45
+    vpts = 0.16:0.003:0.49
     vpt_name = ["x" "Fraction" "[]"]
 
     format = :screen
@@ -16,8 +16,8 @@ function main()
 
     summarize(system, vpts, result; vpt_name, format)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

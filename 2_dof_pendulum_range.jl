@@ -18,8 +18,8 @@ function main()
 
     summarize(system, vpts, result; vpt_name, format)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

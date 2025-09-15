@@ -28,7 +28,8 @@ function main()
 
     summarize(system, result; plots, format)
 
-    println("Done.")
 end
 
+println("Starting...")
 main()
+println("Done.")

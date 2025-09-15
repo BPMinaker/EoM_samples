@@ -9,8 +9,8 @@ function main()
 
     summarize(system, result)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

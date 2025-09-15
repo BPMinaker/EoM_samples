@@ -204,9 +204,8 @@ function main()
     # generate animations of the mode shapes
     # animate_modes(system, result, true)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 @time main()
-
+println("Done.")

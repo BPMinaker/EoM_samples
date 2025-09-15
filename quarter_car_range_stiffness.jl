@@ -20,8 +20,8 @@ function main()
     result = analyze.(output; ss = :skip, impulse = :skip)
     summarize(system, vpts, result; vpt_name, format)
 
-    println("Done.")
-
 end
 
+println("Starting...")
 main()
+println("Done.")

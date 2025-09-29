@@ -68,7 +68,7 @@ function main()
         δ = driver(l, offset, heading, u * t)
 
         # implement steering control law
-        fr = 8000 * (0.5 * y[system.sidx["δ_lf"]] + 0.5 * y[system.sidx["δ_rf"]] - δ)
+        fr = 8000 * (0.5 * (y[system.sidx["δ_lf"]] + y[system.sidx["δ_rf"]]) - δ)
 
         # get slip angles from sensors, subtract steer
         α = y[vidx] ./ (y[uuidx] .+ u) - y[δidx]
@@ -189,12 +189,10 @@ function main()
     xlabel = "x [m]"
     ylabel = "y [m]"
     label = ["Path" "Target path"]
-    lw = 2 # thicker line weight
-    size = (800, 400)
 
     x = u * yoft.t
     path = [i[1] for i in track.(x)]
-    p = EoM.plot(x, [yoft[system.sidx["y"], :] path]; xlabel, ylabel, label, lw, size)
+    p = EoM.plot(x, [yoft[system.sidx["y"], :] path]; xlabel, ylabel, label)
     push!(plots, p)
 
     println("Plotted results.")

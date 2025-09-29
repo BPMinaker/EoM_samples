@@ -3,6 +3,8 @@ include(joinpath("models", "input_ex_bounce_pitch.jl"))
 
 function main()
 
+    u = 20
+
     m = 2000
     a = 1.5
     b = 1.3
@@ -18,17 +20,20 @@ function main()
     format = :screen
     # format = :html
 
-    system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
+    system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy) # note that we don't pass u here, it is only used later for delay
     output = run_eom!(system)
-    result = analyze(output; impulse = :skip)
+    impulse = :skip
+    result = analyze(output; impulse)
 
+    # ask for Bode plots of with both front and rear inputs to both bounce and pitch and passenger motion outputs, but ignore the suspension travel outputs 
     bode = [1 1; 1 1; 1 1; 0 0; 0 0]
     summarize(system, result; bode, format)
 
-    bode = [1, 1, 1, 0, 0]
-    impulse = [0, 0, 0, 0, 0]
-    ss = [0, 0, 0, 0, 0]
-    input_delay!(system, result, (a + b) / 10, [1, 2])
+    # with the front and rear inputs coupled by a time delay of (a+b)/u, we now have only one input, but still the same outputs, so keep only the first column of the previous
+    bode = bode[:, 1]
+    ss = :skip
+    # this function modifies the equations of motion to include the input delay (multiplies second input by exp(-iϕ))
+    input_delay!(system, result, (a + b) / u, [1, 2])
     system.name *= " with input delay"
     summarize(system, result; bode, ss, impulse, format)
 
@@ -37,9 +42,7 @@ function main()
 
     system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
     output = run_eom!(system)
-    ss = :skip
     bode  = :skip
-    impulse = :skip
     result = analyze(output; ss, bode, impulse)
     system.name *= " time history"
 

@@ -82,15 +82,13 @@ function main()
     xlabel = "x [m]"
     ylabel = "y [m]"
     label = ["Path" "Target path"]
-    lw = 2 # thicker line weight
     yidx= system.sidx["y"]
-    size = (800, 400)
 
     x = u * yoft.t
     track_y(x) = track(x)[1]
     path = track_y.(x)
 
-    p5 = EoM.plot(x, [yoft[yidx, :] path]; xlabel, ylabel, label, lw, size)
+    p5 = EoM.plot(x, [yoft[yidx, :] path]; xlabel, ylabel, label)
 
     plots = [p1, p2, p3, p4, p5]
 

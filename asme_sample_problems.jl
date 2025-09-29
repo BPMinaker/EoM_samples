@@ -26,7 +26,7 @@ function chain()
     result = analyze(output)
 
     y = ltisim(result, u_vec, (t1, t2))
-    animate_history(system, y.t, y)
+    animate_history(system, y)
 
 end
 

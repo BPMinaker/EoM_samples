@@ -96,9 +96,7 @@ function main()
     xlabel = "x [m]"
     ylabel = "y [m]"
     label = ""
-    lw = 2 # thicker line weight
-    size = (800, 400)
-    p5 = EoM.plot(u * yoft.t, yoft[5, :]; xlabel, ylabel, label, lw, size)
+    p5 = EoM.plot(u * yoft.t, yoft[5, :]; xlabel, ylabel, label)
 
     plots = [p1, p2, p3, p4, p5]
 

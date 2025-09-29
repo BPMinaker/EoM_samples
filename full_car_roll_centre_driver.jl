@@ -43,6 +43,9 @@ function main()
         system.flex_points_name["RR tire, Z"].preload[1]
     ]
 
+    display(system.sidx)
+
+
     # find the output indices for tire normal loads and slip angles
     Zidx = get.([system.sidx], ["Z_lf", "Z_lr", "Z_rf", "Z_rr"], 0)
     αidx = get.([system.sidx], ["α_lf", "α_lr", "α_rf", "α_rr"], 0)
@@ -162,13 +165,11 @@ function main()
     xlabel = "x [m]"
     ylabel = "y [m]"
     label = ["Path" "Target path"]
-    lw = 2 # thicker line weight
-    size = (800, 400)
 
     x = u * yoft.t
     track_y(x) = track(x)[1]
     path = track_y.(x)
-    p = EoM.plot(x, [yoft[20, :] path]; xlabel, ylabel, label, lw, size)
+    p = EoM.plot(x, [yoft[20, :] path]; xlabel, ylabel, label)
     push!(plots, p)
 
     println("Plotted results.")

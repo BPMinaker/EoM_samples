@@ -29,15 +29,13 @@ function main()
     # now, just for fun, let's plot ms^2 + cs + k over a range of s, to confirm how the roots align with our eigenvalues
     xlabel = "s [rad/s]"
     ylabel = "p(s) [N/m]"
-    size = (800, 400)
-    lw = 2
-    p1 = EoM.plot(; xlabel, ylabel, size)
+    p1 = EoM.plot(; xlabel, ylabel)
 
     s = range(-20, 5; length=201)
     for i in vpts[1:15:end]
         label = "c = $(my_round(i))"
         p = Polynomial([k, i, m])
-        EoM.plot!(p1, s, p.(s); label, lw)
+        EoM.plot!(p1, s, p.(s); label)
     end
     plots = [p1]
 

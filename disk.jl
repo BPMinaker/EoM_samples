@@ -1,4 +1,3 @@
-using Base: format_bytes
 using EoM
 include(joinpath("models", "input_ex_disk.jl"))
 

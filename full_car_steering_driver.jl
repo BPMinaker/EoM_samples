@@ -9,25 +9,26 @@ include("my_specs.jl")
 function main()
 
     u = 80 / 3.6
-
+    Iw = 1.75
+ 
+    m = 1571
+    hG = 0.439
+    Ix = 461
+    Iy = 1848
+    Iz = 2045
     l = 2.63
     b = fwf * l
     a = l - b
     tf = 1.52
     tr = 1.52
-    m = 1571
     muf = 50
     mur = 50
-    hG = 0.439
-    Ix = 461
-    Iy = 1848
-    Iz = 2045
-    Iw = 1.75
 
     format = :screen
     # format = :html
 
-    system = input_full_car_steering(; u, a, b, m, muf, mur, hG, Ix, Iy, Iz, Iw, tf, tr, kf, kr, cf, cr, krf, krr, front, rear)
+    parms = chassis(; m, hG, Ix, Iy, Iz, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur)
+    system = input_full_car_steering(; u, Iw, parms, front, rear)
     sensors_animate!(system)
     output = run_eom!(system)
     #    eom_draw(system)

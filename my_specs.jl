@@ -10,7 +10,7 @@ otre = [-0.2, -0.12, r] # outer tie rod end
 sle = [0, -0.2, r / 2] # spring lower end
 sue = [0, -0.3, 2 * r]  # spring upper end
 
-# don't edit this line
+# don't edit this line (store the geometry data in a structure)
 front = susp(;r, ubj, lbj, uaapf, uaapr, laapf, laapr, itre, otre, sle, sue)
 
 #edit these points to select the rear suspension geometry of your vehicle
@@ -25,7 +25,7 @@ otre = [-0.2, -0.12, r] # outer tie rod end
 sle = [0, -0.2, r / 2] # spring lower end
 sue = [0, -0.3, 2 * r]  # spring upper end
 
-# dont edit this line
+# dont edit this line (store the geometry data in a structure)
 rear = susp(;r, ubj, lbj, uaapf, uaapr, laapf, laapr, itre, otre, sle, sue)
 
 #edit all of these properties as you see fit
@@ -38,5 +38,4 @@ krf = 1000 # anti-roll bar stiffness, front
 krr = 800
 # weight distribution
 fwf = 0.55 # front weight fraction (i.e., b/(a+b)), you can modify this from 0.05 to 0.95
-# braking
-fbf = 0.58 # front brake fraction
+

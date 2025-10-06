@@ -2,6 +2,7 @@
 # define the left side only, right is mirrored, so y values should all be -ve, z all +ve
 # front spring geometry, lower end is fixed to the lower A-arm, and the upper end is fixed to the chassis; as the spring becomes more vertical, it becomes effectively stiffer at the wheel; similarly, as it moves outward closer to the wheel, it also becomes effectively stiffer at the wheel
 
+# define a structure to hold the suspension geometry data
 @kwdef mutable struct susp # suspension properties
     r = 0.3
     ubj = [0, -0.15, 2 * r] # upper ball joint
@@ -16,32 +17,40 @@
     sue = [0, -0.3, 2 * r]  # spring upper end
 end
 
+# define a structure to hold the chassis parameters
+@kwdef mutable struct chassis
+    m = 1800.0 # mass
+    hG = 0.5 # mass centre height
+    Ix = 818.0 # moments of inertia
+    Iy = 3267.0
+    Iz = 3508.0
+    a = 1.5 # wheelbase, front
+    b = 1.5
+    tf = 1.5
+    tr = 1.5
+    kf = 30000.0 # suspension stiffness, front
+    kr = 30000.0
+    cf = 2500.0 # suspension damping, front
+    cr = 2500.0
+    krf = 500.0 # anti-roll stiffness, front
+    krr = 500.0
+    muf = 20.0 # unsprung mass, front
+    mur = 20.0
+end
+
+# full car model with steering
 function input_full_car_steering(;
-    m = 1800.0, # mass
     u = 0.0, # speed
-    a = 1.5, # wheelbase, front
-    b = 1.5,
-    kf = 30000.0, # suspension stiffness, front
-    kr = 30000.0,
-    cf = 2500.0, # suspension damping, front
-    cr = 2500.0,
-    krf = 500.0, # anti-roll stiffness, front
-    krr = 500.0,
-    muf = 20.0, # unsprung mass, front
-    mur = 20.0,
-    hG = 0.5, # mass centre height
-    Ix = 818.0, # moments of inertia
-    Iy = 3267.0,
-    Iz = 3508.0,
     kt = 180000.0, # tire vertical stiffness
     ct = 100.0, # tire vertical damping
     r = 0.3, # wheel radius
     Iw = 1.0, # wheel rotary inertia
-    tf = 1.5,
-    tr = 1.5,
+    parms = chassis(),
     front = susp(; r),
     rear = susp(; r)
 )
+    # unload the chassis parameters
+    (;m, hG, Ix, Iy, Iz, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur) = parms
 
     the_system = mbd_system("EoM Sedan")
  

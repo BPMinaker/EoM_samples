@@ -1,4 +1,4 @@
-using EoM, Polynomials
+using EoM
 include(joinpath("models", "input_ex_smd.jl"))
 # this file repeats the spring mass damper example, but shows how we can analyze a series of systems, using Julia's dot notation
 
@@ -23,8 +23,8 @@ function main()
     output = run_eom!.(system)
 
     # we take the vector of output equations, and analyze all of them, again using dot notation
-    impulse = [1, 0, 0, 0]
-    result = analyze.(output; impulse, ss=:skip)
+    # find impulse response for first output only, i.e., displacement, skip the steady state response
+    result = analyze.(output; impulse=[1,0,0,0], ss=:skip)
 
     # now, just for fun, let's plot ms^2 + cs + k over a range of s, to confirm how the roots align with our eigenvalues
     xlabel = "s [rad/s]"
@@ -32,9 +32,12 @@ function main()
     p1 = EoM.plot(; xlabel, ylabel)
 
     s = range(-20, 5; length=201)
+    c = 0
+    p(x) = m * x^2 + c * x + k
+
     for i in vpts[1:15:end]
         label = "c = $(my_round(i))"
-        p = Polynomial([k, i, m])
+        c = i
         EoM.plot!(p1, s, p.(s); label)
     end
     plots = [p1]

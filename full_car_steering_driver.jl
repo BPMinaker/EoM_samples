@@ -24,8 +24,8 @@ function main()
     muf = 50
     mur = 50
 
-    format = :screen
-    # format = :html
+    # format = :screen
+    format = :html
 
     parms = chassis(; m, hG, Ix, Iy, Iz, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur)
     system = input_full_car_steering(; u, Iw, parms, front, rear)

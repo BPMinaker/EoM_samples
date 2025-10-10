@@ -3,6 +3,9 @@ include(joinpath("models", "input_ex_rotor.jl"))
 
 function main()
 
+    format = :screen
+    # format = :html
+
     vpts = 0.0:2pi/125:2pi
     vpt_name = ["r" "Angular speed" "rad/s"]
 
@@ -11,7 +14,7 @@ function main()
     result = analyze.(output, vpts .== 0; ss=:skip, impulse=:skip)
 
     bode = [1 0; 1 0; 0 1]
-    summarize(system, vpts, result; bode, vpt_name)
+    summarize(system, vpts, result; bode, vpt_name, format)
 
 end
 

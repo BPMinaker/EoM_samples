@@ -3,6 +3,9 @@ include(joinpath("models", "input_ex_shimmy.jl"))
 
 function main()
 
+    format = :screen
+    # format = :html
+
     m = 5
     k = 0.3 * m
     l = 1
@@ -15,7 +18,7 @@ function main()
     output = run_eom!.(system)
     result = analyze.(output; ss=:skip, impulse=:skip)
 
-    summarize(system, vpts, result; vpt_name)
+    summarize(system, vpts, result; vpt_name, format)
 
 end
 

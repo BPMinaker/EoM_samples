@@ -3,9 +3,10 @@ include(joinpath("models", "input_ex_disk.jl"))
 
 function main()
 
-    vpts = 0:3/125:3
     format = :screen
     # format = :html
+
+    vpts = 0:3/125:3
 
     system = [input_ex_disk(u=x) for x in vpts]
     output = run_eom!.(system)

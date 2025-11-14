@@ -36,20 +36,12 @@ function main()
     result = analyze(output, true; bode=:skip, impulse=:skip, ss=:skip)
 
     # get static tire normal loads (kN)
-    Z0 = [
-        system.flex_points_name["LF tire, Z"].preload[1],
-        system.flex_points_name["LR tire, Z"].preload[1],
-        system.flex_points_name["RF tire, Z"].preload[1],
-        system.flex_points_name["RR tire, Z"].preload[1]
-    ]
-
-    display(system.sidx)
-
+    Z0 = [system.flex_points_name[i].preload[1] for i in ["LF tire, Z", "LR tire, Z", "RF tire, Z", "RR tire, Z"]]
 
     # find the output indices for tire normal loads and slip angles
-    Zidx = get.([system.sidx], ["Z_lf", "Z_lr", "Z_rf", "Z_rr"], 0)
-    αidx = get.([system.sidx], ["α_lf", "α_lr", "α_rf", "α_rr"], 0)
-
+    Zidx = [system.sidx[i] for i in ["Z_lf", "Z_lr", "Z_rf", "Z_rr"]]
+    αidx = [system.sidx[i] for i in ["α_lf", "α_lr", "α_rf", "α_rr"]]
+    
     # compute applied tire force
     function u_vec(x, t)
         # get sensor outputs (D=0)

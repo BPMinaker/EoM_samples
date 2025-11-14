@@ -1,5 +1,8 @@
 using EoM
-# using EoM_X3D
+using EoM_X3D
+
+# format = :screen
+format = :html
 
 include(joinpath("models", "input_ex_2_dof_pendulum.jl"))
 
@@ -9,9 +12,9 @@ function main()
     output = run_eom!(system)
     result = analyze(output)
 
-    summarize(system, result)
+    summarize(system, result; format)
 
-    # animate_modes(system, result)
+    animate_modes(system, result)
 
 end
 

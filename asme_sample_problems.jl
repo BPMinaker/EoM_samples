@@ -53,15 +53,14 @@ function pyramid()
     output = run_eom!(system)
     result = analyze(output)
 
-    summarize(system, result)
-
-    # summarize(system, result; format = :html)
+    # summarize(system, result)
+    summarize(system, result; format = :html)
     animate_modes(system, result)
 
 end
 
-chain()
-loops()
+# chain()
+# loops()
 pyramid()
 
 println("Done.")

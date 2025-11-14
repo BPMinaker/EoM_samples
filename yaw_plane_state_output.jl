@@ -1,5 +1,4 @@
 using EoM
-using Interpolations
 include(joinpath("models", "input_ex_yaw_plane.jl"))
 
 function main()

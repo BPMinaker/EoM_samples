@@ -10,7 +10,7 @@ function main()
 
     u = 80 / 3.6
     Iw = 1.75
- 
+
     m = 1571
     hG = 0.439
     Ix = 461
@@ -38,22 +38,18 @@ function main()
     result = analyze(output; ss, bode, impulse)
 
     # get static tire normal loads (kN)
-    Z0 = [
-        system.flex_points_name["LF Tire, Z"].preload[1],
-        system.flex_points_name["LR Tire, Z"].preload[1],
-        system.flex_points_name["RF Tire, Z"].preload[1],
-        system.flex_points_name["RR Tire, Z"].preload[1]
-    ]
+    Z0 = [system.flex_points_name[i].preload[1] for i in ["LF Tire, Z", "LR Tire, Z", "RF Tire, Z", "RR Tire, Z"]]
 
-    Zsidx = get.([system.sidx], ["Zs_lf", "Zs_lr", "Zs_rf", "Zs_rr"], 0)
-    Zdidx = get.([system.sidx], ["Zd_lf", "Zd_lr", "Zd_rf", "Zd_rr"], 0)
-    uuidx = get.([system.sidx], ["u_lf", "u_lr", "u_rf", "u_rr"], 0)
-    vidx = get.([system.sidx], ["v_lf", "v_lr", "v_rf", "v_rr"], 0)
-    δidx = get.([system.sidx], ["δ_lf", "δ_lr", "δ_rf", "δ_rr"], 0)
-    γidx = get.([system.sidx], ["γ_lf", "γ_lr", "γ_rf", "γ_rr"], 0)
+    # get the sensor number for several outputs / actuator number for inputs
+    Zsidx = [system.sidx[i] for i in ["Zs_lf", "Zs_lr", "Zs_rf", "Zs_rr"]]
+    Zdidx = [system.sidx[i] for i in ["Zd_lf", "Zd_lr", "Zd_rf", "Zd_rr"]]
+    uuidx = [system.sidx[i] for i in ["u_lf", "u_lr", "u_rf", "u_rr"]]
+    vidx = [system.sidx[i] for i in ["v_lf", "v_lr", "v_rf", "v_rr"]]
+    δidx = [system.sidx[i] for i in ["δ_lf", "δ_lr", "δ_rf", "δ_rr"]]
+    γidx = [system.sidx[i] for i in ["γ_lf", "γ_lr", "γ_rf", "γ_rr"]]
 
-    Yidx = get.([system.aidx], ["Y_lf", "Y_lr", "Y_rf", "Y_rr"], 0)
-    Nidx = get.([system.aidx], ["N_lf", "N_lr", "N_rf", "N_rr"], 0)
+    Yidx = [system.aidx[i] for i in ["Y_lf", "Y_lr", "Y_rf", "Y_rr"]]
+    Nidx = [system.aidx[i] for i in ["N_lf", "N_lr", "N_rf", "N_rr"]]
     Lidx = system.aidx["L"]
 
     # compute applied tire force

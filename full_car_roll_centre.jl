@@ -1,5 +1,5 @@
 using EoM
-# using EoM_X3D
+
 include(joinpath("models", "input_ex_roll_centre.jl"))
 # note that this model has four actuators, one for each tire lateral force, so we can use an external calculation for the tire model, anything we like, e.g. a magic formula
 
@@ -28,7 +28,7 @@ function main()
     # format = :html
 
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
-    system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr, r) # make sure to include all parameters here, and again below!!!
+    system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr, r) # make sure to include all parameters you want to change here
     output = run_eom!(system, true)
     result = analyze(output, true; bode=:skip, impulse=:skip, ss=:skip)
 
@@ -52,8 +52,8 @@ function main()
         α = y[αidx] - steer(t) * [1, 0, 1, 0] * π / 180
         α .*= [1, 1, -1, -1] # flip sign on RF and RR slip angles (modified iso sign convention)
 
-        # compute tire force, ignore camber effect, restoring moment
-        Y = tire(Z, α, [0, 0, 0, 0])[1]
+        # compute tire force
+        Y = tire(Z, α)
         Y .* [-1, -1, 1, 1] # flip sign on LF and LR tire forces (mirror)
     end
 
@@ -143,8 +143,7 @@ function main()
 
     # get tire forces using slip but with static normal loads, remember to flip signs because of sign convention, mirror
     α[:, 3:4] *= -1
-    Y00 = hcat([tire.(Z0, i * π / 180, [0, 0, 0, 0]) for i in eachrow(α)]...)
-    Y0 = [i[1] for i in Y00]
+    Y0 = hcat([tire.(Z0, i * π / 180) for i in eachrow(α)]...)
     Y0[1:2, :] *= -1
 
     # find total front and rear tire forces
@@ -173,6 +172,22 @@ function main()
     # generate animations of the mode shapes
     # animate_modes(system, result, true)
 
+end
+
+
+# define a nonlinear tire with load sensitivity
+function tire(Z, slip)
+
+    # magic formula tire model parameters
+    mtm = [1.6929, -55.2084E-6, 1.27128, 1601.8 * 180 / π, 6494.6, 4.7966E-3 * 180 / π, -0.3875E-3, 1.0]
+
+    C = mtm[1]
+    D = (mtm[2] * Z .+ mtm[3]) .* Z
+    B = mtm[4] * sin.(2 * atan.(Z / mtm[5])) / C ./ D
+    Bslip = B .* slip
+    E = mtm[7] * Z .+ mtm[8]
+
+    D .* sin.(C * atan.((1.0 .- E) .* Bslip + E .* atan.(Bslip)))
 end
 
 println("Starting...")

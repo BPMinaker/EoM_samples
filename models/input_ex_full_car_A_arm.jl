@@ -507,8 +507,9 @@ function input_full_car_a_arm(;params::list, front::susp, rear::susp)
     item.body[2] = "ground"
     item.location[1] = [params.a / 2, params.tf / 4, params.hG]
     item.location[2] = [params.a / 2, params.tf / 4, params.hG - 0.1]
+    item.gain = 1 / 9.81
     item.order = 3 # acceleration
-    item.units = "m/s^2"
+    item.units = "g"
     item.desc = "Vertical acceleration"
     add_item!(item, the_system)
 

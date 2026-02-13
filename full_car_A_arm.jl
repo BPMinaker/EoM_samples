@@ -391,7 +391,8 @@ steer(t) = sin(2π * 0.7 * (t - 2)) * EoM.pulse(t, 2, 2 + 0.75 / 0.7) - EoM.puls
 zofxl, zofxr = random_road(class=5, dz=0.2, L=(t2 - t1) * u)
 
 flist = readdir("specifications"; join = true)
-time = Dates.format(now(), "HH:MM:SS") 
+time = Dates.format(now(), "HH:MM:SS")
+!isdir("output") && (mkpath("output"))
 open(joinpath("output", "output.txt"), "w") do io
     println(io, "This is the output recorded at $time.")
 end

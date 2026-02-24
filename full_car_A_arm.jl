@@ -98,7 +98,7 @@ function main()
 
     println("Solving time history for double lane change...")
     pass = true
-    while pass
+    while (pass && mult < 10.1)
         println("Testing gain: ", mult)
         yoft_yaw_test = ltisim(result, ptr2, (t1, t2))
 

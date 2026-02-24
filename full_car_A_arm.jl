@@ -122,7 +122,7 @@ function main()
 
         println("Conditions: ", cond1, ", ", cond2, ", ", cond3)
 
-        if cond1 && (cond2 || cond3)
+        if cond1 && cond2 && cond3
             mult += 0.25
         else
             pass = false

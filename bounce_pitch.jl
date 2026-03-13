@@ -1,4 +1,5 @@
-using EoM
+using EoM, EoM_X3D
+
 include(joinpath("models", "input_ex_bounce_pitch.jl"))
 
 function main()
@@ -10,15 +11,15 @@ function main()
     b = 1.3
     kf = 25000
     kr = 30000
-    cf = 600
-    cr = 500
+    cf = 0
+    cr = 0
     Iy = 2000
 
-    #kr = a * kf / b
-    #Iy = m*a*b
+#    kr = a * kf / b
+#    Iy = m*a*b
 
-    format = :screen
-    # format = :html
+    #format = :screen
+    format = :html
 
     system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy) # note that we don't pass u here, it is only used later for delay
     output = run_eom!(system)
@@ -29,6 +30,8 @@ function main()
     bode = [1 1; 1 1; 1 1; 0 0; 0 0]
     summarize(system, result; bode, format)
 
+    animate_modes(system, result)
+
     # with the front and rear inputs coupled by a time delay of (a+b)/u, we now have only one input, but still the same outputs, so keep only the first column of the previous
     bode = bode[:, 1]
     ss = :skip
@@ -36,9 +39,6 @@ function main()
     input_delay!(system, result, (a + b) / u, [1, 2])
     system.name *= " with input delay"
     summarize(system, result; bode, ss, impulse, format)
-
-    # using EoM_X3D
-    # animate_modes(system, result)
 
     system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
     output = run_eom!(system)

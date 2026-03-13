@@ -21,7 +21,7 @@ function main()
     system = [input_ex_truck_trailer(; u=x, m, Iz, d, e, h, mt, It) for x in vpts]
     output = run_eom!.(system, vpts .== 1)
 
-    result = analyze.(output, vpts .== 1; freq=(-1, 1), impulse=:skip, bode=:skip)
+    result = analyze.(output, vpts .== 1; freq=(-1, 1), impulse=:skip)
     summarize(system, vpts, result; format)
 
     # choose the equations of motion for 18 m/s (note function notation)

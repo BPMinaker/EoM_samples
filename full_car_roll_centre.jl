@@ -1,4 +1,4 @@
-using EoM
+using EoM, EoM_X3D
 
 include(joinpath("models", "input_ex_roll_centre.jl"))
 # note that this model has four actuators, one for each tire lateral force, so we can use an external calculation for the tire model, anything we like, e.g. a magic formula
@@ -24,13 +24,15 @@ function main()
     cfy = 0
     cry = 0
 
-    format = :screen
-    # format = :html
+    #format = :screen
+    format = :html
 
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
     system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr, r) # make sure to include all parameters you want to change here
     output = run_eom!(system, true)
     result = analyze(output, true; bode=:skip, impulse=:skip, ss=:skip)
+
+    animate_modes(system, result)
 
     # define a steer function, use a slowly increasing steer angle, in units of degrees, i.e., 3 degrees after 30 seconds
     steer(t) = t / 10

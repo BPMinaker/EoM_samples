@@ -1,5 +1,8 @@
 using EoM
 using Interpolations
+using Plots
+plotlyjs()
+
 include(joinpath("models", "input_ex_yaw_plane.jl"))
 
 function main()
@@ -41,7 +44,7 @@ function main()
 
     # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
     # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
-    summarize(system, vpts, result; format)
+    summarize(vpts, result; format)
 
     # now, let's also do some time domain solutions; let's pick a speed of 100 km/h, or 22.8 m/s, and get the equations of motion and the results for that speed
     u = 22.8
@@ -77,32 +80,32 @@ function main()
 
     # plot yaw rate vs time
     sidx = ["r"]
-    p1 = ltiplot(system, yoft; sidx)
+    p1 = ltiplot(yoft; sidx)
 
     # plot body slip angle vs time
     sidx = ["β"]
-    p2 = ltiplot(system, yoft; sidx)
+    p2 = ltiplot(yoft; sidx)
 
     # plot slip angles, understeer angle vs time
     sidx = ["α_f", "α_r", "α_u"]
-    p3 = ltiplot(system, yoft; sidx)
+    p3 = ltiplot(yoft; sidx)
 
     # plot lateral acceleration vs time
     sidx = ["a_y"]
-    p4 = ltiplot(system, yoft; sidx)
+    p4 = ltiplot(yoft; sidx)
 
     # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
-    # becasue this plot is not a function of time, we need to use the EoM.plot function
+    # becasue this plot is not a function of time, we need to use the plot function
     xlabel = "x [m]"
     ylabel = "y [m]"
     label = ""
-    p5 = EoM.plot(u * yoft.t, yoft[5, :]; xlabel, ylabel, label)
+    p5 = plot(u * yoft.t, yoft[5, :]; xlabel, ylabel, label)
 
     plots = [p1, p2, p3, p4, p5]
 
     # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
 
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
     #using EoM_X3D
     #animate_modes(system, result)

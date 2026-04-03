@@ -1,4 +1,10 @@
 using EoM, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_b_train.jl"))
 
 function main()
@@ -18,9 +24,6 @@ function main()
     # Speed range for analysis
     vpts = 0.4:0.4:40
 
-    format = :screen
-    # format = :html
-
     # Create system instances for different speeds
     system = [input_ex_b_train(; u=x, m1, Iz1, m2, Iz2, m3, Iz3) for x in vpts]
 
@@ -31,7 +34,7 @@ function main()
     result = analyze.(output, vpts .== 1; freq=(-1, 1), impulse=:skip, bode=:skip)
 
     # Summarize results
-    summarize(system, vpts, result; format)
+    summarize(vpts, result; format)
 
     animate_modes(system[10], result[10])
 
@@ -80,20 +83,20 @@ function main()
     plots = []
 
     # Plot yaw rate vs time
-    push!(plots, ltiplot(sys_sim, yoft; sidx=["r1"]))
+    push!(plots, ltiplot(yoft; sidx=["r1"]))
 
     # Plot sideslip vs time
-    push!(plots, ltiplot(sys_sim, yoft; sidx=["β"]))
+    push!(plots, ltiplot(yoft; sidx=["β"]))
 
     # Plot articulation angles
-    push!(plots, ltiplot(sys_sim, yoft; sidx=["γ1"]))
-    push!(plots, ltiplot(sys_sim, yoft; sidx=["γ2"]))
+    push!(plots, ltiplot(yoft; sidx=["γ1"]))
+    push!(plots, ltiplot(yoft; sidx=["γ2"]))
 
     # Plot lateral acceleration
-    push!(plots, ltiplot(sys_sim, yoft; sidx=["ay1"]))
+    push!(plots, ltiplot(yoft; sidx=["ay1"]))
 
     # Show summary with plots
-    summarize(sys_sim, res_sim; plots, format)
+    summarize(res_sim; plots, format)
 
     # animate_modes(sys_sim, res_sim)
 

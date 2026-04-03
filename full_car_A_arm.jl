@@ -1,7 +1,8 @@
-using EoM
-using EoM_X3D
+using EoM, EoM_X3D
 using Interpolations
 using Dates
+using Plots
+plotlyjs()
 
 include(joinpath("models", "input_ex_full_car_A_arm.jl"))
 
@@ -246,28 +247,28 @@ function main()
     uidx = [0]
     label = ["Steer angle δ"]
     ylabel = ", δ [°]"
-    p = ltiplot(system, yoft_yaw, δ; ylabel, label, sidx, uidx)
+    p = ltiplot(yoft_yaw, δ; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # roll angle, pitch angle, slip angle, understeer angle
     sidx = ["ϕ", "θ", "β"]
     label = ["Understeer angle α_u" "Steer angle δ"]
     ylabel = "Angles [°]"
-    p = ltiplot(system, yoft_yaw, [yoft_yaw[system.sidx["α_u-δ"], :] .+ δ δ]; ylabel, label, sidx, uidx)
+    p = ltiplot(yoft_yaw, [yoft_yaw[system.sidx["α_u-δ"], :] .+ δ δ]; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # G lift
     sidx = ["z_G"]
     label = ["Steer angle δ"]
     ylabel = ", δ [°]"
-    p = ltiplot(system, yoft_yaw, δ; ylabel, label, sidx, uidx)
+    p = ltiplot(yoft_yaw, δ; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # lateral forces
     yidx = [0]
     uidx = Yidx
     ylabel = "Lateral forces [N]"
-    p = ltiplot(system, yoft_yaw; ylabel, yidx, uidx)
+    p = ltiplot(yoft_yaw; ylabel, yidx, uidx)
     push!(plots, p)
 
     # plots not directly from inputs or outputs
@@ -279,7 +280,7 @@ function main()
 
     label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
     ylabel = "Vertical forces [N]"
-    p = ltiplot(system, yoft_yaw, Z; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft_yaw, Z; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # find weight transfer
@@ -287,7 +288,7 @@ function main()
 
     label = ["Front weight transfer" "Rear weight transfer"]
     ylabel = "Lateral weight transfer [N]"
-    p = ltiplot(system, yoft_yaw, ΔZ; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft_yaw, ΔZ; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # get tire slip angles
@@ -295,7 +296,7 @@ function main()
     α[:, [1, 3]] .-= δ
     label = ["Tire slip angle α_lf" "Tire slip angle α_lr" "Tire slip angle α_rf" "Tire slip angle α_rr"]
     ylabel = "Slip angles [°]"
-    p = ltiplot(system, yoft_yaw, α; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft_yaw, α; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # get tire lateral forces
@@ -303,29 +304,29 @@ function main()
     acc = sum(YY, dims=1)[1, :] / sum(Z0)
     label = ["ΣY/m"]
     ylabel = "Lateral accel'n [g]"
-    p = ltiplot(system, yoft_yaw, acc; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft_yaw, acc; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     ###############################################
 
     aidx = ["u_lf", "u_rf"]
-    p = ltiplot(system, yoft_bounce; yidx, aidx)
+    p = ltiplot(yoft_bounce; yidx, aidx)
     push!(plots, p)
 
     # roll angle, pitch angle
     sidx = ["ϕ", "θ"]
     ylabel = "Angles [°]"
-    p = ltiplot(system, yoft_bounce; ylabel, label, sidx, uidx)
+    p = ltiplot(yoft_bounce; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # G lift
     sidx = ["z_G"]
-    p = ltiplot(system, yoft_bounce; sidx, uidx)
+    p = ltiplot(yoft_bounce; sidx, uidx)
     push!(plots, p)
 
     # P lift
     sidx = ["zddot_P"]
-    p = ltiplot(system, yoft_bounce; sidx, uidx)
+    p = ltiplot(yoft_bounce; sidx, uidx)
     push!(plots, p)
 
     # get tire vertical forces
@@ -333,32 +334,32 @@ function main()
 
     label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
     ylabel = "Vertical forces [N]"
-    p = ltiplot(system, yoft_bounce, Z; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft_bounce, Z; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     ###############################################
 
     # plot speed
     sidx = ["u_G"]
-    p = ltiplot(system, yoft_long; sidx, uidx)
+    p = ltiplot(yoft_long; sidx, uidx)
     push!(plots, p)
 
 
     # plot axle torque
     yidx = [0]
     aidx = ["m_lr", "m_rr"]
-    p = ltiplot(system, yoft_long; yidx, aidx)
+    p = ltiplot(yoft_long; yidx, aidx)
     push!(plots, p)
 
     # pitch angle
     sidx = ["θ"]
     ylabel = "Pitch angle [°]"
-    p = ltiplot(system, yoft_long; ylabel, label, sidx, uidx)
+    p = ltiplot(yoft_long; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # G lift
     sidx = ["z_G"]
-    p = ltiplot(system, yoft_long; sidx, uidx)
+    p = ltiplot(yoft_long; sidx, uidx)
     push!(plots, p)
 
     # get tire vertical forces
@@ -366,11 +367,11 @@ function main()
 
     label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
     ylabel = "Vertical forces [N]"
-    p = ltiplot(system, yoft_long, Z; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft_long, Z; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     println("Plotted results.")
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
     println("Writing $team_name's result...")
     open(joinpath("output", "output.txt"), "a") do io

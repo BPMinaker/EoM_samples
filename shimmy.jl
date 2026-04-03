@@ -1,24 +1,27 @@
 using EoM
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_shimmy.jl"))
 
 function main()
-
-    format = :screen
-    # format = :html
 
     m = 5
     k = 0.3 * m
     l = 1
     u = l
     I = 0.21 * m * l^2
-    vpts = range(0, 1; length=151)
+    vpts = 0:1/150:1
     vpt_name = ["a/l" "Mass centre location" ""]
 
     system = [input_ex_shimmy(; m, k, a=x * l, b=l - (x * l), u, I) for x in vpts]
     output = run_eom!.(system)
     result = analyze.(output; ss=:skip, impulse=:skip)
 
-    summarize(system, vpts, result; vpt_name, format)
+    summarize(vpts, result; vpt_name, format)
 
 end
 

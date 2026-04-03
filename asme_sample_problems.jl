@@ -1,4 +1,7 @@
 using EoM, EoM_X3D
+using Plots
+plotlyjs()
+
 include(joinpath("models", "input_ex_hanging_chain.jl"))
 
 function chain()
@@ -14,8 +17,9 @@ function chain()
     t2 = 20
     yoft = ltisim(result, u_vec, (t1, t2))
 
-    plots = [ltiplot(system, yoft)]
-    summarize(system, result; plots)
+    plots = [ltiplot(yoft)]
+
+    summarize(result; plots)
 
     # summarize(system, result; plots, format = :html)
     # animate_modes(system, result)
@@ -38,9 +42,8 @@ function loops()
     output = run_eom!(system)
     result = analyze(output)
 
-    summarize(system, result)
+    summarize(result)
 
-    # summarize(system, result; format = :html)
     animate_modes(system, result)
 
 end
@@ -53,14 +56,14 @@ function pyramid()
     output = run_eom!(system)
     result = analyze(output)
 
-    # summarize(system, result)
-    summarize(system, result; format = :html)
+    summarize(result; format = :html)
+
     animate_modes(system, result)
 
 end
 
-# chain()
-# loops()
+chain()
+loops()
 pyramid()
 
 println("Done.")

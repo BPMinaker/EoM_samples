@@ -1,4 +1,7 @@
 using EoM, EoM_X3D
+using Plots
+plotlyjs()
+
 include(joinpath("models", "input_ex_1_dof_pendulum_spring.jl"))
 
 function main()
@@ -7,7 +10,7 @@ function main()
     output = run_eom!(system)
     result = analyze(output)
 
-    summarize(system, result)
+    summarize(result)
 
     animate_modes(system, result)
 

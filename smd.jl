@@ -1,9 +1,11 @@
 # you might find it helpful to turn on 'word wrapping' in VSCode; go to File, Preferences, Settings, and search for 'wrap'; change the setting to 'on'
 
-# load the EoM support library, that defines the `run_eom!()`, `analyze()`, and `summarize()` functions; you can also load the `EoM_X3D` library, which is used for 3D animations, but we won't need it in this example; if you want to use it, uncomment the line below
-
+# load the EoM support library, that defines the `run_eom!()`,and `analyze()`, functions;
 using EoM
-# using EoM_X3D
+# load the plotting library, which also activates th EoM extension function `summarize()`
+using Plots
+# choose the PlotlyJS backend for plotting, which creates interactive plots
+plotlyjs()
 
 # now, we load the function `input_ex_smd()`, which contains the definition of the spring mass damper system; we make Julia aware of the function by `including` the file that contains it; the `joinpath()` function inserts the appropriate separator, i.e., a forward slash or backslash, depending on the platform (Windows/Mac); you can `include` input files for systems you write yourself in the same way
 
@@ -114,7 +116,7 @@ function main()
 
     # we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, spring force, the damping force, the inertial force, and applied force, here there are some keyword arguments for the labels, etc.
 
-    p1 = ltiplot(system, yoft)
+    p1 = ltiplot(yoft)
 
     # the plot is created and stored but not shown, we could send it to the screen using: display(p1); this plot would show up in a tab in VS Code or in a web browser tab
     # or we can add it to a vector of plots, and send it to the `summarize()` function
@@ -123,16 +125,16 @@ function main()
 
     ω = 0.5 * ω_n * 2π
     yoft = ltisim(result, u_vec, (t1, t2))
-    p2 = ltiplot(system, yoft)
+    p2 = ltiplot(yoft)
 
     ω = 2 * ω_n * 2π
     yoft = ltisim(result, u_vec, (t1, t2))
-    p3 = ltiplot(system, yoft)
+    p3 = ltiplot(yoft)
 
     # now let's display all out results, along with the extra plots
 
     plots = [p1, p2, p3]
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
     # alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; that gets overwritten if you run the analysis again, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
 

@@ -1,4 +1,10 @@
 using EoM
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_bendy_bus.jl"))
 
 function main()
@@ -13,7 +19,7 @@ function main()
     output = run_eom!.(system)
     result = analyze.(output; ss=:skip, impulse=:skip)
 
-    summarize(system, vpts, result; vpt_name)
+    summarize(vpts, result; vpt_name, format)
 
 end
 

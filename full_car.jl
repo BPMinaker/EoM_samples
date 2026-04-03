@@ -1,5 +1,10 @@
-using EoM
-# using EoM_X3D
+using EoM #, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_full_car.jl"))
 
 function main()
@@ -13,15 +18,12 @@ function main()
     cr = 100
     Iy = 2000
 
-    format = :screen
-    # format = :html
-
     system = input_ex_full_car(; m, a, b, tf, tr, cf, cr, Iy)
     output = run_eom!(system)
     result = analyze(output)
 
     impulse = :skip
-    summarize(system, result; impulse, format)
+    summarize(result; impulse, format)
 
     # animate_modes(system, result)
 

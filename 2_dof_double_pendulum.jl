@@ -1,9 +1,11 @@
-using EoM
-using EoM_X3D
-include(joinpath("models", "input_ex_2_dof_double_pendulum.jl"))
+using EoM, EoM_X3D
+using Plots
+plotlyjs()
 
 # format = :screen
 format = :html
+
+include(joinpath("models", "input_ex_2_dof_double_pendulum.jl"))
 
 function main()
 
@@ -11,7 +13,7 @@ function main()
     output = run_eom!(system)
     result = analyze(output)
 
-    summarize(system, result; format)
+    summarize(result; format)
 
     animate_modes(system, result)
 

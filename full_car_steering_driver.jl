@@ -1,10 +1,16 @@
 using EoM, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+format = :html
+
 include(joinpath("models", "input_full_car_steering.jl"))
 include(joinpath("models", "track.jl"))
 include(joinpath("models", "driver.jl"))
 
 r = 0.315
-include("my_specs.jl")
+include("full_car_specs.jl")
 
 function main()
 
@@ -23,9 +29,6 @@ function main()
     tr = 1.52
     muf = 50
     mur = 50
-
-    # format = :screen
-    format = :html
 
     parms = chassis(; m, hG, Ix, Iy, Iz, a, b, tf, tr, kf, kr, cf, cr, krf, krr, muf, mur)
     system = input_full_car_steering(; u, Iw, parms, front, rear)
@@ -104,30 +107,30 @@ function main()
     sidx = ["r"]
     label = ["Target steer angle δ"]
     ylabel = ", δ [rad]"
-    p = ltiplot(system, yoft, δ; ylabel, label, sidx, uidx)
+    p = ltiplot(yoft, δ; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # plot the steer moment
     yidx = [0]
     aidx = ["L"]
-    p = ltiplot(system, yoft; yidx, aidx)
+    p = ltiplot(yoft; yidx, aidx)
     push!(plots, p)
 
     yidx = δidx
     label = ["Target steer angle δ"]
     ylabel = "Steer angles [rad]"
-    p = ltiplot(system, yoft, δ; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft, δ; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     sidx = ["ϕ", "θ", "ψ", "β"]
     ylabel = "Angles [rad]"
     label = ["Understeer angle α_u"]
-    p = ltiplot(system, yoft, yoft[system.sidx["α_u-δ"], :] + 0.5 * yoft[system.sidx["δ_lf"], :] + 0.5 * yoft[system.sidx["δ_rf"], :]; ylabel, label, sidx, uidx)
+    p = ltiplot(yoft, yoft[system.sidx["α_u-δ"], :] + 0.5 * yoft[system.sidx["δ_lf"], :] + 0.5 * yoft[system.sidx["δ_rf"], :]; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     yidx = γidx
     ylabel = "Camber [rad]"
-    p = ltiplot(system, yoft; ylabel, yidx, uidx)
+    p = ltiplot(yoft; ylabel, yidx, uidx)
     push!(plots, p)
 
     yidx = [0]
@@ -138,29 +141,29 @@ function main()
 
     ylabel = "Slip angles [rad]"
     label = ["Slip angle α_lf" "Slip angle α_lr" "Slip angle α_rf" "Slip angle α_rf"]
-    p = ltiplot(system, yoft, αt; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft, αt; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # get tire vertical forces
     ZZ = Z0' .- yoft[Zsidx, :]' - yoft[Zdidx, :]'
     label = ["Tire force Z_lf" "Tire force Z_lr" "Tire force Z_rf" "Tire force Z_rr"]
     ylabel = "Vertical forces [N]"
-    p = ltiplot(system, yoft, ZZ; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft, ZZ; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # lateral forces
     aidx = ["Y_lf", "Y_lr", "Y_rf", "Y_rr"]
     ylabel = "Lateral forces [N]"
-    p = ltiplot(system, yoft; ylabel, aidx, yidx)
+    p = ltiplot(yoft; ylabel, aidx, yidx)
     push!(plots, p)
 
     aidx = ["N_lf", "N_lr", "N_rf", "N_rr"]
     ylabel = "Aligning moments [Nm]"
-    p = ltiplot(system, yoft; ylabel, aidx, yidx)
+    p = ltiplot(yoft; ylabel, aidx, yidx)
     push!(plots, p)
 
     sidx = ["z"]
-    p = ltiplot(system, yoft; sidx, uidx)
+    p = ltiplot(yoft; sidx, uidx)
     push!(plots, p)
 
     # find weight transfer
@@ -168,7 +171,7 @@ function main()
 
     label = ["Front weight transfer" "Rear weight transfer"]
     ylabel = "Lateral weight transfer [N]"
-    p = ltiplot(system, yoft, ΔZ; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft, ΔZ; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # get tire lateral forces
@@ -178,7 +181,7 @@ function main()
     label = ["ru" "Σf/m" "vdot"]
     ylabel = "Lateral accel'n [m/s^2]"
 
-    p = ltiplot(system, yoft, [yoft[system.sidx["ru"], :] acc acc - yoft[system.sidx["ru"], :]]; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft, [yoft[system.sidx["ru"], :] acc acc - yoft[system.sidx["ru"], :]]; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
@@ -189,12 +192,10 @@ function main()
 
     x = u * yoft.t
     path = [i[1] for i in track.(x)]
-    p = EoM.plot(x, [yoft[system.sidx["y"], :] path]; xlabel, ylabel, label)
+    p = plot(x, [yoft[system.sidx["y"], :] path]; xlabel, ylabel, label)
     push!(plots, p)
 
-    println("Plotted results.")
-
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
     # generate animations of the mode shapes
     # animate_modes(system, result, true)

@@ -1,4 +1,7 @@
-using EoM, EoM_X3D
+using EoM
+using Plots
+plotlyjs()
+
 include(joinpath("models", "input_ex_1_dof_pendulum_spring.jl"))
 
 function main()
@@ -15,7 +18,7 @@ function main()
 
     result = analyze(output)
 
-    summarize(system, result)
+    summarize(result)
 
 end
 

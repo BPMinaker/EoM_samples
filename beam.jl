@@ -1,12 +1,13 @@
-using EoM
-# using EoM_X3D
+using EoM #, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
 
 include(joinpath("models", "input_ex_beam.jl"))
 
 function main()
-
-    format = :screen
-    # format = :html
 
     mpi = 0.0254
     h = 2 * mpi
@@ -29,7 +30,7 @@ function main()
     output = run_eom!(system, true)
     result = analyze(output, true)
 
-    summarize(system, result; format)
+    summarize(result; format)
 
     # animate_modes(system, result)
 

@@ -1,4 +1,8 @@
-using EoM, Interpolations
+using EoM
+using Interpolations
+using Plots
+plotlyjs()
+
 include(joinpath("models", "input_ex_yaw_plane_flex_steer.jl"))
 
 function main()
@@ -43,7 +47,7 @@ function main()
     output = run_eom!.(system, vpts .== 1)
     result = analyze.(output, vpts .== 1, freq=(-1, 2))
 
-    summarize(system, vpts, result; impulse=:skip)
+    summarize(vpts, result; impulse=:skip, bode=:skip)
 
     ss_resp = hcat(getproperty.(result, :ss_resp)...)
     yy = LinearInterpolation(ss_resp[3, :], vpts)

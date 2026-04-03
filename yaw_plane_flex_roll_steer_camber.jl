@@ -1,5 +1,8 @@
-using EoM, Interpolations
-#using EoM_X3D
+using EoM
+using Interpolations
+using Plots
+plotlyjs()
+
 include(joinpath("models", "input_ex_yaw_plane_flex_roll_steer.jl"))
 
 function main()
@@ -55,13 +58,11 @@ function main()
     ef += Γf * Cγf / cf
     er -= Γr * Cγr / cr
 
-
-
     system = [input_ex_yaw_plane_flex_roll_steer(; u=x, ms, muf, mur, a, b, Izs, cf, cr, ptf, ptr, lf, lr, kf, kr, ef, er, k_phi) for x in vpts]
     output = run_eom!.(system, vpts .== 1)
     result = analyze.(output, vpts .== 1, freq=(-1, 2))
 
-    #summarize(system, vpts, result; impulse = :skip, bode = :skip)
+    summarize(vpts, result; impulse = :skip, bode = :skip)
 
     ss_resp = hcat(getproperty.(result, :ss_resp)...)
     yy = LinearInterpolation(ss_resp[3, :], vpts)
@@ -70,9 +71,6 @@ function main()
     K = dpr * (a + b) * 9.81 / uchar^2
     display(K)
     println("Understeer gradient $(my_round(K)) degrees/g.")
-
-    #eom_draw(system[1])
-    #animate_modes(system[end], result[end], scale=0.2)
 
 end
 

@@ -1,4 +1,7 @@
-using EoM
+using EoM #, EoM_X3D
+using Plots
+plotlyjs()
+
 include(joinpath("models", "input_quarter_car_planar_a_arm.jl"))
 include(joinpath("models", "tire.jl"))
 include("kinematics.jl")
@@ -26,7 +29,6 @@ function main()
         [ptr3, "Quarter Car A-arm - mixed arms"],
     ]
 
-
     for i in vec
 
         system = i[1].(vpt)
@@ -37,7 +39,7 @@ function main()
         rr, L, rc = system[1].scratch
         display(rr)
 
-        summarize(system, vpt, result; vpt_name, ss=:skip)
+        summarize(vpt, result; vpt_name, ss=:skip)
 
     end
     # animate_modes(system[1], result[1], overwrite = false)

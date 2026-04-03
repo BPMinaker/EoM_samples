@@ -1,4 +1,10 @@
 using EoM, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_yaw_plane.jl"))
 include(joinpath("models", "driver.jl"))
 include(joinpath("models", "track.jl"))
@@ -24,30 +30,18 @@ function main()
     ptf = df / cf # front pneumatic trail
     ptr = dr / cr # rear pneumatic trail
 
-    format = :screen
-    # format = :html
-
     system = input_ex_yaw_plane(; u, m, a, b, Iz, cf, cr, ptf, ptr)
     sensors_animate!(system)
     output = run_eom!(system)
     result = analyze(output; ss = :skip, impulse = :skip, bode = :skip)
 
-    #define the steer angle as a function of time, a sin w dwell input ala FMVSS 126
-    # a 0.7 Hz sinewave with origin at t=2 times zero everywhere except times one from t=2 for 3/4 of a wavelength
-    # plus a constant negative one for 0.5 seconds,starting right after the 3/4 wavelength
-    # plus a 0.7 Hz sinewave with origin at t=2.5 times zero everywhere except times one for the last 1/4 of a wavelength
-    # all times 2
-#    steer(t) =  2 * (sin(2π * 0.7 * (t - 2)) * EoM.pulse(t, 2, 2 + 0.75 / 0.7) - EoM.pulse(t, 2 + 0.75 / 0.7, 2.5 + 0.75 / 0.7) + sin(2π * 0.7 * (t - 2.5)) * EoM.pulse(t, 2.5 + 0.75 / 0.7, 2.5 + 1 / 0.7))
-
     # define input function to be steer
-    # put it in the form to also accept x (i.e., u=f(x,t))) but then ignore x
-    # and return a vector even though it is length of one
     function u_vec(x, t)
 
         y = result.ss_eqns.C * x
         # get vehicle location and heading from sensors (y is the output vector)
-        offset = y[system.sidx["chassis_2"]]
-        heading = y[system.sidx["chassis_6"]]
+        offset = y[system.sidx["y"]]
+        heading = y[system.sidx["ψ"]] / dpr 
         [-dpr * driver(a+b, offset, heading, u * t)]
     end
 
@@ -63,19 +57,19 @@ function main()
 
     # plot yaw rate vs time
     sidx = ["r"]
-    p1 = ltiplot(system, yoft; sidx)
+    p1 = ltiplot(yoft; sidx)
 
     # plot body slip angle vs time
     sidx = ["β"]
-    p2 = ltiplot(system, yoft; sidx)
+    p2 = ltiplot(yoft; sidx)
 
     # plot slip angles, understeer angle vs time
     sidx = ["α_f", "α_r", "α_u"]
-    p3 = ltiplot(system, yoft; sidx)
+    p3 = ltiplot(yoft; sidx)
 
     # plot lateral acceleration vs time
     sidx = ["a_y"]
-    p4 = ltiplot(system, yoft; sidx)
+    p4 = ltiplot(yoft; sidx)
 
     # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
     # becasue this plot is not a function of time, we need to use the EoM.plot function
@@ -88,12 +82,12 @@ function main()
     track_y(x) = track(x)[1]
     path = track_y.(x)
 
-    p5 = EoM.plot(x, [yoft[yidx, :] path]; xlabel, ylabel, label)
+    p5 = plot(x, [yoft[yidx, :] path]; xlabel, ylabel, label)
 
     plots = [p1, p2, p3, p4, p5]
 
     # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
 end
 

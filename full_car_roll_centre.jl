@@ -1,4 +1,9 @@
-using EoM, EoM_X3D
+using EoM #, EoM_X3D
+using Plots
+plotlyjs()
+
+#format = :screen
+format = :html
 
 include(joinpath("models", "input_ex_roll_centre.jl"))
 # note that this model has four actuators, one for each tire lateral force, so we can use an external calculation for the tire model, anything we like, e.g. a magic formula
@@ -24,15 +29,12 @@ function main()
     cfy = 0
     cry = 0
 
-    #format = :screen
-    format = :html
-
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
     system = input_full_car_rc(; m, u, a, b, cfy, cry, hf, hr, kf, kr, krf, krr, r) # make sure to include all parameters you want to change here
     output = run_eom!(system, true)
     result = analyze(output, true; bode=:skip, impulse=:skip, ss=:skip)
 
-    animate_modes(system, result)
+#    animate_modes(system, result)
 
     # define a steer function, use a slowly increasing steer angle, in units of degrees, i.e., 3 degrees after 30 seconds
     steer(t) = t / 10
@@ -75,28 +77,28 @@ function main()
     uidx = [0]
     label = ["Steer angle δ"]
     ylabel = ", δ [°]"
-    p = ltiplot(system, yoft, δ; ylabel, label, sidx, uidx)
+    p = ltiplot(yoft, δ; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # roll angle, pitch angle, slip angle, understeer angle
     sidx = ["ϕ", "θ", "β"]
     label = ["Understeer angle α_u" "Steer angle δ"]
     ylabel = "Angles [°]"
-    p = ltiplot(system, yoft, [yoft[system.sidx["α_u-δ"], :] .+ δ δ]; ylabel, label, sidx, uidx)
+    p = ltiplot(yoft, [yoft[system.sidx["α_u-δ"], :] .+ δ δ]; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # G lift
     sidx = ["z_G"]
     label = ["Steer angle δ"]
     ylabel = ", δ [°]"
-    p = ltiplot(system, yoft, δ; ylabel, label, sidx, uidx)
+    p = ltiplot(yoft, δ; ylabel, label, sidx, uidx)
     push!(plots, p)
 
     # lateral forces
     yidx = [0]
     aidx = ["Y_lf", "Y_lr", "Y_rf", "Y_rr"]
     ylabel = "Lateral forces [N]"
-    p = ltiplot(system, yoft; ylabel, yidx, aidx)
+    p = ltiplot(yoft; ylabel, yidx, aidx)
     push!(plots, p)
 
     # yaw moment
@@ -106,7 +108,7 @@ function main()
     uidx = [0]
     label = ["Total"]
     ylabel = "Yaw moments [Nm]"
-    p = ltiplot(system, yoft, N; ylabel, label, yidx, uidx, formatter=:plain)
+    p = ltiplot(yoft, N; ylabel, label, yidx, uidx, formatter=:plain)
     push!(plots, p)
 
     # plots not directly from inputs or outputs
@@ -118,7 +120,7 @@ function main()
 
     label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
     ylabel = "Vertical forces [N]"
-    p = ltiplot(system, yoft, ZZ; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft, ZZ; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # find weight transfer
@@ -126,7 +128,7 @@ function main()
 
     label = ["Front weight transfer" "Rear weight transfer"]
     ylabel = "Lateral weight transfer [N]"
-    p = ltiplot(system, yoft, ΔZ; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft, ΔZ; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # get tire slip angles
@@ -134,7 +136,7 @@ function main()
 
     label = ["Tire slip angle α_lf" "Tire slip angle α_lr" "Tire slip angle α_rf" "Tire slip angle α_rr"]
     ylabel = "Slip angles [°]"
-    p = ltiplot(system, yoft, α; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft, α; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     # get tire lateral forces
@@ -158,18 +160,18 @@ function main()
 
     label = ["Front grip loss" "Rear grip loss"]
     ylabel = "Lateral grip loss due to weight transfer [N]"
-    p = ltiplot(system, yoft, [ΔYF ΔYR]; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft, [ΔYF ΔYR]; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     acc = sum(YY, dims=1)[1, :] * 9.81 / sum(Z0)
     label = ["ru" "Σf/m" "vdot"]
     ylabel = "Lateral accel'n [m/s^2]"
-    p = ltiplot(system, yoft, [yoft[system.sidx["ru"], :] acc acc - yoft[system.sidx["ru"], :]]; ylabel, label, yidx, uidx)
+    p = ltiplot(yoft, [yoft[system.sidx["ru"], :] acc acc - yoft[system.sidx["ru"], :]]; ylabel, label, yidx, uidx)
     push!(plots, p)
 
     println("Plotted results.")
 
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
     # generate animations of the mode shapes
     # animate_modes(system, result, true)

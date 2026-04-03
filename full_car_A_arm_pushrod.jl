@@ -1,4 +1,9 @@
 using EoM, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
 
 include(joinpath("models", "input_full_car_a_arm_pushrod.jl"))
 include(joinpath("models", "susp.jl"))
@@ -13,9 +18,6 @@ function main()
     tw = 1.94 - 0.23
     r = 0.346
     u = 10
-
-    format = :screen
-    # format = :html
 
     system = input_full_car_a_arm_pushrod(; u, a, b, tw, r)
     output = run_eom!(system)
@@ -46,17 +48,17 @@ function main()
     aidx = ["u_LF"]
 
     sidx = ["z_LFc"]
-    p1 = ltiplot(system, yoft; sidx, aidx)
+    p1 = ltiplot(yoft; sidx, aidx)
 
     sidx = ["z_LFc-z_LF"]
-    p2 = ltiplot(system, yoft; sidx, aidx)
+    p2 = ltiplot(yoft; sidx, aidx)
 
     sidx = ["z_LF-u_LF"]
-    p3 = ltiplot(system, yoft; sidx, aidx)
+    p3 = ltiplot(yoft; sidx, aidx)
 
     plots = [p1, p2, p3]
 
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
 end
 

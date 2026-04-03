@@ -1,11 +1,14 @@
 using EoM, Interpolations
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 # read in the function that will define our drag race vehicle model
 include(joinpath("models", "input_ex_drag_race.jl"))
 
 function main()
-
-    format = :screen
-    # format = :html
 
     # set the values of the parameters here
     # tire radius in meters, for example, for 195/50-R16
@@ -211,7 +214,7 @@ function main()
     # make the first plot and save it in a vector
     # we can just choose output number one, which is the distance
     sidx = ["x_G"]
-    plots = [ltiplot(system, yoft; sidx, uidx)]
+    plots = [ltiplot(yoft; sidx, uidx)]
 
     # make the next plot, and push it onto the plot vector
     # we can't just choose output number two, which is the velocity, because we want new units
@@ -219,18 +222,18 @@ function main()
     yidx = [0]
     label = hcat("Velocity u")
     ylabel = "u [km/h]"
-    push!(plots, ltiplot(system, yoft, uu; ylabel, label, yidx, uidx))
+    push!(plots, ltiplot(yoft, uu; ylabel, label, yidx, uidx))
 
     label = hcat("Acceleration u_dot")
     ylabel = "u dot [g]"
-    push!(plots, ltiplot(system, yoft, aG; ylabel, label, yidx, uidx, ylims=(0, Inf)))
+    push!(plots, ltiplot(yoft, aG; ylabel, label, yidx, uidx, ylims=(0, Inf)))
 
     label = ["Z_r" "Z_f"]
     ylabel = "Axle vertical load [kN]"
-    push!(plots, ltiplot(system, yoft, [ZZr ZZf]; ylabel, label, yidx, uidx, ylims=(0, Inf)))
+    push!(plots, ltiplot(yoft, [ZZr ZZf]; ylabel, label, yidx, uidx, ylims=(0, Inf)))
 
     # pass all the results and plots
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
 end
 

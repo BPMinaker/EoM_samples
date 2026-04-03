@@ -1,4 +1,10 @@
 using EoM
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_quarter_car.jl"))
 
 function main()
@@ -12,13 +18,10 @@ function main()
     vpts = 15000:100:30000
     vpt_name = ["k" "Stiffness" "N/m"]
 
-    format = :screen
-    # format = :html
-
     system = [input_ex_quarter_car(; ks=x, ms, mu, kt, cs, ct) for x in vpts]
     output = run_eom!.(system)
     result = analyze.(output; ss=:skip, impulse=:skip)
-    summarize(system, vpts, result; vpt_name, format)
+    summarize(vpts, result; vpt_name, format)
 
 end
 

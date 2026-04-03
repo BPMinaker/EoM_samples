@@ -1,5 +1,10 @@
 using EoM
-# using EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_truck_trailer.jl"))
 
 function main()
@@ -15,14 +20,11 @@ function main()
     It = 3000 # trailer inertia
     vpts = 0.4:0.4:40
 
-    format = :screen
-    # format = :html
-
     system = [input_ex_truck_trailer(; u=x, m, Iz, d, e, h, mt, It) for x in vpts]
     output = run_eom!.(system, vpts .== 1)
 
     result = analyze.(output, vpts .== 1; freq=(-1, 1), impulse=:skip)
-    summarize(system, vpts, result; format)
+    summarize(vpts, result; format)
 
     # choose the equations of motion for 18 m/s (note function notation)
     n = findfirst(vpts .== 18)
@@ -45,25 +47,25 @@ function main()
 
     # plot yaw rate vs time
     sidx = ["r"]
-    plots = [ltiplot(system, yoft; sidx)]
+    plots = [ltiplot(yoft; sidx)]
 
     # plot body slip angle vs time
     sidx = ["β"]
-    push!(plots, ltiplot(system, yoft; sidx))
+    push!(plots, ltiplot(yoft; sidx))
 
     # plot understeer angle vs time
     sidx = ["α_u"]
-    push!(plots, ltiplot(system, yoft; sidx))
+    push!(plots, ltiplot(yoft; sidx))
 
     # plot trailer sway angle vs time
     sidx = ["γ"]
-    push!(plots, ltiplot(system, yoft; sidx))
+    push!(plots, ltiplot(yoft; sidx))
 
     # plot lateral acceleration vs time
     sidx = ["a_y"]
-    push!(plots, ltiplot(system, yoft; sidx))
+    push!(plots, ltiplot(yoft; sidx))
 
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
     # animate_modes(system, result)
 

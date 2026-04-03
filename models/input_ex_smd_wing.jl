@@ -32,6 +32,9 @@ function input_ex_smd_wing(; m = 1.0, c = 0.1, k = 10.0)
 
     # add a wing
     item = wing("wing")
+    item.location = [0, 0, 1]
+    item.body = "block"
+    item.axis = [0, 1, 0]
     add_item!(item, the_system)
 
     # the actuator is a `line item` and defined by two locations, location[1] attaches to body[1]...

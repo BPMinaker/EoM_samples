@@ -1,5 +1,6 @@
-using EoM
-using EoM_X3D
+using EoM, EoM_X3D
+using Plots
+plotlyjs()
 
 # format = :screen
 format = :html
@@ -12,7 +13,7 @@ function main()
     output = run_eom!(system)
     result = analyze(output)
 
-    summarize(system, result; format)
+    summarize(result; format)
 
     animate_modes(system, result)
 

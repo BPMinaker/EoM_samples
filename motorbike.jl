@@ -1,10 +1,13 @@
-using EoM, EoM_X3D
+using EoM #, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_GSXR.jl"))
-
+    
 function main()
-
-    format = :screen
-    # format = :html
 
     u = 20.0 # speed in m/s
     system = input_ex_GSXR(; u)
@@ -12,7 +15,8 @@ function main()
     result = analyze(output)
 
     ss = :skip
-    summarize(system, result; ss, format)
+    summarize(result; ss, format)
+
     #animate_modes(system, result)
 
 end

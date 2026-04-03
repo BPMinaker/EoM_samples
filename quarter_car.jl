@@ -1,5 +1,10 @@
-using EoM
-# using EoM_X3D
+using EoM #, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_quarter_car.jl"))
 
 function main()
@@ -12,9 +17,6 @@ function main()
     cs = 1500
 #    cs = sqrt(ks * ms / 2 * (2 * ks + kt) / kt)  # try Genta's "optimal" damping ratio for passenger acceleration
     ct = 100
-
-    format = :screen
-    # format = :html
 
     system = input_ex_quarter_car(; ms, mu, kt, ks, cs, ct)
     output = run_eom!(system)
@@ -35,20 +37,20 @@ function main()
     println("Plotting results...")
     # plot sprung mass
     sidx = ["z_s"]
-    p1 = ltiplot(system, yoft; sidx)
+    p1 = ltiplot(yoft; sidx)
     # at 1000 Hz, a time interval of 10 s gives us 10000 points, which is fine until we want to plot on a screen with only 1920 pixels, so by default we downsample to plot a maximum 2000 points, unless you set an intger variable scale = x in the `ltiplot` call, where x is the number of points to skip; for example, `ltiplot(system, yoft; yidx, scale=50)` will plot every 50th point, or 200 points in total if the time interval is 10 s at 1000 Hz
 
     # plot suspension travel
     sidx = ["z_s-z_u"]
-    p2 = ltiplot(system, yoft; sidx)
+    p2 = ltiplot(yoft; sidx)
 
     # plot tire compression
     sidx = ["z_u-z_g"]
-    p3 = ltiplot(system, yoft; sidx)
+    p3 = ltiplot(yoft; sidx)
 
     plots = [p1, p2, p3]
 
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
     # generate animations of the mode shapes
     # animate_modes(system, result, scale=0.2)

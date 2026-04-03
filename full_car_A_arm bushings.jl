@@ -1,4 +1,9 @@
 using EoM, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+#format=:html
 
 include(joinpath("models", "input_full_car_a_arm_pushrod.jl"))
 include(joinpath("models", "susp.jl"))
@@ -14,22 +19,19 @@ function main()
     r = 0.346
     u = 10
 
-    format = :screen
-    #format=:html
-
     #system = input_full_car_a_arm_pushrod(; u, a, b, tw, r)
     #output = run_eom!(system)
     # eom_draw(system)
 
     #result = analyze(output; freq=(-1,2))
     #impulse = :skip
-    #summarize(system, result; impulse, format)
+    #summarize(result; impulse, format)
 
     system = input_full_car_a_arm_pushrod(; u, a, b, tw, r, flex=true)
     output = run_eom!(system)
     result = analyze(output; freq=(-1, 2))
     impulse = :skip
-    summarize(system, result; impulse, format=:html)
+    summarize(result; impulse, format)
 
     # animate_modes(system, result)
 

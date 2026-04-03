@@ -1,10 +1,13 @@
 using EoM
+using Plots
+plotlyjs()
+
+format = :screen
+#format = :html
+
 include(joinpath("models", "input_ex_smd.jl"))
 
 function main()
-
-    format = :screen
-    #format = :html
 
     k = 50
     m = 1
@@ -19,14 +22,14 @@ function main()
     yoft = ltisim(result, u_vec, (0, 10))
 
     sidx = ["z"]
-    p1 = ltiplot(system, yoft; sidx)
+    p1 = ltiplot(yoft; sidx)
 
     sidx = ["kz", "czdot", "mzddot"]
-    p2 = ltiplot(system, yoft; sidx)
+    p2 = ltiplot(yoft; sidx)
 
     plots = [p1, p2]
 
-    summarize(system, result; plots, format)
+    summarize(result; plots, format)
 
 end
 

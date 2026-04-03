@@ -50,7 +50,6 @@ end
     result = analyze.(output)
 end
 
-sdfdssdf()
 
 @time begin
     result = vpts .|> f .|> run_eom! .|> analyze

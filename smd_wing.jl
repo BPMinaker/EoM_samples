@@ -1,10 +1,13 @@
 using EoM
+using Plots
+plotlyjs()
+
+format = :screen
+#format = :html
+
 include(joinpath("models", "input_ex_smd_wing.jl"))
 
 function main()
-
-    format = :screen
-    #format = :html
 
     k = 50
     m = 1
@@ -14,7 +17,7 @@ function main()
     output = run_eom!(system)
     result = analyze(output; ss=:skip)
 
-    summarize(system, result; format)
+    summarize(result; format)
 
 end
 

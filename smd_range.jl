@@ -1,11 +1,14 @@
 using EoM
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_smd.jl"))
 # this file repeats the spring mass damper example, but shows how we can analyze a series of systems, using Julia's dot notation
 
 function main()
-
-    format = :screen
-    # format = :html
 
     # set stiffness and mass so that ω_n is 1 Hz (2π rad/s), note that ζ = 1 (critical damping) is therefore c = 4π (from ζ = c/2√km)
     k = 4π^2
@@ -29,22 +32,22 @@ function main()
     # now, just for fun, let's plot ms^2 + cs + k over a range of s, to confirm how the roots align with our eigenvalues
     xlabel = "s [rad/s]"
     ylabel = "p(s) [N/m]"
-    p1 = EoM.plot(; xlabel, ylabel)
+    p1 = plot(; xlabel, ylabel)
 
-    s = range(-20, 5; length=201)
+    s = -20:25/200:5
     c = 0
     p(x) = m * x^2 + c * x + k
 
     for i in vpts[1:15:end]
         label = "c = $(my_round(i))"
         c = i
-        EoM.plot!(p1, s, p.(s); label)
+        plot!(p1, s, p.(s); label)
     end
     plots = [p1]
 
-    # the `summarize()` function has been written using another feature of Julia, called `multiple dispatch`, which allows the same function to do different things, depending on the type of arguments, `summarize()` recognizes if `system` and `result` are vectors, and if so, it drops the tables, and gives a series of plots instead
+    # the `summarize()` function has been written using another feature of Julia, called `multiple dispatch`, which allows the same function to do different things, depending on the type of arguments, `summarize()` recognizes if `result` is a vector, and if so, it drops the tables, and gives a series of plots instead
 
-    summarize(system, vpts, result; vpt_name, plots, format)
+    summarize(vpts, result; vpt_name, plots, format)
 
 end
 

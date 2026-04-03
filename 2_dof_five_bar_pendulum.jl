@@ -1,4 +1,10 @@
 using EoM, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_2_dof_five_bar_pendulum.jl"))
 
 function main()
@@ -7,7 +13,7 @@ function main()
     output = run_eom!(system)
     result = analyze(output)
 
-    summarize(system, result)
+    summarize(result; format)
 
     animate_modes(system, result)
 

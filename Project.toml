@@ -1,6 +1,6 @@
 name = "EoM_samples"
 uuid = "843d7ffb-e6c5-4c2b-9337-20d6ba731113"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Bruce Minaker <bminaker@uwindsor.ca>"]
 
 [deps]

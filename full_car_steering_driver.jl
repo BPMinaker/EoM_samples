@@ -2,7 +2,7 @@ using EoM, EoM_X3D
 using Plots
 plotlyjs()
 
-format = :screen
+# format = :screen
 format = :html
 
 include(joinpath("models", "input_full_car_steering.jl"))

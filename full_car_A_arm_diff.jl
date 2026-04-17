@@ -4,7 +4,7 @@ using Dates
 using Plots
 plotlyjs()
 
-include(joinpath("models", "input_ex_full_car_A_arm.jl"))
+include(joinpath("models", "input_ex_full_car_A_arm_diff.jl"))
 
 # format = :screen
 format = :html
@@ -22,7 +22,7 @@ function main()
     m = 1565
     a = 2.631 * (1 - fwf)
     b = 2.631 * fwf
-    tf =1.5
+    tf = 1.5
     tr = 1.5
     hG = 0.5
     Ix = 818 # moments of inertia
@@ -31,29 +31,34 @@ function main()
     muf = 50 # unsprung mass, front
     mur = 50
     kt = 180000 # tire vertical stiffness
-
+    Iw = 1.75
     # because we are using a nonlinear model of the tire, we have to set the cornering stiffness of the linear tire model to zero
     cfy = 0
     cry = 0
 
-    params = list(; u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt)
+    params = list(; u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt, Iw)
 
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
-    system = input_full_car_a_arm(;params, front, rear) # make sure to include all parameters you want to change here
+    system = input_full_car_a_arm_diff(; params, front, rear) # make sure to include all parameters you want to change here
     sensors_animate!(system)
     output = run_eom!(system, true)
     result = analyze(output, true; bode=:skip, impulse=:skip, ss=:skip)
 
     # get static tire normal loads (kN)
-    Z0 = [system.flex_points_name[i].preload[1] for i in ["LF tire, Z", "LR tire, Z", "RF tire, Z", "RR tire, Z"]]
+    Z0 = [system.flex_points_name[i].preload[1] for i in ["LF Tire Z", "LR Tire Z", "RF Tire Z", "RR Tire Z"]]
+
+    display(Z0)
 
     # find the output indices for tire normal loads and slip angles
-    Zidx = [system.sidx[i] for i in ["Z_lf", "Z_lr", "Z_rf", "Z_rr"]]
-    αidx = [system.sidx[i] for i in ["α_lf", "α_lr", "α_rf", "α_rr"]]
+    Zidx = [system.sidx[i] for i in ["LF Tire Z", "LR Tire Z", "RF Tire Z", "RR Tire Z"]]
+    αidx = [system.sidx[i] for i in ["LF Tire α", "LR Tire α", "RF Tire α", "RR Tire α"]]
+
 
     # find the input indices for tire lateral loads and bumps
-    Yidx = [system.aidx[i] for i in ["Y_lf", "Y_lr", "Y_rf", "Y_rr"]]
-    uuidx = [system.aidx[i] for i in ["u_lf", "u_lr", "u_rf", "u_rr"]]
+    Yidx = [system.aidx[i] for i in ["LF Tire Y", "LR Tire Y", "RF Tire Y", "RR Tire Y"]]
+
+    display(Yidx)
+    uuidx = [system.aidx[i] for i in ["LF Tire z", "LR Tire z", "RF Tire z", "RR Tire z"]]
 
     # compute applied tire force
     function u_vec1(x, t, mode, gain=1.0)
@@ -72,11 +77,17 @@ function main()
 
         uu = zeros(length(system.actuators))
 
+        display(Z)
+        display(α)
+
         # compute tire force, ignore camber effect, restoring moment
         uu[Yidx] = tire(Z, α, [0, 0, 0, 0])[1]
         uu[Yidx] .*= [-1, -1, 1, 1] # flip sign on LF and LR tire forces (mirror)
 
         uu
+        display(uu[Yidx])
+
+        jljlk()
     end
 
     println("Solving time history for steer sweep...")
@@ -88,11 +99,13 @@ function main()
     # sum columns to get total lateral force and divide by total weight to get lateral acceleration in g
     acc = sum(Y, dims=1)[1, :] / sum(Z0)
 
-    #    display(ltiplot(system, yoft_yaw_sweep, [acc yoft_yaw_sweep.t]; ylabel="Lateral accel'n [g], δ [°]", label=["Lat acc" "Steer angle δ"], yidx=[0], uidx=[0]))
+    display(acc)
+
+    display(ltiplot(yoft_yaw_sweep, [acc yoft_yaw_sweep.t]; ylabel="Lateral accel'n [g], δ [°]", label=["Lat acc" "Steer angle δ"], yidx=[0], uidx=[0]))
 
     interp = LinearInterpolation(acc, yoft_yaw_sweep.t)
     gain = interp(0.3)
-    println("Steer gain for 0.3 m/s^2 lateral acceleration: ", round(gain, digits = 3))
+    println("Steer gain for 0.3 m/s^2 lateral acceleration: ", round(gain, digits=3))
 
     mult = 3.0
     ptr2(x, t) = u_vec1(x, t, :dlc, mult * gain)
@@ -177,7 +190,7 @@ function main()
     display(round.(vmax, digits=2))
 
     params.u = 0.01
-    system = input_full_car_a_arm(;params, front, rear) # make sure to include all parameters you want to change here
+    system = input_full_car_a_arm(; params, front, rear) # make sure to include all parameters you want to change here
     sensors_animate!(system)
     output = run_eom!(system, true)
     result = analyze(output, true; bode=:skip, impulse=:skip, ss=:skip)
@@ -219,7 +232,7 @@ function main()
 
         # include rolling resistance loss
         mmt -= (0.013 + 6.5e-6 * uoft^2) * 9.81 * m * sign(uoft) * r
-        uu[midx] = [mmt/2, mmt/2]
+        uu[midx] = [mmt / 2, mmt / 2]
 
         uu
     end
@@ -393,7 +406,7 @@ steer(t) = sin(2π * 0.7 * (t - 2)) * EoM.pulse(t, 2, 2 + 0.75 / 0.7) - EoM.puls
 # define random road profile functions
 zofxl, zofxr = random_road(class=5, dz=0.2, L=(t2 - t1) * u)
 
-flist = readdir("specifications"; join = true)
+flist = readdir("specifications"; join=true)
 time = Dates.format(now(), "HH:MM:SS")
 !isdir("output") && (mkpath("output"))
 open(joinpath("output", "output.txt"), "w") do io

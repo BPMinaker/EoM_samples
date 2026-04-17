@@ -9,7 +9,7 @@ include(joinpath("models", "input_ex_rotor.jl"))
 
 function main()
 
-    vpts = 0.0:2pi/125:2pi
+    vpts = 0:2π/125:2π
     vpt_name = ["r" "Angular speed" "rad/s"]
 
     system = [input_ex_rotor(; r=x) for x in vpts]

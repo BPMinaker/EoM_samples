@@ -129,7 +129,7 @@ function input_ex_bendy_bus(; u = 10, af = 2.22, bf = 3.68, c1 = 166000, c2 = 12
     item.body[2] = "ground"
     item.location[1] = [af, 0, 0]
     item.location[2] = [af, 0.1, 0]
-    item.gain = c1 * pi / 180
+    item.gain = c1 * π / 180
     item.units = "°"
     add_item!(item, the_system)
 
@@ -141,7 +141,7 @@ function input_ex_bendy_bus(; u = 10, af = 2.22, bf = 3.68, c1 = 166000, c2 = 12
     item.location[2] = [0, 0, 0.1]
     item.twist = 1 # angular
     item.order = 2 # velocity
-    item.gain = 180 / pi # radian to degree
+    item.gain = 180 / π # radian to degree
     item.units = "°/s"
     add_item!(item, the_system)
 

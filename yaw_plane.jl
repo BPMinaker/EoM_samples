@@ -36,11 +36,9 @@ function main()
     # generate the equations of motion, but many times, for every different value of forward speed
     output = run_eom!.(system)
 
-    # do the eigenvalues, freq resp, etc, for each forward speed
-    ss = [1, 1, 1, 1, 0, 0, 1, 1]
+    # do the eigenvalues, freq resp, etc, for each forward speed, but skip the impulse response because it is not very informative for this system, and it takes a long time to compute
     impulse = :skip
-    bode = :skip
-    result = analyze.(output; freq=(-1, 1), ss, impulse, bode)
+    result = analyze.(output; freq=(-1, 1), impulse)
 
     # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
     # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
@@ -72,7 +70,7 @@ function main()
 
     # define time interval
     t1 = 0
-    t2 = 20
+    t2 = 8
     yoft = ltisim(result, u_vec, (t1, t2))
 
     # notation conflict, y is system output vector, but also lateral displacement
@@ -94,7 +92,7 @@ function main()
     sidx = ["a_y"]
     p4 = ltiplot(yoft; sidx)
 
-    # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
+    # plot path, noting that it is not even close to uniform scaling, x ~ 200 m, y ~ 3 m
     # becasue this plot is not a function of time, we need to use the plot function
     xlabel = "x [m]"
     ylabel = "y [m]"
@@ -103,29 +101,33 @@ function main()
 
     plots = [p1, p2, p3, p4, p5]
 
-    # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
+    # write all the results; steady state plots of outputs, except y and ψ, which don't reach steady state, eignenvalues, bode plots, time history plots
 
     summarize(result; plots, format)
 
     #using EoM_X3D
     #animate_modes(system, result)
 
-    # generate over a huge range of speeds to find characteristic speed
-    vpts = 0.4:0.4:140
-
+    # generate over a range of speeds to find characteristic speed
+    vpts = 120:0.1:130
+    bode = :skip
     system = [input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr) for x in vpts]
     output = run_eom!.(system)
     result = analyze.(output; freq=(-1, 1), bode, impulse)
 
+    sidx = system[1].sidx["α_u"]
     ss_resp = hcat(getproperty.(result, :ss_resp)...)
-    if maximum(ss_resp[3, :]) > 0.5
-        yy = LinearInterpolation(ss_resp[3, :], vpts)
-        uchar = yy(0.5)
-        println("Characteristic speed $(my_round(uchar)) m/s.")
-        K = dpr * (a + b) * 9.81 / uchar^2
+    α_u = ss_resp[sidx, :]
+    if  minimum(α_u) < 0.5 && maximum(α_u) > 0.5
+        yy = LinearInterpolation(α_u, vpts)
+        u_char = yy(0.5)
+        println("Characteristic speed $(my_round(u_char)) m/s.")
+        K = dpr * (a + b) * 9.81 / u_char^2
         println("Understeer gradient $(my_round(K)) degrees/g.")
-    end
+    else
+        println("Characteristic speed not found in range.  Try a larger range.")
 
+    end
 end
 
 println("Starting...")

@@ -357,7 +357,7 @@ function input_full_car_rc(;
     item.location[2] = [0, 0, 0]
     item.twist = 1
     item.order = 2
-    item.gain = 180 / pi
+    item.gain = 180 / π
     item.units = "°/s"
     item.desc = "Yaw rate"
     add_item!(item, the_system)
@@ -380,7 +380,7 @@ function input_full_car_rc(;
     item.body[2] = "ground"
     item.location[1] = [0, 0, 0.25]
     item.location[2] = [-0.1, 0, 0.25]
-    item.gain = 180 / pi
+    item.gain = 180 / π
     item.twist = 1
     item.units = "°"
     item.desc = "Roll angle"
@@ -392,7 +392,7 @@ function input_full_car_rc(;
     item.body[2] = "ground"
     item.location[1] = [0, 0, 0.25]
     item.location[2] = [0, -0.1, 0.25]
-    item.gain = 180 / pi
+    item.gain = 180 / π
     item.twist = 1
     item.units = "°"
     item.desc = "Pitch angle"
@@ -406,7 +406,7 @@ function input_full_car_rc(;
     item.location[2] = [0, -0.1, 0.25]
     item.order = 2 # velocity
     item.frame = 0 # local frame
-    item.gain = 180 / pi / u # radian to degree
+    item.gain = 180 / π / u # radian to degree
     item.units = "°"
     item.desc = "Slip angle"
     add_item!(item, the_system)

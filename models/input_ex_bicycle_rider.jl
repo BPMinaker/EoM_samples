@@ -5,7 +5,7 @@ function input_ex_bicycle_rider(; u = 0.1, m = 85, h = -0.9, g = -9.81)
     the_system = mbd_system("Rigid Rider Bicycle")
 
     # notice -ve value of g due to upside down z axis
-    rake = pi / 10
+    rake = π / 10
 
     item = body("frame")
     item.mass = m

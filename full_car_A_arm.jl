@@ -4,10 +4,10 @@ using Dates
 using Plots
 plotlyjs()
 
-include(joinpath("models", "input_ex_full_car_A_arm.jl"))
-
 # format = :screen
 format = :html
+
+include(joinpath("models", "input_ex_full_car_A_arm.jl"))
 
 r = 0.315
 u = 22.4 # forward speed in m/s (50 mph)

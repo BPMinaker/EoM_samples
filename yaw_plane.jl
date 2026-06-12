@@ -3,6 +3,9 @@ using Interpolations
 using Plots
 plotlyjs()
 
+format = :screen
+# format = :html
+
 include(joinpath("models", "input_ex_yaw_plane.jl"))
 
 function main()
@@ -26,9 +29,6 @@ function main()
 
     ptf = df / cf # front pneumatic trail
     ptr = dr / cr # rear pneumatic trail
-
-    format = :screen
-    # format = :html
 
     # generate our vector of systems
     system = [input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr) for x in vpts]

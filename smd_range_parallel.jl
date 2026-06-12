@@ -11,7 +11,7 @@ m = 1.0
 f(x) = input_ex_smd(; k, m, c=x)
 
 # then we define the range of values for c
-vpts = 0:0.001:1
+vpts = 0:0.01:1
 
 # timing experiment
 # looping vs vectorizing vs piping vs chaining
@@ -20,22 +20,55 @@ id = zeros(length(vpts))
 
 @time begin
     for i in eachindex(id)
+        local system
+        local output
+        local result
         id[i] = Threads.threadid()
         system = f(vpts[i])
         output = run_eom!(system)
         result = analyze(output)
     end
 end
-#println(id)
+# println(id)
+
+@time begin
+    Threads.@threads for i in eachindex(id)
+        local system
+        local output
+        local result
+        id[i] = Threads.threadid()
+        system = f(vpts[i])
+        output = run_eom!(system)
+        result = analyze(output)
+    end
+end
+# println(id)
+
+system = Vector{mbd_system}(undef, length(vpts))
+output = Vector{EoM.dss_data}(undef, length(vpts))
+result = Vector{EoM.analysis}(undef, length(vpts))
+
+@time begin
+    for i in eachindex(id)
+        id[i] = Threads.threadid()
+        system[i] = f(vpts[i])
+        output[i] = run_eom!(system[i])
+        result[i] = analyze(output[i])
+    end
+end
+# println(id)
 
 @time begin
     Threads.@threads for i in eachindex(id)
         id[i] = Threads.threadid()
-        system = f(vpts[i])
-        output = run_eom!(system)
-        result = analyze(output)
+        system[i] = f(vpts[i])
+        output[i] = run_eom!(system[i])
+        result[i] = analyze(output[i])
     end
 end
+# println(id)
+
+stop_here()
 #println(id)
 
 # @time begin

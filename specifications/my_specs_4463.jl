@@ -40,8 +40,8 @@ kf = 15000 # suspension stiffness, front
 kr = 15000
 cf = 1000 # suspension damping, front
 cr = 700
-krf = 200 # anti-roll bar stiffness, front
-krr = 100
+krf = 1000 # anti-roll bar stiffness, front
+krr = 500
 # weight distribution
 fwf = 0.60 # front weight fraction (i.e., b/(a+b)), you can modify this from 0.05 to 0.95
 

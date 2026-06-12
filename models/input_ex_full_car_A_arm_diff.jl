@@ -198,16 +198,26 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
         item.axis = [0, 1, 0]
         add_item!(item, the_system)
 
-        item = flex_point("LF Tire")
+        item = sensor("LF Tire α")
         item.body[1] = "LF Wheel+hub"
         item.body[2] = "ground"
-        item.location = [a, tf / 2, 0]
-        item.damping = [cfy / u, 0]
-        item.forces = 1
-        item.moments = 0
-        item.axis = [1, 0, 0]
+        item.location[1] = [a, tf / 2, 0]
+        item.location[2] = [a, tf / 2 - 0.1, 0]
+        item.frame = 0
+        item.order = 2
+        item.gain = 1 / u
+        item.units = "rad"
         add_item!(item, the_system)
     end
+
+    item = rigid_point("LF Tire")
+    item.body[1] = "LF Wheel+hub"
+    item.body[2] = "ground"
+    item.location = [a, tf / 2, 0]
+    item.forces = 1
+    item.moments = 0
+    item.axis = [1, 0, 0]
+    add_item!(item, the_system)
 
     item = link("LF Tie-rod")
     item.body[1] = "Chassis"
@@ -338,34 +348,6 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     item.units = "m"
     add_item!(item, the_system)
 
-    item = sensor("LF Tire u")
-    item.body[1] = "LF Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [a, tf / 2, 0]
-    item.location[2] = [a - 0.1, tf / 2, 0]
-    item.order = 2
-    item.units = "m/s"
-    add_item!(item, the_system)
-
-    item = sensor("LF Tire v")
-    item.body[1] = "LF Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [a, tf / 2, 0]
-    item.location[2] = [a, tf / 2 - 0.1, 0]
-    item.order = 2
-    item.units = "m/s"
-    add_item!(item, the_system)
-
-    item = sensor("LF Tire α")
-    item.body[1] = "LF Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [a, tf / 2, 0]
-    item.location[2] = [a, tf / 2 - 0.1, 0]
-    item.order = 2
-    item.gain = 1 / u
-    item.units = "rad"
-    add_item!(item, the_system)
-
     item = sensor("LF Tire Z")
     item.body[1] = "LF Wheel+hub"
     item.body[2] = "ground"
@@ -375,15 +357,6 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     item.actuator = "LF Tire z"
     item.actuator_gain = -kt
     item.units = "N"
-    add_item!(item, the_system)
-
-    item = sensor("LF Wheel travel speed")
-    item.body[1] = "LF Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [a, tf / 2, r]
-    item.location[2] = [a - 0.1, tf / 2, r]
-    item.order = 2
-    item.units = "m/s"
     add_item!(item, the_system)
 
     item = sensor("LF Camber")
@@ -448,7 +421,7 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
-    # Rear 
+    # Rear
 
     item = body("LR Wheel+hub")
     item.moments_of_inertia = [0, Iw, 0]
@@ -495,16 +468,26 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
         item.axis = [0, 1, 0]
         add_item!(item, the_system)
 
-        item = flex_point("LR Tire")
+        item = sensor("LR Tire α")
         item.body[1] = "LR Wheel+hub"
         item.body[2] = "ground"
-        item.location = [-b, tr / 2, 0]
-        item.damping = [cry / u, 0]
-        item.forces = 1
-        item.moments = 0
-        item.axis = [1, 0, 0]
+        item.location[1] = [-b, tr / 2, 0]
+        item.location[2] = [-b, tr / 2 - 0.1, 0]
+        item.frame = 0
+        item.order = 2
+        item.gain = 1 / u
+        item.units = "rad"
         add_item!(item, the_system)
     end
+
+    item = rigid_point("LR Tire")
+    item.body[1] = "LR Wheel+hub"
+    item.body[2] = "ground"
+    item.location = [-b, tr / 2, 0]
+    item.forces = 1
+    item.moments = 0
+    item.axis = [1, 0, 0]
+    add_item!(item, the_system)
 
     item = link("LR Tie-rod")
     item.body[1] = "Chassis"
@@ -636,34 +619,6 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     item.units = "m"
     add_item!(item, the_system)
 
-    item = sensor("LR Tire u")
-    item.body[1] = "LR Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [-b, tr / 2, 0]
-    item.location[2] = [-b - 0.1, tr / 2, 0]
-    item.order = 2
-    item.units = "m/s"
-    add_item!(item, the_system)
-
-    item = sensor("LR Tire v")
-    item.body[1] = "LR Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [-b, tr / 2, 0]
-    item.location[2] = [-b, tr / 2 - 0.1, 0]
-    item.order = 2
-    item.units = "m/s"
-    add_item!(item, the_system)
-
-    item = sensor("LR Tire α")
-    item.body[1] = "LR Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [-b, tr / 2, 0]
-    item.location[2] = [-b, tr / 2 - 0.1, 0]
-    item.order = 2
-    item.gain = 1 / u
-    item.units = "rad"
-    add_item!(item, the_system)
-
     item = sensor("LR Tire Z")
     item.body[1] = "LR Wheel+hub"
     item.body[2] = "ground"
@@ -673,15 +628,6 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     item.actuator = "LR Tire z"
     item.actuator_gain = -kt
     item.units = "N"
-    add_item!(item, the_system)
-
-    item = sensor("LR Wheel travel speed")
-    item.body[1] = "LR Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [-b, tr / 2, r]
-    item.location[2] = [-b - 0.1, tr / 2, r]
-    item.order = 2
-    item.units = "m/s"
     add_item!(item, the_system)
 
     item = sensor("LR Camber")
@@ -749,89 +695,183 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     # reflect all LF or LR items in y axis
     mirror!(the_system)
 
-    item = sensor("Chassis u")
+    item = sensor("u")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
     item.location[2] = [-0.1, 0, hG]
     item.order = 2
+    item.units = "m/s"
+    item.desc = "Longitudinal speed"
     add_item!(item, the_system)
 
-    item = sensor("Chassis v")
+    item = sensor("v")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
     item.location[2] = [0, -0.1, hG]
     item.order = 2
+    item.units = "m/s"
+    item.desc = "Lateral speed"
     add_item!(item, the_system)
 
-    item = sensor("Chassis w")
+    item = sensor("w")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
     item.location[2] = [0, 0, hG - 0.1]
     item.order = 2
+    item.units = "m/s"
+    item.desc = "Vertical speed"
     add_item!(item, the_system)
 
-    item = sensor("Chassis p")
+    item = sensor("p")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
     item.location[2] = [-0.1, 0, hG]
     item.twist = 1
     item.order = 2
+    item.units = "rad/s"
+    item.desc = "Roll rate"
     add_item!(item, the_system)
 
-    item = sensor("Chassis q")
+    item = sensor("q")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
     item.location[2] = [0, -0.1, hG]
     item.twist = 1
     item.order = 2
+    item.units = "rad/s"
+    item.desc = "Pitch rate"
     add_item!(item, the_system)
 
-    item = sensor("Chassis r")
+    item = sensor("r")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
     item.location[2] = [0, 0, hG - 0.1]
     item.twist = 1
     item.order = 2
+    item.units = "rad/s"
+    item.desc = "Yaw rate"
     add_item!(item, the_system)
 
-    item = sensor("Chassis z")
+    item = sensor("x")
+    item.body[1] = "Chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, hG]
+    item.location[2] = [-0.1, 0, hG]
+    item.units = "m"
+    item.desc = "Longitudinal position"
+    add_item!(item, the_system)
+
+    item = sensor("y")
+    item.body[1] = "Chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, hG]
+    item.location[2] = [0, -0.1, hG]
+    item.units = "m"
+    item.desc = "Lateral position"
+    add_item!(item, the_system)
+
+    item = sensor("z")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
     item.location[2] = [0, 0, hG - 0.1]
+    item.units = "m"
+    item.desc = "Vertical position"
     add_item!(item, the_system)
 
-    item = sensor("Chassis ϕ")
+    item = sensor("ϕ")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
     item.location[2] = [-0.1, 0, hG]
     item.twist = 1
+    item.units = "rad"
+    item.desc = "Roll angle"
     add_item!(item, the_system)
 
-    item = sensor("Chassis θ")
+    item = sensor("θ")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
     item.location[2] = [0, -0.1, hG]
     item.twist = 1
+    item.units = "rad"
+    item.desc = "Pitch angle"
     add_item!(item, the_system)
 
-    item = sensor("Chassis ψ")
+    item = sensor("ψ")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
     item.location[2] = [0, 0, hG - 0.1]
     item.twist = 1
+    item.units = "rad"
+    item.desc = "Yaw angle"
     add_item!(item, the_system)
+
+    item = sensor("zddot_P")
+    item.body[1] = "Chassis"
+    item.body[2] = "ground"
+    item.location[1] = [a / 2, 0, hG]
+    item.location[2] = [a / 2, 0, hG - 0.1]
+    item.order = 3
+    item.units = "m/s^2"
+    item.desc = "Passenger vertical acceleration"
+    add_item!(item, the_system)
+
+    # measure the body slip angle
+    item = sensor("β")
+    item.body[1] = "Chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 0]
+    item.location[2] = [0, 0.1, 0]
+    item.order = 2 # velocity
+    item.frame = 0 # local frame
+    item.gain = 180 / π / u # radian to degree
+    item.units = "°"
+    item.desc = "Body slip angle"
+    add_item!(item, the_system)
+
+    # measure the understeer angle
+    item = sensor("α_u")
+    item.body[1] = "Chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 0]
+    item.location[2] = [0, 0, 0.1]
+    item.twist = 1 # angular
+    item.order = 2 # velocity
+    item.gain = -(a + b) / u # radian to degree
+    item.actuator = "δ_f"
+    item.actuator_gain = 1 # input is already in degrees
+    item.units = "rad"
+    item.desc = "Understeer angle"
+    add_item!(item, the_system)
+
+    item = actuator("Xa")
+    item.body[1] = "Chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, hG]
+    item.location[2] = [0.1, 0, hG]
+    item.units = "N"
+    item.desc = "Aerodynamic drag force"
+    add_item!(item, the_system)
+
+    item = actuator("δ_f")
+    item.body[1] = "Chassis"
+    item.body[2] = "Chassis"
+    item.location[1] = [0, 0, hG]
+    item.location[2] = [0.1, 0, hG]
+    item.units = "rad"
+    item.desc = "Steering input"
+    add_item!(item, the_system)
+
 
     the_system
 
 end
-

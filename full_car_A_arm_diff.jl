@@ -1,11 +1,9 @@
 using EoM, EoM_X3D
-using Interpolations
-using Dates
 using Plots
 plotlyjs()
 
-#format = :screen
-format = :html
+format = :screen
+#format = :html
 
 include(joinpath("models", "input_ex_full_car_A_arm_diff.jl"))
 
@@ -15,11 +13,8 @@ t1 = 0
 t2 = 10
 
 dtr = π / 180
-rpm = π / 30
 
 function main()
-
-    # units and tire model weirdness.....
 
     # set the parameters that can't be adjusted by the student
     m = 1565
@@ -35,380 +30,28 @@ function main()
     mur = 50
     kt = 180000 # tire vertical stiffness
     Iw = 1.75
-    # because we are using a nonlinear model of the tire, we have to set the cornering stiffness of the linear tire model to zero
-    cfy = 0
-    cry = 0
-
+    cfy = 1437 / dtr # front axle cornering stiffness in N/rad
+    cry = 1507 / dtr # rear axle cornering stiffness in N/rad
     params = list(; u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt, Iw)
 
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
     system = input_full_car_a_arm_diff(; params, front, rear) # make sure to include all parameters you want to change here
-    sensors_animate!(system)
     output = run_eom!(system, true)
-    result = analyze(output, true; bode=:skip, impulse=:skip, ss=:skip)
+    result = analyze(output, true; impulse=:skip)
+    summarize(result; format)
 
-    # get static tire normal loads (kN)
-    Z0 = [system.flex_points_name[i].preload[1] for i in ["LF Tire Z", "LR Tire Z", "RF Tire Z", "RR Tire Z"]]
-
-    # find the output indices for tire normal loads and slip angles
-    Zidx = [system.sidx[i] for i in ["LF Tire Z", "LR Tire Z", "RF Tire Z", "RR Tire Z"]]
-    αidx = [system.sidx[i] for i in ["LF Tire α", "LR Tire α", "RF Tire α", "RR Tire α"]]
-
-    # find the input indices for tire lateral loads and bumps
-    Yidx = [system.aidx[i] for i in ["LF Tire Y", "LR Tire Y", "RF Tire Y", "RR Tire Y"]]
-    uuidx = [system.aidx[i] for i in ["LF Tire z", "LR Tire z", "RF Tire z", "RR Tire z"]]
-    δidx = system.aidx["δ_f"]
-
-    # compute applied tire force
-    function u_vec1(x, t, mode, gain=1.0)
-        # get sensor outputs (D=0 for these rows)
-        y = result.ss_eqns.C * x
-        # get total normal load
-        Z = Z0 - y[Zidx]
-        # get slip angles from sensors, subtract steer on front, correct for units
-        if mode == :sweep
-            str = t / 4
-        elseif mode == :dlc
-            str = gain * steer(t)
-        end
-        # subtract steer angle on front tires, flip sign on RF and RR to match tire model convention
-        α = y[αidx] - [str, 0, str, 0] .* dtr
-        α .*= [1, 1, -1, -1] # flip sign on RF and RR slip angles (modified iso sign convention)
-
-        uu = zeros(length(system.actuators))
-
-        # record steer angle input for later plotting
-        uu[δidx] = str * dtr
-        # compute tire force, ignore camber effect, restoring moment
-        uu[Yidx] = tire(Z, α, [0, 0, 0, 0])[1]
-        uu[Yidx] .*= [-1, -1, 1, 1] # flip sign on LF and LR tire forces (mirror)
-
-        uu
-    end
-
-    println("Solving time history for steer sweep...")
-    ptr1(x, t) = u_vec1(x, t, :sweep)
-    yoft_yaw_sweep = ltisim(result, ptr1, (t1, t2 / 2))
-
-    # get lateral force inputs as a matrix
-    Y = hcat(yoft_yaw_sweep.u...)[Yidx, :]
-    # sum columns to get total lateral force and divide by total weight to get lateral acceleration in g
-    acc = sum(Y, dims=1)[1, :] / sum(Z0)
-    #display(ltiplot(yoft_yaw_sweep, [acc yoft_yaw_sweep.t/4]; ylabel="Lateral accel'n [g], δ [°]", label=["Lat acc" "Steer angle δ"], yidx=[0], uidx=[0]))
-
-    interp = LinearInterpolation(acc, yoft_yaw_sweep.t / 4)
-    gain = interp(0.3)
-    println("Steer gain for 0.3 m/s^2 lateral acceleration: ", round(gain, digits=3))
-
-    mult = 4.0
-    ptr2(x, t) = u_vec1(x, t, :dlc, mult * gain)
-
-    println("Solving time history for double lane change...")
-    pass = true
-    while (pass && mult < 8.1)
-        println("Testing gain: ", mult)
-        yoft_yaw_test = ltisim(result, ptr2, (t1, t2))
-
-        δ = mult * gain * steer.(yoft_yaw_test.t)
-        #display(ltiplot(yoft_yaw_test, δ * dtr; ylabel=", δ [rad]", label=["Steer angle δ"], sidx=["r"], uidx=[0]))
-
-        idx1 = findfirst(yoft_yaw_test.t .== 3.07) # 2 + 1.07
-        println("Checking displacement at t = 3.07 s: ", round(yoft_yaw_test[system.sidx["y"], :][idx1], digits=3), " m")
-        cond1 = yoft_yaw_test[system.sidx["y"], :][idx1] > 1.83
-
-        max_yaw = minimum(yoft_yaw_test[system.sidx["r"], :])
-        println("Maximum yaw rate during DLC: ", round(max_yaw, digits=3) / dtr, " deg/s")
-
-        idx2 = findfirst(yoft_yaw_test.t .== 4.929) # 2.5 + 1 / 0.7 + 1
-        println("Checking yaw rate at t = 4.929 s: ", round(yoft_yaw_test[system.sidx["r"], :][idx2], digits=3) / dtr, " deg/s")
-        cond2 = yoft_yaw_test[system.sidx["r"], :][idx2] > max_yaw * 0.35
-
-        idx3 = findfirst(yoft_yaw_test.t .== 5.679) # 2.5 + 1 / 0.7 + 1.75
-        println("Checking yaw rate at t = 5.679 s: ", round(yoft_yaw_test[system.sidx["r"], :][idx3], digits=3) / dtr, " deg/s")
-        cond3 = yoft_yaw_test[system.sidx["r"], :][idx3] > max_yaw * 0.20
-
-        println("Conditions: ", cond1, ", ", cond2, ", ", cond3)
-
-        if cond1 && cond2 && cond3
-            mult += 0.25
-        else
-            pass = false
-            mult -= 0.25
-            println("Final steer gain factor: ", mult)
-        end
-    end
-
-    yoft_yaw = ltisim(result, ptr2, (t1, t2))
-    animate_history(system, yoft_yaw)
-
-    plots = []
-    δ = mult * gain * steer.(yoft_yaw.t)
-
-    uidx = [0]
-    yidx = [0]
-
-    # yaw rate
-    sidx = ["r"]
-    aidx = ["δ_f"]
-    p = ltiplot(yoft_yaw; aidx, sidx)
-    push!(plots, p)
-
-    # roll angle, pitch angle, slip angle, understeer angle
-    sidx = ["ϕ", "θ", "β", "α_u"]
-    aidx = ["δ_f"]
-    p = ltiplot(yoft_yaw; sidx, aidx)
-    push!(plots, p)
-
-    # G lift
-    sidx = ["z"]
-    aidx = ["δ_f"]
-    p = ltiplot(yoft_yaw; aidx, sidx)
-    push!(plots, p)
-
-    # lateral forces
-    uidx = Yidx
-    ylabel = "Lateral forces [N]"
-    p = ltiplot(yoft_yaw; ylabel, yidx, uidx)
-    push!(plots, p)
-
-    # get tire vertical forces
-    Z = Z0' .- yoft_yaw[Zidx, :]'
-
-    uidx = [0]
-    label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
-    ylabel = "Vertical forces [N]"
-    p = ltiplot(yoft_yaw, Z; ylabel, label, yidx, uidx)
-    push!(plots, p)
-
-    # find weight transfer
-    ΔZ = 0.5 * [Z[:, 3] - Z[:, 1] Z[:, 4] - Z[:, 2]]
-
-    label = ["Front weight transfer" "Rear weight transfer"]
-    ylabel = "Lateral weight transfer [N]"
-    p = ltiplot(yoft_yaw, ΔZ; ylabel, label, yidx, uidx)
-    push!(plots, p)
-
-    # get tire slip angles
-    α = yoft_yaw[αidx, :]' / dtr
-    α[:, [1, 3]] .-= δ
-    label = ["Tire slip angle α_lf" "Tire slip angle α_lr" "Tire slip angle α_rf" "Tire slip angle α_rr"]
-    ylabel = "Slip angles [°]"
-    p = ltiplot(yoft_yaw, α; ylabel, label, yidx, uidx)
-    push!(plots, p)
-
-    # get tire lateral forces
-    YY = hcat(yoft_yaw.u...)[Yidx, :]
-    acc = sum(YY, dims=1)[1, :] / sum(Z0)
-    label = ["ΣY/m"]
-    ylabel = "Lateral accel'n [g]"
-    p = ltiplot(yoft_yaw, acc; ylabel, label, yidx, uidx)
-    push!(plots, p)
-
-    #####
-
-    function u_vec2(_, t)
-        uu = zeros(length(system.actuators))
-
-        uu[uuidx] = [zofxl(u * t),
-            zofxl(u * t - a - b),
-            zofxr(u * t),
-            zofxr(u * t - a - b)]
-        uu
-    end
-
-    println("Solving time history for ride quality...")
-    yoft_bounce = ltisim(result, u_vec2, (t1, t2))
-
-    rms_pass_acc = sqrt((sum(yoft_bounce[system.sidx["zddot_P"], :] .^ 2) / length(yoft_bounce.t)))
-    println("Uniltered passenger RMS vertical acceleration: ", round(rms_pass_acc, digits=5), " m/s^2")
-
-    # because our input vector must be a function, we interpolate the output of the previous simulation to get the vertical acceleration at the passenger location, not actually an interpolation, but makes the acceleration a function of time
-    interp_z = LinearInterpolation(yoft_bounce.t, yoft_bounce[system.sidx["zddot_P"], :])
-    # use a dummy function to ignore the first argument and return the result as a vector
-    dummy(_, t) = [interp_z(t)]
-    filter = ride_filter()
-    println("Applying ride filter to passenger vertical acceleration...")
-    yoft_filt = ltisim(filter, dummy, (t1, t2))
-
-    # compute RMS vertical acceleration at passenger location
-    rms_pass_acc = sqrt((sum(yoft_filt[1, :] .^ 2) / length(yoft_filt.t)))
-    println("Filtered passenger RMS vertical acceleration: ", round(rms_pass_acc, digits=5), " m/s^2")
-    animate_history(system, yoft_bounce)
-
-    # roll angle, pitch angle
-    sidx = ["ϕ", "θ"]
-    p = ltiplot(yoft_bounce; label, sidx, uidx)
-    push!(plots, p)
-
-    # G lift
-    sidx = ["z"]
-    p = ltiplot(yoft_bounce; sidx, uidx)
-    push!(plots, p)
-
-    # P lift
-    sidx = ["zddot_P"]
-    p = ltiplot(yoft_bounce; sidx, uidx)
-    push!(plots, p)
-
-    # get tire vertical forces
-    Z = Z0' .- yoft_bounce[Zidx, :]'
-
-    label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
-    ylabel = "Vertical forces [N]"
-    p = ltiplot(yoft_bounce, Z; ylabel, label, yidx, uidx)
-    push!(plots, p)
-
-    #####
-
-    η = 0.95 # driveline efficiency
-    μ = 0.9 # friction limit
-    # assume 5% tire slip, for purpose of computing shift speeds
-    slip = 1.05
-
-    ti = [30, 50, 75, 115, 150, 160, 150, 120]
-    ωi = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000]
-    te = LinearInterpolation(ωi, ti)
-
-    # calculate shift speeds (at redline)
-    redline = ωi[end]
-    vmax = 3.6 * redline * rpm * r / slip / fd ./ gear
-    println("Shift speeds [km/h]:")
-    display(round.(vmax, digits=2))
-
-    ρ = 1.23
-    af = 2.85
-    cd = 0.35
-
-    params.u = 0.01
-    system = input_full_car_a_arm_diff(; params, front, rear) # make sure to include all parameters you want to change here
-    sensors_animate!(system)
-    output = run_eom!(system, true)
-    result = analyze(output, true; bode=:skip, impulse=:skip, ss=:skip)
-
-    xGidx = system.sidx["x"]
-    uGidx = system.sidx["u"]
-    ωaidx = system.sidx["Rear axle speed"]
-
-    midx = system.aidx["Rear axle torque"]
-    Xaidx = system.aidx["Xa"]
-
-    function u_vec3(x, t)
-
-        uu = zeros(length(system.actuators))
-        y = result.ss_eqns.C * x
-
-        uoft = y[uGidx]
-        uu[Xaidx] = ρ / 2 * af * cd * uoft * abs(uoft)
-
-        n = findnext(y[uGidx] .< vmax, 1) # use speed in km/h to compare against shift speed
-        if isnothing(n) # if we are above redline in top gear
-            n = length(gear) # use top gear
-        end
-
-        ω = y[ωaidx] * gear[n] * fd * slip / rpm
-        ω < 0 && (ω = 0)
-        ω > redline && (ω = redline)
-        mmt = te(ω) * gear[n] * fd * η
-
-        # find maximum traction force limited torque
-        Z = Z0 - y[Zidx]
-        mmax = μ * (Z[2] + Z[4]) * r #RWD
-        if mmt > mmax
-            mmt = mmax
-        end
-
-        # include rolling resistance loss
-        mmt -= (0.013 + 6.5e-6 * uoft^2) * 9.81 * m * sign(uoft) * r
-
-        uu[midx] = mmt
-
-        uu
-    end
-
-    println("Solving time history for longitudinal motion...")
-    yoft_long = ltisim(result, u_vec3, (t1, 3 * t2))
-    #    animate_history(system, yoft_long)
-
-    interp_xt = LinearInterpolation(yoft_long[xGidx, :], yoft_long.t)
-    interp_tu = LinearInterpolation(yoft_long.t, yoft_long[uGidx, :])
-
-    if yoft_long[xGidx, :][end] > 402.336
-        tq = interp_xt(402.336)
-        println("Quarter mile time: ", round(tq, digits=2), " s at ", 3.6 * round(interp_tu(tq), digits=2), " km/h.")
-    else
-        println("Simulation ended before 1/4 mile!  Increase the time interval.")
-    end
-
-    # plot location
-    sidx = ["x"]
-    p = ltiplot(yoft_long; sidx, uidx)
-    push!(plots, p)
-
-    # plot speed
-    sidx = ["u"]
-    p = ltiplot(yoft_long; sidx, uidx)
-    push!(plots, p)
-
-    # plot axle torque
-    yidx = [0]
-    aidx = ["Rear axle torque"]
-    p = ltiplot(yoft_long; yidx, aidx)
-    push!(plots, p)
-
-    # pitch angle
-    sidx = ["θ"]
-    p = ltiplot(yoft_long; label, sidx, uidx)
-    push!(plots, p)
-
-    # G lift
-    sidx = ["z"]
-    p = ltiplot(yoft_long; sidx, uidx)
-    push!(plots, p)
-
-    # get tire vertical forces
-    Z = Z0' .- yoft_long[Zidx, :]'
-
-    label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
-    ylabel = "Vertical forces [N]"
-    p = ltiplot(yoft_long, Z; ylabel, label, yidx, uidx)
-    push!(plots, p)
-
-    println("Plotted results.")
-    summarize(result; plots, format)
-
-    #    println("Writing $team_name's result...")
-    #    open(joinpath("output", "output.txt"), "a") do io
-    #        println(io, "Multiplier, $mult, Ride RMS vertical acceleration, $rms_pass_acc, Drag strip time, $tq")
-    #    end
-
-    # generate animations of the mode shapes
-    # animate_modes(system, result, true)
+    animate_modes(system, result)
 
 end
 
 println("Starting...")
-
-# define a steer function
-steer(t) = sin(2π * 0.7 * (t - 2)) * EoM.pulse(t, 2, 2 + 0.75 / 0.7) - EoM.pulse(t, 2 + 0.75 / 0.7, 2.5 + 0.75 / 0.7) + sin(2π * 0.7 * (t - 2.5)) * EoM.pulse(t, 2.5 + 0.75 / 0.7, 2.5 + 1 / 0.7)
-
-# define random road profile functions
-zofxl, zofxr = random_road(class=4, dz=0.2, L=(t2 - t1) * u)
-#p1 = plot(0:0.005:(t2 - t1), zofxl.((0:0.005:(t2 - t1))*u); label="Left road profile", xlabel="Distance [m]", ylabel="Road height [m]")
-#display(p1)
-
 flist = readdir("specifications"; join=true)
-time = Dates.format(now(), "HH:MM:SS")
-!isdir("output") && (mkpath("output"))
-open(joinpath("output", "output.txt"), "w") do io
-    println(io, "This is the output recorded at $time.")
-end
+
 for file in flist
     println("Including file: ", file)
     include(file)
     println("Running $team_name's simulation...")
-    open(joinpath("output", "output.txt"), "a") do io
-        print(io, "$team_name, ")
-    end
+
     main()
 end
 

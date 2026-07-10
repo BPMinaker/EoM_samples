@@ -30,19 +30,7 @@ function main()
     yoft = ltisim(result, u_vec, (t1, t2))
 
     println("Plotting results...")
-    # plot sprung mass
-    sidx = ["z_s"]
-    p1 = ltiplot(yoft; sidx)
-
-    # plot suspension travel
-    sidx = ["z_s-z_u"]
-    p2 = ltiplot(yoft; sidx)
-
-    # plot tire compression
-    sidx = ["z_u-z_g"]
-    p3 = ltiplot(yoft; sidx)
-
-    plots = [p1, p2, p3]
+    plots = [ltiplot(yoft; sidx = i) for i in [["z_s"], ["z_s-z_u"], ["z_u-z_g"]]]
 
     summarize(result; plots, format)
 

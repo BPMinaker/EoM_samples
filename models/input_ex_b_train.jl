@@ -185,6 +185,33 @@ function input_ex_b_train(;
     item.desc = "Tractor Yaw Rate"
     add_item!(item, the_system)
 
+
+    # Trailer Yaw Rate
+    item = sensor("r2")
+    item.body[1] = "lead_trailer"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 0]
+    item.location[2] = [0, 0, 0.1]
+    item.twist = 1 # angular
+    item.order = 2 # velocity
+    item.gain = 180 / π
+    item.units = "°/s"
+    item.desc = "Trailer1 Yaw Rate"
+    add_item!(item, the_system)
+
+    # Trailer Yaw Rate
+    item = sensor("r3")
+    item.body[1] = "pup_trailer"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 0]
+    item.location[2] = [0, 0, 0.1]
+    item.twist = 1 # angular
+    item.order = 2 # velocity
+    item.gain = 180 / π
+    item.units = "°/s"
+    item.desc = "Trailer2 Yaw Rate"
+    add_item!(item, the_system)
+
     # Tractor Sideslip
     item = sensor("β")
     item.body[1] = "tractor"

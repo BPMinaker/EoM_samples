@@ -36,16 +36,17 @@ function main()
     # Summarize results
     summarize(vpts, result; format)
 
-    animate_modes(system[10], result[10])
 
-    # Time history simulation at specific speed (e.g., 20 m/s)
-    # Choose the equations of motion for 20 m/s
-    u_sim = 4
+    # Time history simulation at specific speed (e.g., 10 m/s)
+    # Choose the equations of motion for 10 m/s
+    u_sim = 6
     # Find closest speed in vpts
     n = findfirst(abs.(vpts .- u_sim) .< 0.1)
     if isnothing(n)
         error("Simulation speed $u_sim not found in vpts range")
     end
+
+    animate_modes(system[n], result[n])
 
     sys_sim = system[n]
     res_sim = result[n]
@@ -73,32 +74,10 @@ function main()
     # Solve the equations of motion
     yoft = ltisim(res_sim, u_vec, (t1, t2))
 
-    # Review sensors from input_ex_b_train.jl:
-    # 1. r1 (Tractor Yaw Rate)
-    # 2. β (Tractor Sideslip)
-    # 3. γ1 (Lead Articulation)
-    # 4. γ2 (Pup Articulation)
-    # 5. ay1 (Tractor Lat Accel)
-
-    plots = []
-
-    # Plot yaw rate vs time
-    push!(plots, ltiplot(yoft; sidx=["r1"]))
-
-    # Plot sideslip vs time
-    push!(plots, ltiplot(yoft; sidx=["β"]))
-
-    # Plot articulation angles
-    push!(plots, ltiplot(yoft; sidx=["γ1"]))
-    push!(plots, ltiplot(yoft; sidx=["γ2"]))
-
-    # Plot lateral acceleration
-    push!(plots, ltiplot(yoft; sidx=["ay1"]))
+    plots = [ltiplot(yoft; sidx=i) for i in[["r1", "r2", "r3"], ["β", "γ1", "γ2"], ["ay1"]]]
 
     # Show summary with plots
     summarize(res_sim; plots, format)
-
-    # animate_modes(sys_sim, res_sim)
 
 end
 

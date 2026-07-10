@@ -43,32 +43,13 @@ function main()
     # solve the equations of motion
     yoft = ltisim(result, u_vec, (t1, t2))
 
-    # sensors are, in order, r, β, α_u, ψ, a_lat
-
-    # plot yaw rate vs time
-    sidx = ["r"]
-    plots = [ltiplot(yoft; sidx)]
-
-    # plot body slip angle vs time
-    sidx = ["β"]
-    push!(plots, ltiplot(yoft; sidx))
-
-    # plot understeer angle vs time
-    sidx = ["α_u"]
-    push!(plots, ltiplot(yoft; sidx))
-
-    # plot trailer sway angle vs time
-    sidx = ["γ"]
-    push!(plots, ltiplot(yoft; sidx))
-
-    # plot lateral acceleration vs time
-    sidx = ["a_y"]
-    push!(plots, ltiplot(yoft; sidx))
+    # generate plots of the time history
+    println("Plotting results...")
+    plots = [ltiplot(yoft; sidx = i) for i in [["r"], ["β"], ["α_u"], ["γ"], ["a_y"]]]
 
     summarize(result; plots, format)
 
     # animate_modes(system, result)
-
 end
 
 println("Starting...")

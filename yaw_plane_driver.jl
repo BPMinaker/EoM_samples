@@ -15,7 +15,7 @@ function main()
 
     dpr = 180 / π
 
-    u = 30
+    u = 20
 
     m = 1914 # mass
     a = 1.473 # front wheelbase
@@ -33,7 +33,7 @@ function main()
     system = input_ex_yaw_plane(; u, m, a, b, Iz, cf, cr, ptf, ptr)
     sensors_animate!(system)
     output = run_eom!(system)
-    result = analyze(output; ss = :skip, impulse = :skip, bode = :skip)
+    result = analyze(output; impulse = :skip, bode = :skip)
 
     # define input function to be steer
     function u_vec(x, t)
@@ -47,31 +47,16 @@ function main()
 
     # define time interval
     t1 = 0
-    t2 = 10
+    t2 = 15
     yoft = ltisim(result, u_vec, (t1, t2))
-
+    # notation conflict, y is system output vector, but also lateral displacement
+    # so call the output vector yoft, for y of t, to avoid confusion
     animate_history(system, yoft)
 
-    # notation conflict, y is system output vector, but also lateral displacement
-    # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
+    # generate plots of the time history
+    plots = [ltiplot(yoft; sidx = i) for i in [["r"], ["β"], ["α_f", "α_r", "α_u"], ["a_y"]]]
 
-    # plot yaw rate vs time
-    sidx = ["r"]
-    p1 = ltiplot(yoft; sidx)
-
-    # plot body slip angle vs time
-    sidx = ["β"]
-    p2 = ltiplot(yoft; sidx)
-
-    # plot slip angles, understeer angle vs time
-    sidx = ["α_f", "α_r", "α_u"]
-    p3 = ltiplot(yoft; sidx)
-
-    # plot lateral acceleration vs time
-    sidx = ["a_y"]
-    p4 = ltiplot(yoft; sidx)
-
-    # plot path, noting that it is not even close to uniform scaling, x ~ 400 m, y ~ 2.5 m
+    # plot path, noting that it is not even close to uniform scaling, x ~ 300 m, y ~ 2.5 m
     # becasue this plot is not a function of time, we need to use the EoM.plot function
     xlabel = "x [m]"
     ylabel = "y [m]"
@@ -79,14 +64,13 @@ function main()
     yidx= system.sidx["y"]
 
     x = u * yoft.t
+    # keep location (first element), but remove heading and curvature, so we can plot the path
     track_y(x) = track(x)[1]
     path = track_y.(x)
-
     p5 = plot(x, [yoft[yidx, :] path]; xlabel, ylabel, label)
+    push!(plots, p5)
 
-    plots = [p1, p2, p3, p4, p5]
-
-    # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
+    # write all the results; steady state plots of outputs (except y and ψ, which don't reach steady state), eignenvalues, bode plots, time history plots
     summarize(result; plots, format)
 
 end

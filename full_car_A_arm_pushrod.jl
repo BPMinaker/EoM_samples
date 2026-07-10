@@ -28,7 +28,6 @@ function main()
     rfidx = system.aidx["u_RF"]
     rridx = system.aidx["u_RR"]
 
-    zofxl, zofxr = random_road(class=5, dz=0.2)
     function u_vec(_, t)
         uu = zeros(length(system.aidx)) 
        
@@ -46,22 +45,13 @@ function main()
     yoft = ltisim(result, u_vec, (t1, t2))
 
     aidx = ["u_LF"]
-
-    sidx = ["z_LFc"]
-    p1 = ltiplot(yoft; sidx, aidx)
-
-    sidx = ["z_LFc-z_LF"]
-    p2 = ltiplot(yoft; sidx, aidx)
-
-    sidx = ["z_LF-u_LF"]
-    p3 = ltiplot(yoft; sidx, aidx)
-
-    plots = [p1, p2, p3]
+    plots = [ltiplot(yoft; sidx = i, aidx) for i in [["z_LFc"], ["z_LFc-z_LF"], ["z_LF-u_LF"]]]
 
     summarize(result; plots, format)
 
 end
 
 println("Starting...")
+zofxl, zofxr = random_road(class=5, dz=0.2)
 main()
 println("Done.")

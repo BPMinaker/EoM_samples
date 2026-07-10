@@ -21,14 +21,20 @@ function main()
     a = 1.473 # front wheelbase
     b = 1.403 # rear wheelbase
     Iz = 2600 # inertia
-    cf = 2 * 1437 * dpr # front axle cornering stiffness in N/rad
-    cr = 2 * 1507 * dpr # rear axle cornering stiffness in N/rad
+    cf = 1437 # front tire cornering stiffness in N/°
+    cr = 1507 # rear tire cornering stiffness in N/°
+    df = 34 # front tire self-aligning moment stiffness in Nm/°
+    dr = 38 # rear tire self-aligning moment stiffness in Nm/°
 
-    df = 2 * 34 * dpr # front axle self-aligning moment stiffness in Nm/rad
-    dr = 2 * 38 * dpr # rear axle self-aligning moment stiffness in Nm/rad
-
-    ptf = df / cf # front pneumatic trail
+    ptf = df / cf # front pneumatic trail 
     ptr = dr / cr # rear pneumatic trail
+    # we adjust the location of the front and rear tires (modelled as flex_points) to account for the pneumatic trail, which is a function of the self-aligning moment stiffness and the cornering stiffness
+    # the pneumatic trail is small compared to the wheelbase, but it effectively moves the centre of mass forward relative to the tires, so it has an understeering effect that can be significant
+
+    cf *= 2 * dpr # front axle cornering stiffness in N/rad
+    cr *= 2 * dpr # rear axle cornering stiffness in N/rad
+    df *= 2 * dpr # front axle self-aligning moment stiffness in Nm/rad
+    dr *= 2 * dpr # rear axle self-aligning moment stiffness in Nm/rad
 
     # generate our vector of systems
     system = [input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr) for x in vpts]
@@ -37,10 +43,8 @@ function main()
     output = run_eom!.(system)
 
     # do the eigenvalues, freq resp, etc, for each forward speed, but skip the impulse response because it is not very informative for this system, and it takes a long time to compute
-    impulse = :skip
-    result = analyze.(output; freq=(-1, 1), impulse)
+    result = analyze.(output; freq=(-1, 1), impulse = :skip)
 
-    # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
     # write all the results; steady state plots of outputs 1 through 4, 7, 8 (5 and 6 don't reach steady state)
     summarize(vpts, result; format)
 
@@ -72,62 +76,27 @@ function main()
     t1 = 0
     t2 = 8
     yoft = ltisim(result, u_vec, (t1, t2))
-
     # notation conflict, y is system output vector, but also lateral displacement
-    # sensors are, in order, r, β, α_u, a_lat, y, θ, α_f, α_r
+    # so call the output vector yoft, for y of t, to avoid confusion
 
-    # plot yaw rate vs time
-    sidx = ["r"]
-    p1 = ltiplot(yoft; sidx)
-
-    # plot body slip angle vs time
-    sidx = ["β"]
-    p2 = ltiplot(yoft; sidx)
-
-    # plot slip angles, understeer angle vs time
-    sidx = ["α_f", "α_r", "α_u"]
-    p3 = ltiplot(yoft; sidx)
-
-    # plot lateral acceleration vs time
-    sidx = ["a_y"]
-    p4 = ltiplot(yoft; sidx)
+    # generate plots of the time history
+    println("Plotting results...")
+    plots = [ltiplot(yoft; sidx = i) for i in [["r"], ["β"], ["α_f", "α_r", "α_u"], ["a_y"]]]
 
     # plot path, noting that it is not even close to uniform scaling, x ~ 200 m, y ~ 3 m
     # becasue this plot is not a function of time, we need to use the plot function
     xlabel = "x [m]"
     ylabel = "y [m]"
     label = ""
-    p5 = plot(u * yoft.t, yoft[5, :]; xlabel, ylabel, label)
+    yidx= system.sidx["y"]
+    p5 = plot(u * yoft.t, yoft[yidx, :]; xlabel, ylabel, label)
+    push!(plots, p5)
 
-    plots = [p1, p2, p3, p4, p5]
-
-    # write all the results; steady state plots of outputs, except y and ψ, which don't reach steady state, eignenvalues, bode plots, time history plots
-
+    # write all the results; steady state plots of outputs (except y and ψ, which don't reach steady state), eignenvalues, bode plots, time history plots
     summarize(result; plots, format)
 
     #using EoM_X3D
     #animate_modes(system, result)
-
-    # generate over a range of speeds to find characteristic speed
-    vpts = 120:0.1:130
-    bode = :skip
-    system = [input_ex_yaw_plane(; u=x, m, a, b, Iz, cf, cr, ptf, ptr) for x in vpts]
-    output = run_eom!.(system)
-    result = analyze.(output; freq=(-1, 1), bode, impulse)
-
-    sidx = system[1].sidx["α_u"]
-    ss_resp = hcat(getproperty.(result, :ss_resp)...)
-    α_u = ss_resp[sidx, :]
-    if  minimum(α_u) < 0.5 && maximum(α_u) > 0.5
-        yy = LinearInterpolation(α_u, vpts)
-        u_char = yy(0.5)
-        println("Characteristic speed $(my_round(u_char)) m/s.")
-        K = dpr * (a + b) * 9.81 / u_char^2
-        println("Understeer gradient $(my_round(K)) degrees/g.")
-    else
-        println("Characteristic speed not found in range.  Try a larger range.")
-
-    end
 end
 
 println("Starting...")

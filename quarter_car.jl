@@ -34,27 +34,16 @@ function main()
     yoft = ltisim(result, u_vec, (t1, t2))
     # default for ltisim is to solve at 1000 Hz, so at 10 m/s, a dx of 0.01 m, or 1 cm, giving 20 points per wavelength at the shortest wave, much more than the minimum of 2 points per wavelength (Nyquist criterion), and many more at longer wavelengths
 
+    # at 1000 Hz, a time interval of 10 s gives us 10000 points, which is fine until we want to plot on a screen with only 1920 pixels, so by default ltiplot() downsamples to plot a maximum 2000 points, unless you set an intger variable scale = x in the call, where x is the number of points to skip; for example, `ltiplot(yoft; sidx = ["z_s"], scale=50)` will plot every 50th point, or 200 points in total if the time interval is 10 s at 1000 Hz
+
+    # plot sprung mass motion, suspension travel, and tire compression
     println("Plotting results...")
-    # plot sprung mass
-    sidx = ["z_s"]
-    p1 = ltiplot(yoft; sidx)
-    # at 1000 Hz, a time interval of 10 s gives us 10000 points, which is fine until we want to plot on a screen with only 1920 pixels, so by default we downsample to plot a maximum 2000 points, unless you set an intger variable scale = x in the `ltiplot` call, where x is the number of points to skip; for example, `ltiplot(system, yoft; yidx, scale=50)` will plot every 50th point, or 200 points in total if the time interval is 10 s at 1000 Hz
-
-    # plot suspension travel
-    sidx = ["z_s-z_u"]
-    p2 = ltiplot(yoft; sidx)
-
-    # plot tire compression
-    sidx = ["z_u-z_g"]
-    p3 = ltiplot(yoft; sidx)
-
-    plots = [p1, p2, p3]
+    plots = [ltiplot(yoft; sidx = i) for i in [["z_s"], ["z_s-z_u"], ["z_u-z_g"]]]
 
     summarize(result; plots, format)
 
     # generate animations of the mode shapes
     # animate_modes(system, result, scale=0.2)
-
 end
 
 println("Starting...")

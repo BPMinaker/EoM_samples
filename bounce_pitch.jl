@@ -44,23 +44,10 @@ function main()
     t2 = 10
     yoft = ltisim(result, u_vec, (t1, t2))
 
-    # plot bounce
-    sidx = ["z_G"]
-    p1 = ltiplot(yoft; sidx)
+    # plot bounce, pitrch, passenger motion, and suspension travel vs time
+    println("Plotting results...")
+    plots = [ltiplot(yoft; sidx = i) for i in [["z_G"], ["θ(a+b)"], ["z_P"], ["z_f", "z_r"]]]
 
-    # plot pitch
-    sidx = ["θ(a+b)"]
-    p2 = ltiplot(yoft; sidx)
-
-    # plot passenger motion
-    sidx = ["z_P"]
-    p3 = ltiplot(yoft; sidx)
-
-    # plot suspension travel
-    sidx = ["z_f", "z_r"]
-    p4 = ltiplot(yoft; sidx)
-
-    plots = [p1, p2, p3, p4]
     summarize(result; plots, format)
 
     # regenerate eqns of motion for coupled input analysis

@@ -248,7 +248,7 @@ function main()
 
     println("Solving time history for longitudinal motion...")
     yoft_long = ltisim(result, u_vec3, (t1, 3 * t2))
-    #    animate_history(system, yoft_long)
+    animate_history(system, yoft_long)
 
     interp_xt = LinearInterpolation(yoft_long[xGidx, :], yoft_long.t)
     interp_tu = LinearInterpolation(yoft_long.t, yoft_long[uGidx, :])

@@ -40,7 +40,7 @@ function main()
     println("Plotting results...")
     plots = [ltiplot(yoft; sidx = i) for i in [["z_s"], ["z_s-z_u"], ["z_u-z_g"]]]
 
-    summarize(result; plots, format)
+    summarize(result; plots, format, tex=true)
 
     # generate animations of the mode shapes
     # animate_modes(system, result, scale=0.2)

@@ -10,7 +10,7 @@ include(joinpath("models", "input_ex_smd.jl"))
 function main()
 
     k = 50
-    m = 1
+    m = 3
     c = 0.2
 
     system = input_ex_smd(; k, m, c)
@@ -21,15 +21,9 @@ function main()
     u_vec(_, t) = [sin(ω * t)]
     yoft = ltisim(result, u_vec, (0, 10))
 
-    sidx = ["z"]
-    p1 = ltiplot(yoft; sidx)
+    plots = [ltiplot(yoft; sidx=i) for i in [["z"], ["kz", "czdot", "mzddot"]]]
 
-    sidx = ["kz", "czdot", "mzddot"]
-    p2 = ltiplot(yoft; sidx)
-
-    plots = [p1, p2]
-
-    summarize(result; plots, format)
+    summarize(result; plots, format, tex=true)
 
 end
 

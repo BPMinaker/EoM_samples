@@ -207,6 +207,8 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
         item.order = 2
         item.gain = 1 / u
         item.units = "rad"
+        item.actuator = "δ_f"
+        item.actuator_gain = -1
         add_item!(item, the_system)
     end
 
@@ -305,13 +307,6 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     item.location[2] = item.location[1] .* [1, -1, 1]
     item.stiffness = krf
     item.twist = 1
-    add_item!(item, the_system)
-
-    item = actuator("LF Tire X")
-    item.body[1] = "LF Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [a, tf / 2, 0]
-    item.location[2] = [a - 0.1, tf / 2, 0]
     add_item!(item, the_system)
 
     item = actuator("LF Tire Y")
@@ -575,14 +570,6 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     item.location[2] = item.location[1] .* [1, -1, 1]
     item.stiffness = krr
     item.twist = 1
-    add_item!(item, the_system)
-
-    item = actuator("LR Tire X")
-    item.body[1] = "LR Wheel+hub"
-    item.body[2] = "ground"
-    item.location[1] = [-b, tr / 2, 0]
-    item.location[2] = [-b - 0.1, tr / 2, 0]
-    item.units = "N"
     add_item!(item, the_system)
 
     item = actuator("LR Tire Y")

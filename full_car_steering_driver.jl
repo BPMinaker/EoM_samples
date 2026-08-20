@@ -10,7 +10,7 @@ include(joinpath("models", "track.jl"))
 include(joinpath("models", "driver.jl"))
 
 r = 0.315
-include("full_car_specs.jl")
+include(joinpath("specifications", "full_car_specs.jl"))
 
 function main()
 

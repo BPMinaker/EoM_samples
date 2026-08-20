@@ -2,8 +2,8 @@ using EoM, EoM_X3D
 using Plots
 plotlyjs()
 
-#format = :screen
-format = :html
+format = :screen
+#format = :html
 
 include(joinpath("models", "input_ex_bounce_pitch.jl"))
 
@@ -16,14 +16,14 @@ function main()
     b = 1.3
     kf = 25000
     kr = 30000
-    cf = 0
-    cr = 0
+    cf = 1500
+    cr = 1600
     Iy = 2000
 
 #    kr = a * kf / b
 #    Iy = m*a*b
 
-    system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy) # note that we don't pass u here, it is only used later for delay
+    system = input_ex_bounce_pitch(;m, a, b, kf, kr, cf, cr, Iy) # note that we don't pass u here, it is only used later for delay
     output = run_eom!(system)
     impulse = :skip
     result = analyze(output; impulse)
@@ -48,19 +48,14 @@ function main()
     println("Plotting results...")
     plots = [ltiplot(yoft; sidx = i) for i in [["z_G"], ["θ(a+b)"], ["z_P"], ["z_f", "z_r"]]]
 
-    summarize(result; plots, format)
+    summarize(result; plots, format, tex=true)
 
-    # regenerate eqns of motion for coupled input analysis
-    system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy) # note that we don't pass u here, it is only used later for delay
-    system.name *= " with input delay"
-    output = run_eom!(system)
-    result = analyze(output; impulse)
-    input_delay!(result, (a + b) / u, [1, 2]) # this function modifies the equations of motion to include the input delay (multiplies second input by exp(-iϕ))
+    result.sys_data.name *= " with input delay"
+    input_delay!(result, (a + b) / u, [1, 2]) # this function modifies the frequency response to include the input delay (multiplies second input by exp(-iϕ))
 
-    # with the front and rear inputs coupled by a time delay of (a+b)/u, we now have only one input, but still the same outputs, so keep only the first column of the previous
+    # with the front and rear inputs coupled by a time delay of (a+b)/u, we now have only one input, but still the same outputs, so plot only the first column 
     bode = bode[:, 1]
-    ss = :skip
-    summarize(result; bode, ss, impulse, format)
+    summarize(result; bode, ss=:skip, impulse=:skip, format)
 
 end
 

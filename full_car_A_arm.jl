@@ -55,23 +55,36 @@ function main()
     Yidx = [system.aidx[i] for i in ["Y_lf", "Y_lr", "Y_rf", "Y_rr"]]
     uuidx = [system.aidx[i] for i in ["u_lf", "u_lr", "u_rf", "u_rr"]]
 
+    δidx = system.aidx["δ"]
+
     # compute applied tire force
     function u_vec1(x, t, mode, gain=1.0)
-        # get sensor outputs (D=0 for these rows)
-        y = result.ss_eqns.C * x
-        # get total normal load
-        Z = Z0 - y[Zidx]
+
         # get slip angles from sensors, subtract steer on front, correct for units
         if mode == :sweep
-            str = t * dtr
+            str = t
         elseif mode == :dlc
-            str = gain * steer(t) * dtr
+            str = gain * steer(t)
         end
-        α = y[αidx] - [str, 0, str, 0]
-        α .*= [1, 1, -1, -1] # flip sign on RF and RR slip angles (modified iso sign convention)
 
         uu = zeros(length(system.actuators))
+        uu[δidx] = str
+ 
+        # this is a tricky bit
+        # technically we have y = Cx + Du, but we also want u = u(y)
+        # y gives us the slip angles and normal loads, which we need to compute the tire forces
+        # u also holds the steering that we need to compute the slip angles
+        # but slip anlges don't depend immediatley on tire forces
+        # so we can set the steer angle input, measure the slip angles and normal loads
+        # then compute the tire forces, then return the tire forces as the rest of the input vector
 
+        y = result.ss_eqns.C * x + result.ss_eqns.D * uu
+        α = y[αidx]
+        α .*= [1, 1, -1, -1] # flip sign on RF and RR slip angles (modified iso sign convention)
+
+        # get total normal load
+        Z = Z0 - y[Zidx]
+ 
         # compute tire force, ignore camber effect, restoring moment
         uu[Yidx] = tire(Z, α, [0, 0, 0, 0])[1]
         uu[Yidx] .*= [-1, -1, 1, 1] # flip sign on LF and LR tire forces (mirror)
@@ -102,9 +115,7 @@ function main()
     while (pass && mult < 10.1)
         println("Testing gain: ", mult)
         yoft_yaw_test = ltisim(result, ptr2, (t1, t2))
-
-        # δ = mult * gain * steer.(yoft_yaw_test.t)
-        # display(ltiplot(system, yoft_yaw_test, δ; ylabel=", δ [°]", label=["Steer angle δ"], sidx=["r"], uidx=[0]))
+        # display(ltiplot(yoft_yaw_test; sidx=["r"], aidx=["δ"]))
 
         idx1 = findfirst(yoft_yaw_test.t .== 3.07) # 2 + 1.07
         println("Checking displacement at t = 3.07 s: ", round(yoft_yaw_test[system.sidx["y"], :][idx1], digits=3), " m")
@@ -179,8 +190,8 @@ function main()
     params.u = 0.01
     system = input_full_car_a_arm(;params, front, rear) # make sure to include all parameters you want to change here
     sensors_animate!(system)
-    output = run_eom!(system, true)
-    result = analyze(output, true; bode=:skip, impulse=:skip, ss=:skip)
+    output = run_eom!(system)
+    result = analyze(output; bode=:skip, impulse=:skip, ss=:skip)
 
     xGidx = system.sidx["x_G"]
     uGidx = system.sidx["u_G"]
@@ -239,39 +250,15 @@ function main()
     end
 
     println("Plotting results...")
-    # empty plot vector to push plots into
-    plots = []
 
-    δ = mult * gain * steer.(yoft_yaw.t)
-
-    # yaw rate
-    sidx = ["r"]
-    uidx = [0]
-    label = ["Steer angle δ"]
-    ylabel = ", δ [°]"
-    p = ltiplot(yoft_yaw, δ; ylabel, label, sidx, uidx)
-    push!(plots, p)
-
-    # roll angle, pitch angle, slip angle, understeer angle
-    sidx = ["ϕ", "θ", "β"]
-    label = ["Understeer angle α_u" "Steer angle δ"]
-    ylabel = "Angles [°]"
-    p = ltiplot(yoft_yaw, [yoft_yaw[system.sidx["α_u-δ"], :] .+ δ δ]; ylabel, label, sidx, uidx)
-    push!(plots, p)
-
-    # G lift
-    sidx = ["z_G"]
-    label = ["Steer angle δ"]
-    ylabel = ", δ [°]"
-    p = ltiplot(yoft_yaw, δ; ylabel, label, sidx, uidx)
-    push!(plots, p)
+    aidx = ["δ"]
+    plots = [ltiplot(yoft_yaw; sidx = i, aidx) for i in [["r"], ["ϕ", "θ", "β", "α_u"], ["z_G"]]]
 
     # lateral forces
     yidx = [0]
     uidx = Yidx
     ylabel = "Lateral forces [N]"
-    p = ltiplot(yoft_yaw; ylabel, yidx, uidx)
-    push!(plots, p)
+    push!(plots, ltiplot(yoft_yaw; ylabel, yidx, uidx))
 
     # plots not directly from inputs or outputs
     uidx = [0]
@@ -282,95 +269,56 @@ function main()
 
     label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
     ylabel = "Vertical forces [N]"
-    p = ltiplot(yoft_yaw, Z; ylabel, label, yidx, uidx)
-    push!(plots, p)
+    push!(plots, ltiplot(yoft_yaw, Z; ylabel, label, yidx, uidx))
 
     # find weight transfer
     ΔZ = 0.5 * [Z[:, 3] - Z[:, 1] Z[:, 4] - Z[:, 2]]
 
     label = ["Front weight transfer" "Rear weight transfer"]
     ylabel = "Lateral weight transfer [N]"
-    p = ltiplot(yoft_yaw, ΔZ; ylabel, label, yidx, uidx)
-    push!(plots, p)
+    push!(plots, ltiplot(yoft_yaw, ΔZ; ylabel, label, yidx, uidx))
 
-    # get tire slip angles
-    α = 180 / π * yoft_yaw[αidx, :]'
-    α[:, [1, 3]] .-= δ
-    label = ["Tire slip angle α_lf" "Tire slip angle α_lr" "Tire slip angle α_rf" "Tire slip angle α_rr"]
-    ylabel = "Slip angles [°]"
-    p = ltiplot(yoft_yaw, α; ylabel, label, yidx, uidx)
-    push!(plots, p)
+    push!(plots, ltiplot(yoft_yaw; sidx = ["α_lf", "α_lr", "α_rf", "α_rr"], uidx = [0]))
 
     # get tire lateral forces
     YY = hcat(yoft_yaw.u...)[Yidx, :]
     acc = sum(YY, dims=1)[1, :] / sum(Z0)
     label = ["ΣY/m"]
     ylabel = "Lateral accel'n [g]"
-    p = ltiplot(yoft_yaw, acc; ylabel, label, yidx, uidx)
-    push!(plots, p)
+    push!(plots, ltiplot(yoft_yaw, acc; ylabel, label, yidx, uidx))
 
     ###############################################
 
+    yidx = [0]
     aidx = ["u_lf", "u_rf"]
-    p = ltiplot(yoft_bounce; yidx, aidx)
-    push!(plots, p)
+    push!(plots, ltiplot(yoft_bounce; yidx, aidx))
 
-    # roll angle, pitch angle
-    sidx = ["ϕ", "θ"]
-    ylabel = "Angles [°]"
-    p = ltiplot(yoft_bounce; ylabel, label, sidx, uidx)
-    push!(plots, p)
-
-    # G lift
-    sidx = ["z_G"]
-    p = ltiplot(yoft_bounce; sidx, uidx)
-    push!(plots, p)
-
-    # P lift
-    sidx = ["zddot_P"]
-    p = ltiplot(yoft_bounce; sidx, uidx)
-    push!(plots, p)
+    uidx = [0]
+    append!(plots, [ltiplot(yoft_bounce; uidx, sidx = i) for i in [["ϕ", "θ"], ["z_G"], ["zddot_P"]]])
 
     # get tire vertical forces
     Z = Z0' .- yoft_bounce[Zidx, :]'
 
     label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
     ylabel = "Vertical forces [N]"
-    p = ltiplot(yoft_bounce, Z; ylabel, label, yidx, uidx)
-    push!(plots, p)
+    push!(plots, ltiplot(yoft_bounce, Z; ylabel, label, yidx, uidx))
 
     ###############################################
 
-    # plot speed
-    sidx = ["u_G"]
-    p = ltiplot(yoft_long; sidx, uidx)
-    push!(plots, p)
+    uidx = [0]
+    append!(plots, [ltiplot(yoft_long; sidx = i, uidx) for i in [["u_G"], ["θ"], ["z_G"]]])
 
-
-    # plot axle torque
+  # plot axle torque
     yidx = [0]
     aidx = ["m_lr", "m_rr"]
-    p = ltiplot(yoft_long; yidx, aidx)
-    push!(plots, p)
-
-    # pitch angle
-    sidx = ["θ"]
-    ylabel = "Pitch angle [°]"
-    p = ltiplot(yoft_long; ylabel, label, sidx, uidx)
-    push!(plots, p)
-
-    # G lift
-    sidx = ["z_G"]
-    p = ltiplot(yoft_long; sidx, uidx)
-    push!(plots, p)
-
+    push!(plots, ltiplot(yoft_long; yidx, aidx))
+    
     # get tire vertical forces
     Z = Z0' .- yoft_long[Zidx, :]'
 
     label = ["Tire vertical force Z_lf" "Tire vertical force Z_lr" "Tire vertical force Z_rf" "Tire vertical force Z_rr"]
     ylabel = "Vertical forces [N]"
-    p = ltiplot(yoft_long, Z; ylabel, label, yidx, uidx)
-    push!(plots, p)
+    push!(plots, ltiplot(yoft_long, Z; ylabel, label, yidx, uidx))
 
     println("Plotted results.")
     summarize(result; plots, format)

@@ -30,7 +30,7 @@ function main()
     output = run_eom!(system, true)
     result = analyze(output, true)
 
-    summarize(result; format)
+    summarize(result; format, tex=true)
 
     # animate_modes(system, result)
 

@@ -86,61 +86,55 @@ function main()
     # we choose an excitation frequency that's very close to the natural frequency, to excite resonance (note that we can use Greek characters in Julia; e.g., you can get an ω using \omega)
 
     ω_n = result.omega_n[1]
-    if ω_n == 0
-        ω_n = minimum(abs.(result.e_val))
-    end
-    ω = 0.95 * ω_n * 2π
+ 
+    # define a force function that's a sinewave (ω_n is in Hz, so we multiply by 2π to get rad/s); note the square brackets, as the input must be a vector, even if it only has length of one
 
-    # and define a force function that's a sinewave at that frequency
-
-    foft(t) = sin(ω * t)
-
-    # the input function we pass to our time history solver `ltisim()` has to be defined as a function of the state and time, i.e., it has to accept two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input so we record x in _ and ignore it; note the square brackets, as the input must be a vector, even if it only has length of one
-
-    u_vec(_, t) = [foft(t)]
+    foft(t) = [sin(2π * ω_n * t)]
 
     # solve for 20 seconds
 
     t1 = 0
     t2 = 20
 
-    # we pass the structured variable `ss_eqns` that holds the A, B, C, and D matrices, the input function, and the time span to EoM's ltisim, it will formulate the problem and call Julia's ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has entries z, kz, czdot, and mzddot; we could choose the initial state x0 if we wanted, but `ltisim()` will just use zeroes if we don't specify anything else
+    # the input function we pass to our time history solver `ltisim()` has to be defined as a function of the state and time, i.e., it has to accept two arguments, but it doesn't actually have to use them both; in this case we only use a time dependent input so we record x in _ and ignore it
 
-    yoft = ltisim(result, u_vec, (t1, t2))
+    # we could run a simulation and plot the result for a single input frequency (95% of ω_n) like so:
 
-    # the result is a structured variable that holds the time vector t, and the output vector y, which has the same length as t; we can access the time vector using `yoft.t`, the output vector using `yoft.y`, and the input vector using `yoft.u`
+    # u_vec(_, t) = foft(0.95t) 
+    # yoft = ltisim(result, u_vec, (t1, t2))
+    # plot_1 = ltiplot(yoft)
 
-    # our result is the displacement, the spring force, the damping force, and the inertial force;
+    # we pass the structured variable `result` that holds the A, B, C, and D matrices, the input function, and the time span to EoM's ltisim, it will formulate the problem and call Julia's ODE solver; it solves the equation x_dot = Ax + Bu for x, then uses y = Cx + Du to solve for y, the output vector, which in this case has entries z, kz, czdot, and mzddot; we could choose the initial state x0 if we wanted, but `ltisim()` will just use zeroes if we don't specify anything else
 
-    println("Plotting...")
+    # the result is a structured variable that holds the time vector t, and the output vector y, which has the same length as t; we can access the time vector using `yoft.t`, the output vector using `yoft.y`, and the input vector using `yoft.u`, in this case, the displacement, the spring force, the damping force, and the inertial force;
 
-    # we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, spring force, the damping force, the inertial force, and applied force, here there are some keyword arguments for the labels, etc.
+    # we can make a plot; here we plot `t` on the x axis, and on the y axis, the displacement, spring force, the damping force, the inertial force, and applied force
 
-    p1 = ltiplot(yoft)
+    # the plot is created and stored but not shown, we could send it to the screen using: display(plot_1); this plot would show up in a tab in VS Code or in a web browser tab
 
-    # the plot is created and stored but not shown, we could send it to the screen using: display(p1); this plot would show up in a tab in VS Code or in a web browser tab
-    # or we can add it to a vector of plots, and send it to the `summarize()` function
+    # instead we solve for three different excitation frequencies: one near, one below, and one above the natural frequency; the result is a vector of structured variables, each with its own time and output vectors
 
-    # let's reproduce the plot, but with the excitation frequency well below and well above the natural frequency; in both cases, the displacement should be smaller; `foft()` is defined as a function of `ω` so all we have to do is update `ω`, and `foft()` will update as well
+    # we creat a vector of input functions, each with it's own multiple of ω_n
+    # we vectorize the sim and plot functions with the . notation
 
-    ω = 0.5 * ω_n * 2π
-    yoft = ltisim(result, u_vec, (t1, t2))
-    p2 = ltiplot(yoft)
+    u1(_,t) = foft(t)
+    u2(_,t) = foft(0.5t)
+    u3(_,t) = foft(2t)
+    u_vecs = [u1, u2, u3]
 
-    ω = 2 * ω_n * 2π
-    yoft = ltisim(result, u_vec, (t1, t2))
-    p3 = ltiplot(yoft)
+    yoft = ltisim.([result], u_vecs, [(t1, t2)])
+    plots = ltiplot.(yoft)
 
-    # now let's display all out results, along with the extra plots
-
-    plots = [p1, p2, p3]
-    summarize(result; plots, format)
+    summarize(result; plots, format, tex=true)
 
     # alternatively, we can send the analysis results, and any extra plots to html output; look in the `outputs` folder for a subfolder with today's date, and in that folder, a `Spring Mass Damper.html` file; that gets overwritten if you run the analysis again, so you can leave it open in your browser and just refresh if you rerun the simulation with new values
+
+    # or if you just want the raw numerical data, use the write_ouput() function 
 
     # write_output(system, result)
 
     # if you want to animate the modes, you can uncomment the line below; it will create a 3D animation of the system, showing the modes of vibration; it requires the EoM_X3D library, which is not loaded by default
+
     # animate_modes(system, result)
 
 end

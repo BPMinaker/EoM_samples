@@ -401,6 +401,8 @@ function input_full_car_a_arm(;params::list, front::susp, rear::susp)
     item.gain = 1 / u
     item.units = "rad"
     item.desc = "Tire slip angle"
+    item.actuator = "δ"
+    item.actuator_gain = -π / 180
     add_item!(item, the_system)
 
     item = sensor("α_lr")
@@ -490,7 +492,7 @@ function input_full_car_a_arm(;params::list, front::susp, rear::susp)
     add_item!(item, the_system)
 
     #18
-    item = sensor("α_u-δ")
+    item = sensor("α_u")
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location[1] = [0, 0, hG]
@@ -499,7 +501,9 @@ function input_full_car_a_arm(;params::list, front::susp, rear::susp)
     item.order = 2 # velocity
     item.gain = -180 * (a + b) / π / u # radian to degree
     item.units = "°"
-    item.desc = "Understeer term"
+    item.actuator = "δ"
+    item.actuator_gain = 1
+    item.desc = "Understeer angle"
     add_item!(item, the_system)
 
     #19
@@ -563,6 +567,16 @@ function input_full_car_a_arm(;params::list, front::susp, rear::susp)
     item.gain = 180 / π
     item.units = "°"
     item.desc = "Yaw angle"
+    add_item!(item, the_system)
+
+    # dummy actuator to allow for steer angle input, but not used in the analysis
+    item = actuator("δ")
+    item.body[1] = "ground"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, 0]
+    item.location[2] = [0, 0, -0.1]
+    item.units = "°"
+    item.desc = "Steer angle"
     add_item!(item, the_system)
 
     the_system

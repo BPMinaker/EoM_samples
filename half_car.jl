@@ -21,7 +21,7 @@ function main()
     impulse = :skip
     result = analyze(output; impulse)
 
-    summarize(result; format)
+    summarize(result; format, tex=true)
 
     # animate_modes(system, result)
 

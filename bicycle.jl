@@ -17,7 +17,7 @@ function main()
     result = analyze.(output, vpts .== 0; ss=:skip, impulse=:skip)
 
     summarize(vpts, result; format)
-    # summarize(result[10]; format)
+    summarize(result[10]; format, tex=true)
 
     # animate_modes(system[10], result[10])
 

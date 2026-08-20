@@ -1,5 +1,4 @@
 using EoM
-using Interpolations
 using Plots
 plotlyjs()
 

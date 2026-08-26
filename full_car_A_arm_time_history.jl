@@ -31,12 +31,12 @@ function main()
     muf = 50 # unsprung mass, front
     mur = 50
     kt = 180000 # tire vertical stiffness
-
+    Iw = 1.75
     # because we are using a nonlinear model of the tire, we have to set the cornering stiffness of the linear tire model to zero
     cfy = 0
     cry = 0
 
-    params = list(; u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt)
+    params = list(; u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt, Iw)
 
     # build system description with no cornering stiffnesses because will use a nonlinear tire model
     system = input_full_car_a_arm(;params, front, rear) # make sure to include all parameters you want to change here
@@ -341,12 +341,15 @@ steer(t) = sin(2π * 0.7 * (t - 2)) * EoM.pulse(t, 2, 2 + 0.75 / 0.7) - EoM.puls
 # define random road profile functions
 zofxl, zofxr = random_road(class=5, dz=0.2, L=(t2 - t1) * u)
 
-flist = readdir("specifications"; join = true)
+#flist = readdir("specifications"; join = true)
+flist = [joinpath("specifications", "my_specs_4463.jl")]
+
 time = Dates.format(now(), "HH:MM:SS")
 !isdir("output") && (mkpath("output"))
 open(joinpath("output", "output.txt"), "w") do io
     println(io, "This is the output recorded at $time.")
 end
+
 for file in flist
     println("Including file: ", file)
     include(file)

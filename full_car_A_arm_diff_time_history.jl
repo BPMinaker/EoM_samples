@@ -349,18 +349,14 @@ open(joinpath("output", "output.txt"), "w") do io
     println(io, "This is the output recorded at $time.")
 end
 
-
-include(joinpath("specifications", "my_specs_4463.jl"))
-main()
-
-# for file in flist
-#     println("Including file: ", file)
-#     include(file)
-#     println("Running $team_name's simulation...")
-#     open(joinpath("output", "output.txt"), "a") do io
-#         print(io, "$team_name, ")
-#     end
-#     main()
-# end
+for file in flist
+    println("Including file: ", file)
+    include(file)
+    println("Running $team_name's simulation...")
+    open(joinpath("output", "output.txt"), "a") do io
+        print(io, "$team_name, ")
+    end
+    main()
+end
 
 println("Done.")

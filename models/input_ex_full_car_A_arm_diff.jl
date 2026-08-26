@@ -1,3 +1,26 @@
+# this file defines a symmetric full-car model with A-arm suspension
+# it assumes no longitudinal slip of the tire
+# inputs are the lateral force at each tire LF Tire Y, etc
+# the road vertical location at each tire, LF Tire z, and the vertical road force LF Tire Z
+# a linear vertical tire is used, but the additional force input allows modelling of lift-off by adding a lifting force to cencel the non-physcial tension from the linear model
+# the drive moments on the front and rear differentials, Front axle torque, Rear axle torque
+# the brake torque at each wheel LF_Brake etc
+# and the aero drag Xa
+
+# it incorporates a linear lateral tire model, or 
+# to use a non-linear tire, set cornering stiffness cfy and cry to zero, and
+# use the outputs slip angle and normal force α_lf, Z_lf, etc to compute a non-linear lateral force
+# steer angle δ_f is defined as an input but the actual steering motion is not modelled
+# steer input is used to compute the tire sliip angle and understeer angle
+# and to record the value used in the non-linear tire for plotting later
+#
+# model is suitable for steady state linear and modal analysis
+# or ride quality
+# or constant speed lateral manuevers
+# or straight line longitudinal acceleration
+# lack of coupled tire model means it is not suitable for combined lateral-longitudinal modeling
+
+
 # define a structure to hold the suspension geometry data
 mutable struct susp
     r::Float64 # wheel radius
@@ -60,7 +83,6 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     add_item!(weight(item), the_system)
 
     # Drivetrain
-
     item = body("Front differential")
     item.location = [a, 0, r]
     add_item!(item, the_system)

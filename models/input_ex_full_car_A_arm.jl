@@ -1,3 +1,23 @@
+# this file defines a symmetric full-car model with A-arm suspension
+# it assumes no longitudinal slip of the tire
+# inputs are the lateral force at each tire Y_lf, etc
+# the road vertical location at each tire, u_lf, etc
+# the drive moments on the rear wheels, m_lr, m_rr
+# and the aero drag Xa
+# 
+# it incorporates a linear lateral tire model, or 
+# to use a non-linear tire, set cornering stiffness cfy and cry to zero, and
+# use the outputs slip angle and normal force α_lf, Z_lf, etc to compute a non-linear lateral force
+# steer angle δ is defined as an input but the actual steering motion is not modelled
+# steer input is used to compute the tire sliip angle and understeer angle
+# and to record the value used in the non-linear tire for plotting later
+#
+# model is suitable for steady state linear and modal analysis
+# or ride quality
+# or constant speed lateral manuevers
+# or straight line longitudinal acceleration
+# lack of coupled tire model means it is not suitable for combined lateral-longitudinal modeling
+
 # define a structure to hold the suspension geometry data
 mutable struct susp
     r::Float64 # wheel radius
@@ -39,15 +59,16 @@ mutable struct list
     cfy::Float64 # cornering stiffness, front
     cry::Float64
     kt::Float64 # tire vertical stiffness
+    Iw::Float64 # wheel inertia
 end
 
 # define a constructor for the list structure that adds keyword arguments
-list(;u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt) =
-list(u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt)
+list(;u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt, Iw) =
+list(u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt, Iw)
 
 function input_full_car_a_arm(;params::list, front::susp, rear::susp)
 
-    (;u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt) = params
+    (;u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt, Iw) = params
 
     the_system = mbd_system("Full Car Model with A-arms")
 
@@ -63,6 +84,7 @@ function input_full_car_a_arm(;params::list, front::susp, rear::susp)
 
     item = body("LF wheel")
     item.mass = muf
+    item.moments_of_inertia = [Iw/2, Iw, Iw/2]
     item.location = [a, tf / 2, front.r]
     item.velocity = [u, 0, 0]
     add_item!(item, the_system)
@@ -70,6 +92,7 @@ function input_full_car_a_arm(;params::list, front::susp, rear::susp)
 
     item = body("LR wheel")
     item.mass = mur
+    item.moments_of_inertia = [Iw/2, Iw, Iw/2]
     item.location = [-b, tr / 2, rear.r]
     item.velocity = [u, 0, 0]
     add_item!(item, the_system)

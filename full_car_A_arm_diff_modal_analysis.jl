@@ -45,14 +45,7 @@ function main()
 end
 
 println("Starting...")
-flist = readdir("specifications"; join=true)
-
-for file in flist
-    println("Including file: ", file)
-    include(file)
-    println("Running $team_name's simulation...")
-
-    main()
-end
-
+# get all the supension and properties and weight distribution
+include(joinpath("specifications", "full_car_specs.jl"))
+main()
 println("Done.")

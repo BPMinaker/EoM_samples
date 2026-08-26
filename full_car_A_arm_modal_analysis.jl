@@ -1,0 +1,47 @@
+using EoM, EoM_X3D
+using Plots
+plotlyjs()
+
+format = :screen
+#format = :html
+
+include(joinpath("models", "input_ex_full_car_A_arm.jl"))
+
+r = 0.315
+u = 22.4 # forward speed in m/s (50 mph)
+
+function main()
+
+    # set the geometry and inertial parameters
+    m = 1565
+    a = 2.63 * (1 - fwf)
+    b = 2.63 * fwf
+    tf = 1.8
+    tr = 1.8
+    hG = 0.57
+    Ix = 818 # moments of inertia
+    Iy = 3267
+    Iz = 3508
+    muf = 50 # unsprung mass, front
+    mur = 50
+    kt = 180000 # tire vertical stiffness
+    Iw = 1.75
+    cfy = 1437 * 180/π  # front axle cornering stiffness in N/rad
+    cry = 1507 * 180/π # rear axle cornering stiffness in N/rad
+    params = list(; u, m, a, b, tf, tr, hG, Ix, Iy, Iz, kf, kr, cf, cr, krf, krr, muf, mur, cfy, cry, kt, Iw)
+
+    # build system description with no cornering stiffnesses because will use a nonlinear tire model
+    system = input_full_car_a_arm(; params, front, rear) # make sure to include all parameters you want to change here
+    output = run_eom!(system, true)
+    result = analyze(output, true; impulse=:skip)
+    summarize(result; format)
+
+    animate_modes(system, result)
+
+end
+
+println("Starting...")
+# get all the supension and properties and weight distribution
+include(joinpath("specifications", "full_car_specs.jl"))
+main()
+println("Done.")

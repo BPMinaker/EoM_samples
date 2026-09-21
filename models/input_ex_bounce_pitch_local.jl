@@ -1,6 +1,7 @@
-function input_ex_bounce_pitch(; a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 38000, cf = 1000, cr = 1200, m = 16975 / 9.81, Iy = 3267)
+function input_ex_bounce_pitch(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 38000, cf = 1000, cr = 1200, m = 16975 / 9.81, Iy = 3267)
 
-    # A bounce pitch model
+    # A bounce pitch model with the fixed speed constraint defined in a vehicle fixed reference frame.  Because EoM defaults to damping defined in a local frame, but the bounce pitch model needs damping to be defined in a global frame, we need to add a second flex point to the front and rear suspension to account for the damping in the global frame.  This is a bit of a hack, but it works.  Note that the resulting equations of motion are equivalent to the original bounce pitch model.
+
     the_system = mbd_system("Bounce Pitch Model")
 
     # Add one body representing the chassis
@@ -9,6 +10,7 @@ function input_ex_bounce_pitch(; a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 
     item.moments_of_inertia = [0, Iy, 0]  ## Only the Iy term matters here
     item.products_of_inertia = [0, 0, 0]
     item.location = [0, 0, 0.25]  ## Put cg at origin, but offset vertically to make animation more clear
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     # Add a spring, to connect our chassis to ground, representing the front suspension
@@ -23,6 +25,16 @@ function input_ex_bounce_pitch(; a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 
     item.damping = [cf, 0]
     add_item!(item, the_system)
 
+    item = flex_point("front susp extra")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location = [a, 0, 0.25]  ## Front axle "a" m ahead of cg
+    item.s_mtx = zeros(6,6)
+    item.forces = 3
+    item.moments = 3
+    item.s_mtx[3, 5] = -cf * u
+    add_item!(item, the_system)
+
     # Rear suspension
     item = flex_point("rear susp")
     item.body[1] = "chassis"
@@ -34,6 +46,17 @@ function input_ex_bounce_pitch(; a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 
     item.stiffness = [kr, 0]
     item.damping = [cr, 0]
     add_item!(item, the_system)
+
+    item = flex_point("rear susp extra")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location = [-b, 0, 0.25]  ## Rear axle "b" m behind cg
+    item.s_mtx = zeros(6,6)
+    item.forces = 3
+    item.moments = 3
+    item.s_mtx[3, 5] = -cr * u
+    add_item!(item, the_system)
+
 
     # Constrain to linear motion in z direction (bounce)
     item = rigid_point("bounce")

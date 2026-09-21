@@ -28,8 +28,11 @@ function main()
     impulse = :skip
     result = analyze(output; impulse)
 
-    # ask for Bode plots of with both front and rear inputs to both bounce and pitch and passenger motion outputs, but ignore the suspension travel outputs 
-    bode = [1 1; 1 1; 1 1; 0 0; 0 0]
+    # specify which input-output combinations to plot in Bode plots
+    # bode is a grid, where each row corresponds to an output, and each column corresponds to an input, 1 means plot, 0 means skip
+    # inputs are: 1 = front wheel bump, 2 = rear wheel bump
+    # outputs are: 1 = CG bounce, 2 = pitch, 3 = pitch times wheelbase (to get units of length) 4 = passenger bounce (halfway from G to front axle), 5 = front suspension travel, 6 = rear suspension travel, 7 - front chassis bounce, 8 = rear chassis bounce
+    bode = [1 1; 0 0; 1 1; 1 1; 1 0; 0 1; 1 0;0 1]
     summarize(result; bode, format)
 
     animate_modes(system, result)
@@ -44,9 +47,9 @@ function main()
     t2 = 10
     yoft = ltisim(result, u_vec, (t1, t2))
 
-    # plot bounce, pitrch, passenger motion, and suspension travel vs time
+    # plot bounce, pitch, passenger motion, and suspension travel vs time
     println("Plotting results...")
-    plots = [ltiplot(yoft; sidx = i) for i in [["z_G"], ["θ(a+b)"], ["z_P"], ["z_f", "z_r"]]]
+    plots = [ltiplot(yoft; sidx = i) for i in [["z_G"], ["θ(a+b)"], ["z_P"], ["z_f-u_f", "z_r-u_r"]]]
 
     summarize(result; plots, format, tex=true)
 
@@ -54,7 +57,7 @@ function main()
     input_delay!(result, (a + b) / u, [1, 2]) # this function modifies the frequency response to include the input delay (multiplies second input by exp(-iϕ))
 
     # with the front and rear inputs coupled by a time delay of (a+b)/u, we now have only one input, but still the same outputs, so plot only the first column 
-    bode = bode[:, 1]
+    bode =[1, 0, 1, 1, 0, 0, 0, 0]
     summarize(result; bode, ss=:skip, impulse=:skip, format)
 
 end

@@ -1,4 +1,4 @@
-using EoM, EoM_X3D
+using EoM
 using Plots
 plotlyjs()
 
@@ -6,6 +6,7 @@ format = :screen
 #format = :html
 
 include(joinpath("models", "input_ex_bounce_pitch.jl"))
+#include(joinpath("models", "input_ex_bounce_pitch_local.jl"))
 
 function main()
 
@@ -65,20 +66,23 @@ function main()
     T3 = C11*(A12*B2 - AAA*B1)
     T4 = C11*B1
 
-    display(T1)
-    display(T2)
-    display(T3)
-    display(T4)
-
     K = [kf+kr b*kr-a*kf; b*kr-a*kf a^2*kf+b^2*kr]
     L = [cf+cr b*cr-a*cf; b*cr-a*cf a^2*cf+b^2*cr]
     M = [m 0;0 Iy]
     F=[kf kr; -a*kf b*kr]
     G=[cf cr; -a*cf b*cr]
 
+    println("Term 1:")
+    display(T1)
     display(-inv(M)*K)
+    println("Term 2:")
+    display(T2)
     display(-inv(M)*L)
+    println("Term 3:")
+    display(T3)
     display(inv(M)*F)
+    println("Term 4:")
+    display(T4)
     display(inv(M)*G)
 
     cond1 = all(abs.(T1 - -inv(M)*K) .< 1e-5)
@@ -87,7 +91,7 @@ function main()
     cond4 = all(abs.(T4 - inv(M)*G) .< 1e-5)
 
     if cond1 && cond2 && cond3 && cond4
-        println("matches")
+        println("All terms match, the state-space equations are equivalent to the equations of motion derived from Newton's laws.")
     end
 
 end

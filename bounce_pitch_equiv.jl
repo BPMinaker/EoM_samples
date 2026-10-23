@@ -59,36 +59,40 @@ function main()
     B2 = result.ss_eqns.B[3:4, 1:2]
 
     C11 = result.ss_eqns.C[1:2, 1:2]
-    C11inv = C11^-1
 
-    T1 = C11*(A12*A21 - AAA*A11)*C11inv
-    T2 = C11*(A11 + AAA)*C11inv
-    T3 = C11*(A12*B2 - AAA*B1)
-    T4 = C11*B1
+    T1 = C11 * (A12 * A21 - AAA * A11) / C11
+    T2 = C11 * (A11 + AAA) / C11
+    T3 = C11 * (A12 * B2 - AAA * B1)
+    T4 = C11 * B1
 
-    K = [kf+kr b*kr-a*kf; b*kr-a*kf a^2*kf+b^2*kr]
-    L = [cf+cr b*cr-a*cf; b*cr-a*cf a^2*cf+b^2*cr]
+    K = [kf + kr b * kr - a * kf; b * kr - a * kf a^2 * kf + b^2 * kr]
+    L = [cf + cr b * cr - a * cf; b * cr - a * cf a^2 * cf + b^2 * cr]
     M = [m 0;0 Iy]
-    F=[kf kr; -a*kf b*kr]
-    G=[cf cr; -a*cf b*cr]
+    F=[kf kr; -a * kf b * kr]
+    G=[cf cr; -a * cf b * cr]
+
+    V1 = -M \ K
+    V2 = -M \ L
+    V3 = M \ F
+    V4 = M \ G
 
     println("Term 1:")
     display(T1)
-    display(-inv(M) * K)
+    display(V1)
     println("Term 2:")
     display(T2)
-    display(-inv(M) * L)
+    display(V2)
     println("Term 3:")
     display(T3)
-    display(inv(M) * F)
+    display(V3)
     println("Term 4:")
     display(T4)
-    display(inv(M) * G)
+    display(V4)
 
-    cond1 = (T1 ≈ -inv(M) * K)
-    cond2 = (T2 ≈ -inv(M) * L)
-    cond3 = (T3 ≈ inv(M) * F)
-    cond4 = (T4 ≈ inv(M) * G)
+    cond1 = (T1 ≈ V1)
+    cond2 = (T2 ≈ V2)
+    cond3 = (T3 ≈ V3)
+    cond4 = (T4 ≈ V4)
 
     if cond1 && cond2 && cond3 && cond4
         println("All terms match, the state-space equations are equivalent to the equations of motion derived from Newton's laws.")

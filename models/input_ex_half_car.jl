@@ -1,4 +1,4 @@
-function input_ex_half_car(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 38000, cf = 1000, cr = 1200, m = 16975 / 9.81, Iy = 3267, kt = 300000, muf = 50, mur = 50)
+function input_ex_half_car(;a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 38000, cf = 1000, cr = 1200, m = 16975 / 9.81, Iy = 3267, kt = 300000, muf = 50, mur = 50)
 
     # A half car model
     # Note tire and suspension properties are for both left and right sides summed
@@ -8,23 +8,19 @@ function input_ex_half_car(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr
     item = body("chassis")
     item.mass = m
     item.moments_of_inertia = [0, Iy, 0] # only the Iy term matters here
-    item.products_of_inertia = [0, 0, 0]
     item.location = [0, 0, 0.25] # put cg at origin, but offset vertically to make animation more clear
-    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
     add_item!(weight(item), the_system)
 
     item = body("front unsprung")
     item.mass = muf
     item.location = [a, 0, 0.1]
-    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
     add_item!(weight(item), the_system)
 
     item = body("rear unsprung")
-    item.mass = muf
+    item.mass = mur
     item.location = [-b, 0, 0.1]
-    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
     add_item!(weight(item), the_system)
 
@@ -52,7 +48,7 @@ function input_ex_half_car(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr
     item.damping = [cr, 0]
     add_item!(item, the_system)
 
-    item = flex_point("tire")
+    item = flex_point("front tire")
     item.body[1] = "front unsprung"
     item.body[2] = "ground"
     item.stiffness = [kt, 0]
@@ -63,7 +59,7 @@ function input_ex_half_car(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
-    item = flex_point("tire")
+    item = flex_point("rear tire")
     item.body[1] = "rear unsprung"
     item.body[2] = "ground"
     item.stiffness = [kt, 0]
@@ -74,7 +70,7 @@ function input_ex_half_car(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
-    item = rigid_point("slider front")
+    item = rigid_point("front slider")
     item.body[1] = "front unsprung"
     item.body[2] = "ground"
     item.location = [a, 0, 0.1]
@@ -83,7 +79,7 @@ function input_ex_half_car(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr
     item.axis = [0, 0, 1]
     add_item!(item, the_system)
 
-    item = rigid_point("slider rear")
+    item = rigid_point("rear slider")
     item.body[1] = "rear unsprung"
     item.body[2] = "ground"
     item.location = [-b, 0, 0.1]
@@ -119,7 +115,20 @@ function input_ex_half_car(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr
     item.location[2] = [a, 0, 0]
     item.gain = kt
     item.units = "m"
+    item.desc = "front road bump"
     add_item!(item, the_system)
+
+    # force the bounce and pitch
+    item = actuator("u_r")
+    item.body[1] = "rear unsprung"
+    item.body[2] = "ground"
+    item.location[1] = [-b, 0, 0.1]
+    item.location[2] = [-b, 0, 0]
+    item.gain = kt
+    item.units = "m"
+    item.desc = "rear road bump"
+    add_item!(item, the_system)
+
 
     # measure the bounce
     item = sensor("z_G")
@@ -128,26 +137,49 @@ function input_ex_half_car(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr
     item.location[1] = [0, 0, 0.25]
     item.location[2] = [0, 0, 0]
     item.units = "m"
+    item.desc = "centre of mass motion"
     add_item!(item, the_system)
 
-    # suspension travel
     item = sensor("z_f")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [a, 0, 0.25]
+    item.location[2] = [a, 0, 0]
+    item.units = "m"
+    item.desc = "front chassis motion"
+    add_item!(item, the_system)
+
+    item = sensor("z_r")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [-b, 0, 0.25]
+    item.location[2] = [-b, 0, 0]
+    item.units = "m"
+    item.desc = "rear chassis motion"
+    add_item!(item, the_system)
+
+
+    # suspension travel
+    item = sensor("z_f-z_uf")
     item.body[1] = "chassis"
     item.body[2] = "front unsprung"
     item.location[1] = [a, 0, 0.25]
     item.location[2] = [a, 0, 0.1]
     item.units = "m"
+    item.desc = "front suspension travel"
     add_item!(item, the_system)
 
     # add measure between ground and unsprung mass
-    item = sensor("z_2-u_f")
+    item = sensor("z_uf-u_f")
     item.body[1] = "front unsprung"
     item.body[2] = "ground"
     item.actuator = "u_f"
     item.location[1] = [a, 0, 0.1]
     item.location[2] = [a, 0, 0]
     item.units = "m"
+    item.desc = "front tire compression"
     add_item!(item, the_system)
+
 
     the_system
 

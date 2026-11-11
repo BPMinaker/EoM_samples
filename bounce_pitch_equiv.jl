@@ -6,7 +6,7 @@ format = :screen
 #format = :html
 
 include(joinpath("models", "input_ex_bounce_pitch.jl"))
-#include(joinpath("models", "input_ex_bounce_pitch_local.jl"))
+include(joinpath("models", "input_ex_bounce_pitch_local.jl"))
 
 function main()
 
@@ -21,18 +21,20 @@ function main()
     cr = 1600
     Iy = 2000
 
-#    kr = a * kf / b
-#    Iy = m*a*b
-
-    system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
-    output = run_eom!(system)
-
     ss =:skip
     bode = :skip
     impulse = :skip
 
-    result = analyze(output; ss, bode, impulse)
-    summarize(result; format, tex=true)
+    # global reference frame model
+    system = input_ex_bounce_pitch(; m, a, b, kf, kr, cf, cr, Iy)
+    output = run_eom!(system)
+    result_g = analyze(output; ss, bode, impulse)
+
+    # local reference frame model - note the  addition of u in the arguments to the function call
+    # this is how Julia knows to call the function with the local frame
+    system = input_ex_bounce_pitch(; u, m, a, b, kf, kr, cf, cr, Iy)
+    output = run_eom!(system)
+    result_l = analyze(output; ss, bode, impulse)
 
     # this is a manipulation of the state-space equations to show that they are equivalent to the equations of motion derived from Newton's laws
     # we assume Newtons equations of motion are in the form:
@@ -48,33 +50,37 @@ function main()
     # where A11 is 2x2, A12 is 2x2, A21 is 2x2, A22 is 2x2, B1 is 2x2, B2 is 2x2, C11 is 2x2, C21 is nx2, C22 is nxn, D2 is nx2
     # after partitioning, we can manipulate the equations to show equivalence of four terms
 
-    A11 = result.ss_eqns.A[1:2, 1:2]
-    A12 = result.ss_eqns.A[1:2, 3:4]
-    A21 = result.ss_eqns.A[3:4, 1:2]
-    A22 = result.ss_eqns.A[3:4, 3:4]
-
-    AAA = A12*A22/A12
-
-    B1 = result.ss_eqns.B[1:2, 1:2]
-    B2 = result.ss_eqns.B[3:4, 1:2]
-
-    C11 = result.ss_eqns.C[1:2, 1:2]
-
-    T1 = C11 * (A12 * A21 - AAA * A11) / C11
-    T2 = C11 * (A11 + AAA) / C11
-    T3 = C11 * (A12 * B2 - AAA * B1)
-    T4 = C11 * B1
 
     K = [kf + kr b * kr - a * kf; b * kr - a * kf a^2 * kf + b^2 * kr]
     L = [cf + cr b * cr - a * cf; b * cr - a * cf a^2 * cf + b^2 * cr]
     M = [m 0;0 Iy]
-    F=[kf kr; -a * kf b * kr]
-    G=[cf cr; -a * cf b * cr]
+    F = [kf kr; -a * kf b * kr]
+    G = [cf cr; -a * cf b * cr]
 
     V1 = -M \ K
     V2 = -M \ L
     V3 = M \ F
     V4 = M \ G
+
+
+    #check global frame state-space equations against the equations of motion derived from Newton's laws
+
+    A11 = result_g.ss_eqns.A[1:2, 1:2]
+    A12 = result_g.ss_eqns.A[1:2, 3:4]
+    A21 = result_g.ss_eqns.A[3:4, 1:2]
+    A22 = result_g.ss_eqns.A[3:4, 3:4]
+
+    AAA = A12*A22/A12
+
+    B1 = result_g.ss_eqns.B[1:2, 1:2]
+    B2 = result_g.ss_eqns.B[3:4, 1:2]
+
+    C11 = result_g.ss_eqns.C[1:2, 1:2]
+
+    T1 = C11 * (A12 * A21 - AAA * A11) / C11
+    T2 = C11 * (A11 + AAA) / C11
+    T3 = C11 * (A12 * B2 - AAA * B1)
+    T4 = C11 * B1
 
     println("Term 1:")
     display(T1)
@@ -95,8 +101,57 @@ function main()
     cond4 = (T4 ≈ V4)
 
     if cond1 && cond2 && cond3 && cond4
-        println("All terms match, the state-space equations are equivalent to the equations of motion derived from Newton's laws.")
+        println("All terms match, the global state-space equations are equivalent to the equations of motion derived from Newton's laws.")
     end
+
+    #check local frame state-space equations against the equations of motion derived from Newton's laws
+
+    A11 = result_l.ss_eqns.A[1:2, 1:2]
+    A12 = result_l.ss_eqns.A[1:2, 3:4]
+    A21 = result_l.ss_eqns.A[3:4, 1:2]
+    A22 = result_l.ss_eqns.A[3:4, 3:4]
+
+    AAA = A12*A22/A12
+
+    B1 = result_l.ss_eqns.B[1:2, 1:2]
+    B2 = result_l.ss_eqns.B[3:4, 1:2]
+
+    C11 = result_l.ss_eqns.C[1:2, 1:2]
+
+    T1 = C11 * (A12 * A21 - AAA * A11) / C11
+    T2 = C11 * (A11 + AAA) / C11
+    T3 = C11 * (A12 * B2 - AAA * B1)
+    T4 = C11 * B1
+
+    println("Term 1:")
+    display(T1)
+    display(V1)
+    println("Term 2:")
+    display(T2)
+    display(V2)
+    println("Term 3:")
+    display(T3)
+    display(V3)
+    println("Term 4:")
+    display(T4)
+    display(V4)
+
+    cond1 = (T1 ≈ V1)
+    cond2 = (T2 ≈ V2)
+    cond3 = (T3 ≈ V3)
+    cond4 = (T4 ≈ V4)
+
+    if cond1 && cond2 && cond3 && cond4
+        println("All terms match, the local state-space equations are equivalent to the equations of motion derived from Newton's laws.")
+    end
+
+
+
+
+
+
+
+
 
 end
 

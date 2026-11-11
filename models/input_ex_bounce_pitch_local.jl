@@ -1,6 +1,6 @@
 function input_ex_bounce_pitch(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 38000, cf = 1000, cr = 1200, m = 16975 / 9.81, Iy = 3267)
 
-    # A bounce pitch model with the fixed speed constraint defined in a vehicle fixed reference frame.  Because EoM defaults to damping defined in a local frame, but the bounce pitch model needs damping to be defined in a global frame, we need to add a second flex point to the front and rear suspension to account for the damping in the global frame.  This is a bit of a hack, but it works.  Note that the resulting equations of motion are equivalent to the original bounce pitch model.
+    # A bounce pitch model with the fixed speed constraint defined in a vehicle fixed reference frame.  Because EoM defaults to damping defined in a local frame, but the bounce pitch model needs damping to be defined in a global frame, we need to add a second flex point to the front and rear suspension to account for the damping in the global frame.  This is a bit of a hack, but it works.  Note that the resulting equations of motion are equivalent to the original bounce pitch model.  This model is included only as a demonstration that the two approaches are equivalent.
 
     the_system = mbd_system("Bounce Pitch Model")
 
@@ -56,7 +56,6 @@ function input_ex_bounce_pitch(; u = 0, a = 1.189, b = 2.885 - 1.189, kf = 35000
     item.moments = 3
     item.s_mtx[3, 5] = -cr * u
     add_item!(item, the_system)
-
 
     # Constrain to linear motion in z direction (bounce)
     item = rigid_point("bounce")

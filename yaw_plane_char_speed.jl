@@ -1,5 +1,5 @@
 using EoM
-using Interpolations
+using DataInterpolations
 using Plots
 plotlyjs()
 
@@ -40,7 +40,7 @@ function main()
     ss_resp = hcat(getproperty.(result, :ss_resp)...)
     α_u = ss_resp[sidx, :]
     if  minimum(α_u) < 0.5 && maximum(α_u) > 0.5
-        yy = LinearInterpolation(α_u, vpts)
+        yy = CubicSpline(vpts, α_u)
         u_char = yy(0.5)
         println("Characteristic speed $(my_round(u_char)) m/s.")
         K = dpr * (a + b) * 9.81 / u_char^2

@@ -1,6 +1,6 @@
 
 using EoM
-using Interpolations
+using DataInterpolations
 using Plots
 plotlyjs()
 
@@ -35,7 +35,7 @@ function main()
     summarize(vpts, result)
 
     ss_resp = hcat(getproperty.(result, :ss_resp)...)
-    yy = LinearInterpolation(ss_resp[3, :], vpts)
+    yy = CubicSpline(vpts, ss_resp[3, :])
     uchar = yy(0.5)
     println("Characteristic speed $(my_round(uchar)) m/s.")
     K = dpr * (a + b) * 9.81 / uchar^2

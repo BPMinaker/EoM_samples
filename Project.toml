@@ -4,6 +4,7 @@ version = "0.2.0"
 authors = ["Bruce Minaker <bminaker@uwindsor.ca>"]
 
 [deps]
+DataInterpolations = "82cc6244-b520-54b8-b5a6-8a565e85f1d0"
 EoM = "25d7ee20-f19a-11e8-093a-7b526cbd2d90"
 EoM_X3D = "29d18a9a-f19a-11e8-3142-81fd2672d0ac"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
@@ -16,6 +17,7 @@ EoM = {rev = "master", url = "https://github.com/BPMinaker/EoM.jl"}
 EoM_X3D = {rev = "master", url = "https://github.com/BPMinaker/EoM_X3D.jl"}
 
 [compat]
+DataInterpolations = "10.1.4"
 EoM = "3.0.0"
 EoM_X3D = "0.2.0"
 ForwardDiff = "1.0.1"

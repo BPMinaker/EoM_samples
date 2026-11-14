@@ -1,4 +1,4 @@
-using EoM, Interpolations
+using EoM, DataInterpolations
 using Plots
 plotlyjs()
 
@@ -34,7 +34,7 @@ function main()
     redline = ωi[end]
 
     # make the fit, linear is not the best, but good enough
-    te = LinearInterpolation(ωi, ti)
+    te = CubicSpline(ti, ωi)
     # te is now a callable function, i.e., te(ω) returns torque (in Nm) at engine speed ω (in rpms)
 
     # calculate shift speeds (at redline)
@@ -189,9 +189,9 @@ function main()
 
     # linear interpolation to find 1/4 mile, 60 mph times
     # note 1/4 mile = 402.336 m, 60 mph = 96.5606 km/h
-    interp_xt = LinearInterpolation(x, yoft.t)
-    interp_tu = LinearInterpolation(yoft.t, uu)
-    interp_ut = LinearInterpolation(uu, yoft.t)
+    interp_xt = CubicSpline(yoft.t, x)
+    interp_tu = CubicSpline(uu, yoft.t)
+    interp_ut = CubicSpline(yoft.t, uu)
 
     # find quarter mile time and speed, round it, and print
     if x[end] > 402.336

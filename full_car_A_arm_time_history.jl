@@ -1,5 +1,5 @@
 using EoM, EoM_X3D
-using Interpolations
+using DataInterpolations
 using Dates
 using Plots
 plotlyjs()
@@ -103,7 +103,7 @@ function main()
 
     #    display(ltiplot(system, yoft_yaw_sweep, [acc yoft_yaw_sweep.t]; ylabel="Lateral accel'n [g], δ [°]", label=["Lat acc" "Steer angle δ"], yidx=[0], uidx=[0]))
 
-    interp = LinearInterpolation(acc, yoft_yaw_sweep.t)
+    interp = CubicSpline(yoft_yaw_sweep.t, acc)
     gain = interp(0.3)
     println("Steer gain for 0.3 m/s^2 lateral acceleration: ", round(gain, digits = 3))
 
@@ -159,8 +159,10 @@ function main()
     println("Solving time history for ride quality...")
     yoft_bounce = ltisim(result, u_vec2, (t1, t2))
 
+    accz = yoft_bounce[system.sidx["wdot_P"], :] - yoft_bounce[system.sidx["qu"], :]
+
     # because our input vector must be a function, we interpolate the output of the previous simulation to get the vertical acceleration at the passenger location, not actually an interpolation, but makes the acceleration a function of time
-    interp_z = LinearInterpolation(yoft_bounce.t, yoft_bounce[system.sidx["zddot_P"], :])
+    interp_z = CubicSpline(accz, yoft_bounce.t)
     # use a dummy function to ignore the first argument and return the result as a vector
     dummy(_, t) = [interp_z(t)]
     filter = ride_filter()
@@ -179,7 +181,7 @@ function main()
 
     ti = [30, 50, 75, 115, 150, 160, 150, 120]
     ωi = [0, 1000, 2000, 3000, 4000, 5000, 6000, 7000]
-    te = LinearInterpolation(ωi, ti)
+    te = CubicSpline(ti, ωi)
 
     # calculate shift speeds (at redline)
     redline = ωi[end]
@@ -239,8 +241,8 @@ function main()
     yoft_long = ltisim(result, u_vec3, (t1, 3 * t2))
     animate_history(system, yoft_long)
 
-    interp_xt = LinearInterpolation(yoft_long[xGidx, :], yoft_long.t)
-    interp_tu = LinearInterpolation(yoft_long.t, yoft_long[uGidx, :])
+    interp_xt = CubicSpline(yoft_long.t, yoft_long[xGidx, :])
+    interp_tu = CubicSpline(yoft_long[uGidx, :], yoft_long.t)
 
     if yoft_long[xGidx, :][end] > 402.336
         tq = interp_xt(402.336)
@@ -294,7 +296,10 @@ function main()
     push!(plots, ltiplot(yoft_bounce; yidx, aidx))
 
     uidx = [0]
-    append!(plots, [ltiplot(yoft_bounce; uidx, sidx = i) for i in [["ϕ", "θ"], ["z_G"], ["zddot_P"]]])
+    append!(plots, [ltiplot(yoft_bounce; uidx, sidx = i) for i in [["ϕ", "θ"], ["z_G"]]])
+
+    p = ltiplot(yoft_bounce, [accz yoft_filt[1,:]]; ylabel="Vertical accel'n [g]", label=["Unfiltered" "Filtered"], yidx, uidx)
+    push!(plots, p)
 
     # get tire vertical forces
     Z = Z0' .- yoft_bounce[Zidx, :]'
@@ -342,7 +347,7 @@ steer(t) = sin(2π * 0.7 * (t - 2)) * EoM.pulse(t, 2, 2 + 0.75 / 0.7) - EoM.puls
 zofxl, zofxr = random_road(class=5, dz=0.2, L=(t2 - t1) * u)
 
 #flist = readdir("specifications"; join = true)
-flist = [joinpath("specifications", "my_specs_4463.jl")]
+flist = [joinpath("specifications_student", "my_specs_4463.jl")]
 
 time = Dates.format(now(), "HH:MM:SS")
 !isdir("output") && (mkpath("output"))

@@ -72,7 +72,7 @@ function input_ex_half_car(;a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 38000
 
     item = rigid_point("front slider")
     item.body[1] = "front unsprung"
-    item.body[2] = "ground"
+    item.body[2] = "chassis"
     item.location = [a, 0, 0.1]
     item.forces = 2
     item.moments = 3
@@ -81,7 +81,7 @@ function input_ex_half_car(;a = 1.189, b = 2.885 - 1.189, kf = 35000, kr = 38000
 
     item = rigid_point("rear slider")
     item.body[1] = "rear unsprung"
-    item.body[2] = "ground"
+    item.body[2] = "chassis"
     item.location = [-b, 0, 0.1]
     item.forces = 2
     item.moments = 3

@@ -85,10 +85,12 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     # Drivetrain
     item = body("Front differential")
     item.location = [a, 0, r]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = body("Front diff gear")
     item.location = [a + 0.1, 0, r]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = rigid_point("Front diff bearing")
@@ -130,10 +132,12 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
 
     item = body("Rear differential")
     item.location = [-b, 0, r]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = body("Rear diff gear")
     item.location = [-b + 0.1, 0, r]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = rigid_point("Rear diff bearing")
@@ -266,6 +270,7 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
 
     item = body("LF Lower A-arm")
     item.location = (front.lbj + front.laapr + front.laapf) / 3 + [a, tf / 2, 0]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = rigid_point("LF Lower ball joint")
@@ -295,6 +300,7 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
 
     item = body("LF Anti-roll arm")
     item.location = [a - 0.25, 0.5, front.sle[3] - 0.05]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = rigid_point("LF Anti-roll arm pivot")
@@ -396,10 +402,12 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
 
     item = body("LF Axle")
     item.location = [a, tf / 4, r]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = body("LF Stub axle")
     item.location = [a, 0.1, r]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = rigid_point("LF CV joint")
@@ -529,6 +537,7 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
 
     item = body("LR Lower A-arm")
     item.location = (rear.lbj + rear.laapr + rear.laapf) / 3 + [-b, tr / 2, 0]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = rigid_point("LR Lower ball joint")
@@ -558,6 +567,7 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
 
     item = body("LR Anti-roll arm")
     item.location = [-b + 0.25, 0.5, rear.sle[3] - 0.05]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = rigid_point("LR Anti-roll arm pivot")
@@ -659,10 +669,12 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
 
     item = body("LR Axle")
     item.location = [-b, tr / 4, r]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = body("LR Stub axle")
     item.location = [-b, 0.1, r]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = rigid_point("LR CV joint")
@@ -824,7 +836,7 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     item.desc = "Yaw angle"
     add_item!(item, the_system)
 
-    item = sensor("zddot_P")
+    item = sensor("wdot_P")
     item.body[1] = "Chassis"
     item.body[2] = "ground"
     item.location[1] = [a / 2, 0, hG]
@@ -832,6 +844,18 @@ function input_full_car_a_arm_diff(; params::list, front::susp, rear::susp)
     item.order = 3
     item.units = "m/s^2"
     item.desc = "Passenger vertical acceleration"
+    add_item!(item, the_system)
+
+    item = sensor("qu")
+    item.body[1] = "Chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, hG]
+    item.location[2] = [0, -0.1, hG]
+    item.twist = 1
+    item.order = 2
+    item.gain = u
+    item.units = "m/s^2"
+    item.desc = "Vertical acceleration"
     add_item!(item, the_system)
 
     # measure the body slip angle

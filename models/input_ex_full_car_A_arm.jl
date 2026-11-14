@@ -223,10 +223,12 @@ function input_full_car_a_arm(;params::list, front::susp, rear::susp)
     # anti-roll
     item = body("LF anti-roll arm")
     item.location = [a - 0.2, tf / 2 - front.r / 2, front.r - 0.1]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = body("LR anti-roll arm")
     item.location = [-b + 0.2, tr / 2 - rear.r / 2, rear.r - 0.1]
+    item.velocity = [u, 0, 0]
     add_item!(item, the_system)
 
     item = rigid_point("LF anti-roll hinge")
@@ -530,13 +532,25 @@ function input_full_car_a_arm(;params::list, front::susp, rear::susp)
     add_item!(item, the_system)
 
     #19
-    item = sensor("zddot_P")
+    item = sensor("wdot_P")
     item.body[1] = "chassis"
     item.body[2] = "ground"
     item.location[1] = [a / 2, tf / 4, hG]
     item.location[2] = [a / 2, tf / 4, hG - 0.1]
     item.gain = 1 / 9.81
     item.order = 3 # acceleration
+    item.units = "g"
+    item.desc = "Vertical acceleration"
+    add_item!(item, the_system)
+
+    item = sensor("qu")
+    item.body[1] = "chassis"
+    item.body[2] = "ground"
+    item.location[1] = [0, 0, hG]
+    item.location[2] = [0, -0.1, hG]
+    item.twist = 1
+    item.order = 2
+    item.gain = u / 9.81
     item.units = "g"
     item.desc = "Vertical acceleration"
     add_item!(item, the_system)
